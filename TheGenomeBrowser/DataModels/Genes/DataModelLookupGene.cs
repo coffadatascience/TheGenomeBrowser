@@ -40,6 +40,11 @@ namespace TheGenomeBrowser.DataModels.Genes
         public int EndPosition { get; set; }
 
         /// <summary>
+        /// var for GenBankAccn (assembly used to retrieve the chromosome number for the gene)
+        /// </summary>
+        public string GenBankAccn { get; set; }
+
+        /// <summary>
         /// var with the list of elements that are part of the gene (note JCO--> we may also consider using a dictionary here, where position is the key and the element is the value) Whether a dictionary works, depends on storage and retrieval.
         /// </summary>
         public List<DataModelLookupGeneElement> GeneElements { get; set; }
@@ -52,7 +57,7 @@ namespace TheGenomeBrowser.DataModels.Genes
         /// <summary>
         /// passes for failed constructor, setups a new item
         /// 
-        public void DataModelLookupGeneSetupNewItem(string geneName, string chromosome, int StartLocation, int EndLocation)
+        public void DataModelLookupGeneSetupNewItem(string geneName, string chromosome, int StartLocation, int EndLocation, string genBankAccn)
         {
             Id = Guid.NewGuid();
             GeneElements = new List<DataModelLookupGeneElement>();
@@ -62,6 +67,7 @@ namespace TheGenomeBrowser.DataModels.Genes
             Chromosome = chromosome;
             StartPosition = StartLocation;
             EndPosition = EndLocation;
+            GenBankAccn = genBankAccn;
         }
 
 

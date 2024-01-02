@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheGenomeBrowser.DataModels.NCBIImportedData;
 
 namespace TheGenomeBrowser.ViewModels.View
 {
@@ -27,7 +28,7 @@ namespace TheGenomeBrowser.ViewModels.View
         /// </summary>
         /// <param name="nameGridView"></param>
         /// <param name="dataModelGtfFile"></param>
-        public ViewDataGridImportedDataGtfFile(string nameGridView, DataModels.DataModelGtfFile dataModelGtfFile) : base(nameGridView)
+        public ViewDataGridImportedDataGtfFile(string nameGridView, DataModelGtfFile dataModelGtfFile) : base(nameGridView)
         {
 
             //set the data source for the grid

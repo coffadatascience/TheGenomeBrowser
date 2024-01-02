@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TheGenomeBrowser.DataModels
+namespace TheGenomeBrowser.DataModels.NCBIImportedData
 {
     /// <summary>
     /// class that hold the information of a GFF3 file (contains a list of GFF3Features)
@@ -34,7 +34,7 @@ namespace TheGenomeBrowser.DataModels
 
         #region methods
 
-        
+
 
 
         #endregion
@@ -50,7 +50,7 @@ namespace TheGenomeBrowser.DataModels
         #region fields
 
         /// <summary>
-        /// var for seqname
+        /// var for seqname --> matches with the Field Relationship in the assembly report
         /// </summary>
         public string Seqname { get; set; }
 
@@ -108,7 +108,7 @@ namespace TheGenomeBrowser.DataModels
         /// <summary>
         /// var for db ref
         /// </summary>
-        public string DbXref { get;  set; }
+        public string DbXref { get; set; }
 
         /// <summary>
         /// var for gb key
@@ -188,4 +188,7 @@ namespace TheGenomeBrowser.DataModels
         #endregion
 
     }
+
+
+
 }

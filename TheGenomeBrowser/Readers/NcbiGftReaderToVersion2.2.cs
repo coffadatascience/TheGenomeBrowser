@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheGenomeBrowser.DataModels.NCBIImportedData;
 
 namespace TheGenomeBrowser.Readers
 {
@@ -128,10 +129,10 @@ namespace TheGenomeBrowser.Readers
         //  #!annotation-date 11/19/2021
         /// </summary>
         /// <param name="filePath"></param>
-        public static TheGenomeBrowser.DataModels.DataModelGtfFile ReadGFF3(string filePath)
+        public static DataModelGtfFile ReadGFF3(string filePath)
         {
             //create a new GFF3Reader
-            var DataModelGtfFile = new TheGenomeBrowser.DataModels.DataModelGtfFile();
+            var DataModelGtfFile = new TheGenomeBrowser.DataModels.NCBIImportedData.DataModelGtfFile();
 
             //read the file line by line
             foreach (string line in File.ReadLines(filePath))
@@ -155,7 +156,7 @@ namespace TheGenomeBrowser.Readers
                 string[] attributePairs = fields[8].Split(';');
 
                 //create a new GFF3Feature
-                TheGenomeBrowser.DataModels.GTFFeature feature = new DataModels.GTFFeature
+                GTFFeature feature = new DataModels.NCBIImportedData.GTFFeature
                 {
                     Seqname = seqname,
                     Source = source,

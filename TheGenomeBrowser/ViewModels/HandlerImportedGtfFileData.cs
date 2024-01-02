@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheGenomeBrowser.DataModels.NCBIImportedData;
+using TheGenomeBrowser.ViewModels.Settings;
 using TheGenomeBrowser.ViewModels.View;
 using TheGenomeBrowser.ViewModels.VIewModel;
 
@@ -22,13 +25,32 @@ namespace TheGenomeBrowser.ViewModels
         /// </summary>
         public int _columnWidth { get; set; }
 
+        /// <summary>
+        /// Combo box for the view settings
+        /// </summary>
+        public ComboBox comboBoxConditionalFormatExperimentView { get; set; }
+
+        #endregion
+
+        #region settings
+
+        /// <summary>
+        /// property that hold the enum for the current view as by the settings viewmodelparameter
+        /// </summary>
+        public TheGenomeBrowser.ViewModels.Settings.ViewModelParameters.EnumViewDataGridImportedDataGtfFile CurrentViewSettingsEnum { get; set; }
+
 
         #region DataModels 
 
         /// <summary>
         /// data model for imported GTF file
         /// </summary>
-        public DataModels.DataModelGtfFile DataModelGtfFile { get; set; }
+        public DataModelGtfFile DataModelGtfFile { get; set; }
+
+        /// <summary>
+        /// data model for the GTF assembly report information (this data can be used to retrieve the chromosome number for the gene and contains information about the assembly/analysis\submitters)
+        /// </summary>
+        public DataModelAssemblyReport DataModelGtfAssemblyReport { get; set; }
 
         /// <summary>
         /// var for the data model lookup gene list
@@ -44,7 +66,13 @@ namespace TheGenomeBrowser.ViewModels
         /// </summary>
         public ViewModelGtfFile ViewModelGtfFile { get; set; }
 
+        /// <summary>
+        /// view model for the assembly report comments
+        /// </summary>
+        public ViewModelAssemblyReportComments ViewModelAssemblyReportComments { get; set; }
+
         #endregion
+
 
         #region Views
 
@@ -52,6 +80,16 @@ namespace TheGenomeBrowser.ViewModels
         /// var for view data grid imported data GTF file
         /// </summary>
         public ViewDataGridImportedDataGtfFile ViewDataGridImportedDataGtfFile { get; set; }
+
+        /// <summary>
+        /// var for view data grid assembly report comments
+        /// </summary>
+        public ViewDataGridAssemblyReportComments ViewDataGridAssemblyReportComments { get; set; }
+
+        /// <summary>
+        /// var for view data grid assembly report list
+        /// </summary>
+        public ViewDataGridAssemblyReportList ViewDataGridAssemblyReportList { get; set; }
 
         /// <summary>
         /// view for the processed gene list
@@ -69,18 +107,73 @@ namespace TheGenomeBrowser.ViewModels
         public HandlerImportedGtfFileData()
         {
             //set column width
-            _columnWidth = 50;
+            _columnWidth = 70;
+
+            //set the current view settings enum
+            CurrentViewSettingsEnum = TheGenomeBrowser.ViewModels.Settings.ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelGtfFile;
+
+            //create combo box for the view settings
+            this.comboBoxConditionalFormatExperimentView = new ComboBox();
+            //set size
+            this.comboBoxConditionalFormatExperimentView.Size = new Size(150, 50);
+            //place below the conditional format combo box
+            this.comboBoxConditionalFormatExperimentView.Location = new Point(10, 70); //--> place the checkbox higher, so the lowest range may all be combo filters
+            //set button text color to black
+            this.comboBoxConditionalFormatExperimentView.ForeColor = System.Drawing.SystemColors.ControlText;
+            //set the name of the combo box by the constant as found in the viewmodelparameters
+            this.comboBoxConditionalFormatExperimentView.Name = TheGenomeBrowser.ViewModels.Settings.ViewModelParameters._comboBoxNameViewDataGridImportedDataGtfFile;
+            this.comboBoxConditionalFormatExperimentView.Text = "Data views";
+            this.comboBoxConditionalFormatExperimentView.Dock = DockStyle.None;
+            this.comboBoxConditionalFormatExperimentView.DropDownStyle = ComboBoxStyle.DropDownList;
+            //create a tooltip for comboBoxProbeFragmentDisplayType that explains what it does
+            ToolTip toolTip4 = new ToolTip();
+            //set tooltip2 text to ("This control can be used to change set of displayed samples based on the sample quality criteria")
+            toolTip4.SetToolTip(this.comboBoxConditionalFormatExperimentView, "This control can be used to switch between the different views of the imported and procesed data");
+            // 4. combo box with quality control criteria - add the enum values to the combobox
+            LoadEnumEnumViewDataGridImportedDataGtfFileDisplayCombo(this.comboBoxConditionalFormatExperimentView);
 
             //create data model
-            DataModelGtfFile = new DataModels.DataModelGtfFile();
+            DataModelGtfFile = new DataModels.NCBIImportedData.DataModelGtfFile();
 
             //create view model
             ViewModelGtfFile = new ViewModelGtfFile();
+            //create view model for the assembly report comments
+            ViewModelAssemblyReportComments = new ViewModelAssemblyReportComments();
 
             //create view data grid imported data GTF file
             ViewDataGridImportedDataGtfFile = new ViewDataGridImportedDataGtfFile("ViewDataGridImportedDataGtfFile");
+            //new view data grid assembly report comments
+            ViewDataGridAssemblyReportComments = new ViewDataGridAssemblyReportComments("ViewDataGridAssemblyReportComments");
+            //new view data grid assembly report list
+            ViewDataGridAssemblyReportList = new ViewDataGridAssemblyReportList("ViewDataGridAssemblyReportList");
 
         }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// rocedure that sets the viewmodels and views for the assembly report information
+        /// </summary>
+        /// <param name="dataModelAssemblyReport"></param>
+        public void ProcessDataModelAssemblyReport(DataModelAssemblyReport dataModelAssemblyReport)
+        {
+            //set the data model in the handler
+            this.DataModelGtfAssemblyReport = dataModelAssemblyReport;
+
+            //process the data model in the ViewModelAssemblyReportComments
+            ViewModelAssemblyReportComments.SetDataModelAssemblyReportComments(dataModelAssemblyReport);
+            //set the data source for the comments grid
+            this.ViewDataGridAssemblyReportComments.LoadViewModelGenericModelSettingInformationList(ViewModelAssemblyReportComments, 200);
+
+            //set the data source for the grid
+            this.ViewDataGridAssemblyReportList.DataSource = dataModelAssemblyReport.AssemblyReportItemsList;
+
+            //set the text of the combo box to the current view
+            this.comboBoxConditionalFormatExperimentView.Text = "Assembly report";
+        }
+
 
         #endregion
 
@@ -101,16 +194,51 @@ namespace TheGenomeBrowser.ViewModels
             //set the dictionary of genes in the data model lookup gene list
             this.DataModelLookupGeneList.Genes = dictionaryGeneNameGeneObject;
 
+            //boolean that remembers if the user responds positive to continue import of the GTF file wihout an assembly report
+            bool continueImportWithoutAssemblyReport = false;
 
             //loop all features in the GTF file
-            foreach (DataModels.GTFFeature feature in DataModelGtfFile.FeaturesList)
+            foreach (GTFFeature feature in DataModelGtfFile.FeaturesList)
             {
 
                 //get the gene id
                 string geneId = feature.GeneId;
 
-                //get the chromosome
-                string chromosome = feature.ExtractChromosomeFromSeqname();
+                //Check if we have a DataModelGtfAssemblyReport, if this is the case, we may use this to retrieve the chromosome number by looking up the accession number in the DataModelGtfAssemblyReport
+
+                //set a var for the chromosome
+                string chromosome = "?";
+
+                //check if we have a DataModelGtfAssemblyReport
+                if (DataModelGtfAssemblyReport != null)
+                {
+                    //get the chromosome number from the DataModelGtfAssemblyReport
+                    chromosome = DataModelGtfAssemblyReport.GetChromosomeNumber(feature.Seqname);
+                }
+                else
+                {
+
+                    //ask the user if he/she wants to continue without an assembly report
+                    if (!continueImportWithoutAssemblyReport)
+                    {
+                        //ask the user if he/she wants to continue without an assembly report
+                        continueImportWithoutAssemblyReport = ViewModelGtfFile.AskUserToContinueWithoutAssemblyReport();
+                    }
+
+                    //check if the user wants to continue without an assembly report
+                    if (continueImportWithoutAssemblyReport)
+                    {
+                        //set the chromosome to the seqname
+                        chromosome = feature.Seqname;
+                    }
+                    else
+                    {
+                        //stop the import
+                        return;
+                    }
+
+                }
+
 
                 //check if the gene id is not null or empty
                 if (!string.IsNullOrEmpty(geneId))
@@ -123,12 +251,14 @@ namespace TheGenomeBrowser.ViewModels
                         //get location start
                         int locationStart = feature.Start;
                         int locationEnd = feature.End;
+                        //var for seqname
+                        string seqname = feature.Seqname;
 
                         //create a new data model lookup gene object
                         DataModels.Genes.DataModelLookupGene dataModelLookupGene = new DataModels.Genes.DataModelLookupGene();
 
                         //set the gene name, chromosome and start and end location
-                        dataModelLookupGene.DataModelLookupGeneSetupNewItem(geneId, chromosome, locationStart, locationEnd);
+                        dataModelLookupGene.DataModelLookupGeneSetupNewItem(geneId, chromosome, locationStart, locationEnd, seqname);
 
                         //create a new list of gene elements
                         List<DataModels.Genes.DataModelLookupGeneElement> listGeneElements = new List<DataModels.Genes.DataModelLookupGeneElement>();
@@ -178,7 +308,30 @@ namespace TheGenomeBrowser.ViewModels
         #endregion
 
 
+        #region methods "view settings"
 
+        /// <summary>
+        /// procedure that loads the enum types in the combo box for the EnumViewDataGridImportedDataGtfFile
+        /// </summary>
+        /// <param name="cbo"></param>
+        public static void LoadEnumEnumViewDataGridImportedDataGtfFileDisplayCombo(ComboBox cbo)
+        {
+            cbo.DataSource = Enum
+                .GetValues(typeof(ViewModelParameters.EnumViewDataGridImportedDataGtfFile))
+                .Cast<Enum>()
+                .Select(value => new
+                {
+                    Description = (Attribute.GetCustomAttribute(value.GetType().GetField(value.ToString()), typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description ?? value.ToString(),
+                    value
+                })
+                .OrderBy(item => item.value)
+                .ToList();
+            cbo.DisplayMember = "Description";
+            cbo.ValueMember = "value";
+        }
+
+
+        #endregion
 
 
 

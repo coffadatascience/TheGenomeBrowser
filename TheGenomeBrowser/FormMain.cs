@@ -1,6 +1,9 @@
+using System.ComponentModel;
 using System.Windows.Forms;
+using TheGenomeBrowser.DataModels.NCBIImportedData;
 using TheGenomeBrowser.Readers;
 using TheGenomeBrowser.ViewModels;
+using TheGenomeBrowser.ViewModels.Settings;
 
 namespace TheGenomeBrowser
 {
@@ -91,6 +94,20 @@ namespace TheGenomeBrowser
             buttonImportGFF3.Click += new EventHandler(buttonImportGTF3_Click);
             splitContainerMain.Panel1.Controls.Add(buttonImportGFF3);
 
+            //add a new button to the form that triggers and event to read the Assembly report file (this file can be used to lookup the chromosome to each accession number --> or that it is on a different molecule)
+            Button buttonReadAssemblyReportFile = new Button();
+            //set name of button
+            buttonReadAssemblyReportFile.Name = "buttonReadAssemblyReportFile";
+            buttonReadAssemblyReportFile.Text = "Read Assembly Report file";
+            //set size
+            buttonReadAssemblyReportFile.Location = new Point(120, 10);
+            buttonReadAssemblyReportFile.Size = new Size(150, 50);
+            buttonReadAssemblyReportFile.Click += new EventHandler(buttonReadAssemblyReportFile_Click);
+            splitContainerMain.Panel1.Controls.Add(buttonReadAssemblyReportFile);
+            //add a new button to the form that triggers and event to read the Assembly report file (this file can be used to lookup the chromosome to each accession number --> or that it is on a different molecule)
+            Button buttonReadGff3File = new Button();
+
+
             //test button that retrieves the data from the database using the gene name and exon number
             Button buttonTest = new Button();
             //set name of button BUTTON_PROCESS_GTF
@@ -98,20 +115,86 @@ namespace TheGenomeBrowser
             //set text of button
             buttonTest.Text = "Process GTF file";
             //set location of button
-            buttonTest.Location = new Point(120, 10);
+            buttonTest.Location = new Point(290, 10);
             //set size of button
             buttonTest.Size = new Size(150, 50);
             //add event handler
             buttonTest.Click += new EventHandler(buttonProcessImportedGtfDataIntoDataModel_Click);
             //add button to split container 1
             splitContainerMain.Panel1.Controls.Add(buttonTest);
+
+            //add the combo box from the handler in the form just below the first button (import GTF file) and set the event handler for the combo box (this.comboBoxConditionalFormatExperimentView )
+            splitContainerMain.Panel1.Controls.Add(_handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView);
+
+            _handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView.SelectedIndexChanged += new EventHandler(ComboBoxViewDataGridImportedDataGtfFile_SelectedIndexChanged);
+
         }
+
+
 
 
 
         #endregion
 
         #region events
+
+        /// <summary>
+        /// event hanlder that switched between the different views of the imported GTF data (1. DataModelGtfFile, 2. DataAssemblyReportComments, 3. DataAssemblyReport, 4. DataModelLookupGeneList)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        public void ComboBoxViewDataGridImportedDataGtfFile_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+
+            //get the selected item
+            var selectedItem = _handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView.SelectedItem;
+
+            //check if the selected item is not null
+            if (selectedItem != null)
+            {
+                //parse selected item to combobox=
+                var ComboxBox = ((ComboBox)sender);
+                //parse item to enum
+                var SelectedEnum = (ViewModelParameters.EnumViewDataGridImportedDataGtfFile)Enum.Parse(typeof(ViewModelParameters.EnumViewDataGridImportedDataGtfFile), ComboxBox.SelectedValue.ToString());
+
+                //get the split container 1 and add the grid view to it (panel 2)
+                var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
+
+                //clear the split container 1
+                splitContainer1.Panel2.Controls.Clear();
+
+                //switch between the different views
+                switch (SelectedEnum)
+                {
+                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelGtfFile:
+                        //add the grid view to the split container 1
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridImportedDataGtfFile);
+                        break;
+                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataAssemblyReportComments:
+                        //add the grid view to the split container 1
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridAssemblyReportComments);
+                        //adjust column width (note JCO: we have to do this after the load)
+                        _handlerImportedGtfFileData.ViewDataGridAssemblyReportComments.AdjustColumnWidth(150);
+                        break;
+                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataAssemblyReport:
+                        //add the grid view to the split container 1
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridAssemblyReportList);
+                        //adjust column width (note JCO: we have to do this after the load)
+                        _handlerImportedGtfFileData.ViewDataGridAssemblyReportList.AdjustColumnWidth(120);
+                        break;
+                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelLookupGeneList:
+                        //add the grid view to the split container 1
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridGeneList);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+      
+            }
+
+
+        }
 
         /// <summary>
         /// event handler for a button that triggers the processing of imported GTF data into a.o. gene lists (but may be all usefull data models)
@@ -144,6 +227,45 @@ namespace TheGenomeBrowser
 
 
         }
+
+        /// <summary>
+        /// triggers event that reads the assembly report file into a DataModelAssemblyReport
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void buttonReadAssemblyReportFile_Click(object? sender, EventArgs e)
+        {
+
+            //new open file dialog
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            openFileDialog.RestoreDirectory = true;
+
+            //check if the user selected a file
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                //get the file path
+                string filePath = openFileDialog.FileName;
+
+                //read the file
+                var assemblyReport = NcbiGftAssemblyReportReader.ImportDataFromFile(filePath);
+
+                //process the assembly report
+                _handlerImportedGtfFileData.ProcessDataModelAssemblyReport(assemblyReport);
+
+                //get the split container 1 and add the grid view to it (panel 2)
+                var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
+                splitContainer1.Panel2.Controls.Clear();
+                splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridAssemblyReportList);
+
+
+
+            }
+
+        }
+
+
 
 
         /// <summary>
@@ -223,6 +345,10 @@ namespace TheGenomeBrowser
             return null;
 
         }
+
+
+
+
 
         #endregion
     }
