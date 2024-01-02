@@ -25,7 +25,7 @@ namespace TheGenomeBrowser.Readers
             // For troubleshooting its nice to have the debug print
 
             //loop through the features
-            foreach (var feature in GtfFile.Features)
+            foreach (var feature in GtfFile.FeaturesList)
             {
 
                 //print the information of the feature in the debug window (if we are in debug mode)
@@ -339,7 +339,7 @@ namespace TheGenomeBrowser.Readers
                 feature.AttributesString = sb.ToString();
 
                 //add the feature to the list of features
-                DataModelGtfFile.Features.Add(feature);
+                DataModelGtfFile.FeaturesList.Add(feature);
             }
 
             //return the list of features

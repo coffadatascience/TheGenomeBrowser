@@ -33,6 +33,11 @@ namespace TheGenomeBrowser
         private const string BUTTON_IMPORT_GTF = "Import GTF file";
 
         /// <summary>
+        /// constant for button name that processes imported GTF data into a.o. gene lists (but may be all usefull data models)
+        /// </summary>
+        private const string BUTTON_PROCESS_GTF = "Process GTF file";
+
+        /// <summary>
         /// constant for name of data grid view of GTF datamodel
         /// </summary>
         private const string DATA_GRID_VIEW_GTF_DATA_MODEL = "ViewDataGridImportedDataGtfFile";
@@ -88,13 +93,16 @@ namespace TheGenomeBrowser
 
             //test button that retrieves the data from the database using the gene name and exon number
             Button buttonTest = new Button();
-            buttonTest.Text = "Test";
+            //set name of button BUTTON_PROCESS_GTF
+            buttonTest.Name = BUTTON_PROCESS_GTF;
+            //set text of button
+            buttonTest.Text = "Process GTF file";
             //set location of button
             buttonTest.Location = new Point(120, 10);
             //set size of button
-            buttonTest.Size = new Size(100, 50);
+            buttonTest.Size = new Size(150, 50);
             //add event handler
-            buttonTest.Click += new EventHandler(buttonTest_Click);
+            buttonTest.Click += new EventHandler(buttonProcessImportedGtfDataIntoDataModel_Click);
             //add button to split container 1
             splitContainerMain.Panel1.Controls.Add(buttonTest);
         }
@@ -106,13 +114,32 @@ namespace TheGenomeBrowser
         #region events
 
         /// <summary>
-        /// event handler for the button that tests the database connection
+        /// event handler for a button that triggers the processing of imported GTF data into a.o. gene lists (but may be all usefull data models)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void buttonTest_Click(object? sender, EventArgs e)
+        private void buttonProcessImportedGtfDataIntoDataModel_Click(object? sender, EventArgs e)
         {
+
+            //check if we have a data model in the GTF file handler, if not return appropiate message
+            if (_handlerImportedGtfFileData.DataModelGtfFile == null)
+            {
+                MessageBox.Show("No GTF file imported yet, please import a GTF file first");
+                return;
+            }
+
+            //process imported GTF data into data models
+            _handlerImportedGtfFileData.ProcessGtfFileImportedDataSetView();
+
+            //get the split container 1 and add the grid view to it (panel 2)
+            var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
+
+            //clear the split container 1
+            splitContainer1.Panel2.Controls.Clear();
+
+            //add the grid view to the split container 1
+            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridGeneList);
 
 
 
@@ -147,8 +174,11 @@ namespace TheGenomeBrowser
                 if (GtfFile != null)
                 {
 
+                    //set the GTF file in the handler
+                    _handlerImportedGtfFileData.DataModelGtfFile = GtfFile;
+
                     //set the data source for the grid
-                    _handlerImportedGtfFileData.ViewDataGridImportedDataGtfFile.DataSource = GtfFile.Features;
+                    _handlerImportedGtfFileData.ViewDataGridImportedDataGtfFile.DataSource = GtfFile.FeaturesList;
 
                     //adjust column width
                     _handlerImportedGtfFileData.ViewDataGridImportedDataGtfFile.AdjustColumnWidth(this._handlerImportedGtfFileData._columnWidth);

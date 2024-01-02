@@ -15,7 +15,7 @@ namespace TheGenomeBrowser.DataModels
         #region fields
 
         //list of GFF3Features
-        public List<GTFFeature> Features { get; set; }
+        public List<GTFFeature> FeaturesList { get; set; }
 
 
         #endregion
@@ -26,7 +26,7 @@ namespace TheGenomeBrowser.DataModels
         //constructor
         public DataModelGtfFile()
         {
-            Features = new List<GTFFeature>();
+            FeaturesList = new List<GTFFeature>();
         }
 
         #endregion
@@ -150,13 +150,39 @@ namespace TheGenomeBrowser.DataModels
         #endregion
 
 
-        #region properties
+        #region constructor
 
         /// <summary>
         /// constructor
         /// </summary>
         public GTFFeature()
         {
+        }
+
+        #endregion
+
+        #region methods
+
+        /// <summary>
+        /// procedure that extract the chromosome from the seqname field (a seqname may be NC_000001.11, where the chromosome is 1, or NC_000006.12, where the chromosome is 6)
+        /// </summary>
+        /// <returns></returns>
+        public string ExtractChromosomeFromSeqname()
+        {
+            //split the seqname on the dot
+            string[] splitSeqname = Seqname.Split('.');
+
+            //get the first element
+            string chromosome = splitSeqname[0];
+
+            //remove all non numeric characters
+            chromosome = new string(chromosome.Where(c => char.IsDigit(c)).ToArray());
+
+            //remove all leading zeros
+            chromosome = chromosome.TrimStart('0');
+
+            //return the chromosome
+            return chromosome;
         }
 
         #endregion

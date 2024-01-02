@@ -31,7 +31,7 @@ namespace TheGenomeBrowser.ViewModels.View
         {
 
             //set the data source for the grid
-            DataSource = dataModelGtfFile.Features;
+            DataSource = dataModelGtfFile.FeaturesList;
 
             //adjust column width
             AdjustColumnWidth(_columnWidth);
