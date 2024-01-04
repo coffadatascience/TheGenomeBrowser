@@ -180,10 +180,38 @@ namespace TheGenomeBrowser.ViewModels
         #region methods "processing GTF file imported data"
 
         /// <summary>
+        /// async procedure that processes the GTF file imported data set view
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> ProcessGtfFileImportedDataSetViewAsync(IProgress<int> progress)
+        {
+
+            //read GTF file async
+            await Task.Run(() =>
+            {
+                //process the data model
+                ProcessGtfFileImportedDataSetView(progress);
+
+            });
+
+            //return true
+            return true;
+
+        }
+
+        /// <summary>
         /// procedure that take the DataModelGtfFile and processes this to a list of genes (based on GeneId, that will become the gene name and unique identifier)
         /// </summary>
-        public void ProcessGtfFileImportedDataSetView()
+        private void ProcessGtfFileImportedDataSetView(IProgress<int> progress)
         {
+
+
+            //int with total number of features
+            int totalNumberOfFeatures = DataModelGtfFile.FeaturesList.Count;
+            // int to count the number of features
+            int numberOfFeatures = 0;
+            //int to coutn update on every 100 features
+            int numberOfFeaturesUpdate = 0;
 
             //create a new DatamodelLookupGeneList object local
             this.DataModelLookupGeneList = new DataModels.Genes.DataModelLookupGeneList();
@@ -292,7 +320,34 @@ namespace TheGenomeBrowser.ViewModels
                     }
 
                 }
-         
+
+                //check if the progress is not null
+                if (progress != null)
+                {
+
+                    //check if we need to update the progress
+                    if (numberOfFeaturesUpdate > 100)
+                    {
+                        //reset the number of features update
+                        numberOfFeaturesUpdate = 0;
+
+                        //var for the progress percentage in double
+                        double progressPercentageDouble = ((double)numberOfFeatures / (double)totalNumberOfFeatures) * 100;
+
+                        //calculate the progress
+                        int progressPercentage = (int)Math.Round(progressPercentageDouble);
+
+                        //report the progress
+                        progress.Report(progressPercentage);
+
+
+                    }
+                }
+                
+                //increase the number of features
+                numberOfFeatures++;
+                //increase the number of features update
+                numberOfFeaturesUpdate++;
             }
 
             //create a new view data grid gene list

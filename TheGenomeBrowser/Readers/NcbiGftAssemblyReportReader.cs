@@ -32,15 +32,42 @@ namespace TheGenomeBrowser.Readers
     //  # Sequence-Name	Sequence-Role	Assigned-Molecule	Assigned-Molecule-Location/Type	GenBank-Accn	Relationship	RefSeq-Accn	Assembly-Unit	Sequence-Length	UCSC-style-name
     //  Example of a data line: 1	assembled-molecule	1	Chromosome	CM000663.2	=	NC_000001.11	Primary Assembly	248956422	chr1
     /// </summary>
-    public static class NcbiGftAssemblyReportReader
+    public class NcbiGftAssemblyReportReader
     {
+
+
+        /// <summary>
+        /// read GTF file async (note that the original void procedure is kept for reference below this procedure)
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public async Task<DataModelAssemblyReport> ImportDataFromFileAsync(string filePath)
+        {
+
+            //var for the data model
+            var DataModelAssemblyReport = new DataModelAssemblyReport();
+
+            //read GTF file async
+            await Task.Run(() =>
+            {
+                //read GTF file
+                DataModelAssemblyReport = ImportDataFromFile(filePath);
+
+            });
+
+            //return the data model
+            return DataModelAssemblyReport;
+
+
+        }
+
 
         /// <summary>
         /// Function that reads the file and returns a data model (DataModelGftAssemblyReport) by importing the data in the file.
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static TheGenomeBrowser.DataModels.NCBIImportedData.DataModelAssemblyReport ImportDataFromFile(string filePath)
+        public DataModelAssemblyReport ImportDataFromFile(string filePath)
         {
             // Read the file content
             string[] lines = File.ReadAllLines(filePath);

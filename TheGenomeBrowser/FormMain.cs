@@ -108,7 +108,7 @@ namespace TheGenomeBrowser
             //set size
             buttonReadAssemblyReportFile.Location = new Point(120, 10);
             buttonReadAssemblyReportFile.Size = new Size(150, 50);
-            buttonReadAssemblyReportFile.Click += new EventHandler(buttonReadAssemblyReportFile_Click);
+            buttonReadAssemblyReportFile.Click += new EventHandler(async (sender, e) => await buttonReadAssemblyReportFile_ClickAsync(sender, e));
             splitContainerMain.Panel1.Controls.Add(buttonReadAssemblyReportFile);
             //add a new button to the form that triggers and event to read the Assembly report file (this file can be used to lookup the chromosome to each accession number --> or that it is on a different molecule)
             Button buttonReadGff3File = new Button();
@@ -221,7 +221,7 @@ namespace TheGenomeBrowser
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void buttonProcessImportedGtfDataIntoDataModel_Click(object? sender, EventArgs e)
+        private async void buttonProcessImportedGtfDataIntoDataModel_Click(object? sender, EventArgs e)
         {
 
             //check if we have a data model in the GTF file handler, if not return appropiate message
@@ -231,8 +231,25 @@ namespace TheGenomeBrowser
                 return;
             }
 
-            //process imported GTF data into data models
-            _handlerImportedGtfFileData.ProcessGtfFileImportedDataSetView();
+            //make the progress bar visible
+            progressBar.Visible = true;
+
+            //setup a progress bar
+            var progress = new Progress<int>();
+
+            //set the progress bar to the text box
+            progress.ProgressChanged += (s, message) =>
+            {
+                //update the progress bar
+                progressBar.Value = message;
+            };
+
+
+            //process imported GTF data into data models using async ProcessGtfFileImportedDataSetViewAsync in the handler
+            await _handlerImportedGtfFileData.ProcessGtfFileImportedDataSetViewAsync(progress);
+
+            //make the progress bar invisible
+            progressBar.Visible = false;
 
             //get the split container 1 and add the grid view to it (panel 2)
             var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
@@ -253,7 +270,7 @@ namespace TheGenomeBrowser
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void buttonReadAssemblyReportFile_Click(object? sender, EventArgs e)
+        private async Task buttonReadAssemblyReportFile_ClickAsync(object? sender, EventArgs e)
         {
 
             //new open file dialog
@@ -267,8 +284,12 @@ namespace TheGenomeBrowser
                 //get the file path
                 string filePath = openFileDialog.FileName;
 
-                //read the file
-                var assemblyReport = NcbiGftAssemblyReportReader.ImportDataFromFile(filePath);
+
+                //new reader for the assembly report
+                var AssemblyReportReader = new NcbiGftAssemblyReportReader();
+
+                //read the file using ImportDataFromFileAsync. wait for the result
+                var assemblyReport = await AssemblyReportReader.ImportDataFromFileAsync(filePath);
 
                 //process the assembly report
                 _handlerImportedGtfFileData.ProcessDataModelAssemblyReport(assemblyReport);
@@ -283,8 +304,6 @@ namespace TheGenomeBrowser
             }
 
         }
-
-
 
 
         /// <summary>
