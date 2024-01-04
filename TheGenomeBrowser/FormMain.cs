@@ -45,7 +45,13 @@ namespace TheGenomeBrowser
         /// </summary>
         private const string DATA_GRID_VIEW_GTF_DATA_MODEL = "ViewDataGridImportedDataGtfFile";
 
+        /// <summary>
+        /// progress bar (bar that shows the progress)
+        /// </summary>
+        private ProgressBar progressBar = new ProgressBar();
+
         #endregion
+
 
         #region constructors
 
@@ -107,6 +113,18 @@ namespace TheGenomeBrowser
             //add a new button to the form that triggers and event to read the Assembly report file (this file can be used to lookup the chromosome to each accession number --> or that it is on a different molecule)
             Button buttonReadGff3File = new Button();
 
+            //setup progress bar
+            progressBar.Location = new Point(10, 98);
+            progressBar.Size = new Size(400, 13);
+            progressBar.Minimum = 0;
+            progressBar.Maximum = 100;
+            progressBar.Step = 1;
+            progressBar.Value = 0;
+            progressBar.Visible = false;
+            progressBar.ForeColor = Color.Red;
+            progressBar.Enabled = false;
+            //add the progress bar to the form
+            splitContainerMain.Panel1.Controls.Add(progressBar);
 
             //test button that retrieves the data from the database using the gene name and exon number
             Button buttonTest = new Button();
@@ -126,6 +144,7 @@ namespace TheGenomeBrowser
             //add the combo box from the handler in the form just below the first button (import GTF file) and set the event handler for the combo box (this.comboBoxConditionalFormatExperimentView )
             splitContainerMain.Panel1.Controls.Add(_handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView);
 
+            //add the text box to the form just below the combo box
             _handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView.SelectedIndexChanged += new EventHandler(ComboBoxViewDataGridImportedDataGtfFile_SelectedIndexChanged);
 
         }
@@ -286,17 +305,37 @@ namespace TheGenomeBrowser
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
 
+
                 //get the file path
                 string filePath = openFileDialog.FileName;
 
-                //setup the task to read the GTF file
-                DataModelGtfFile GtfFile = await Task<DataModelGtfFile>.Run(() => GTFReader.ReadGFF3(filePath));
+                //make the progress bar visible
+                progressBar.Visible = true;
 
+                // Note JCO --> implementation example of a progress event with a async await procedure wihtin the caller
+                //setup a progress bar
+                var progress = new Progress<int>();
+                //set the progress bar to the text box
+                progress.ProgressChanged += (s, message) =>
+                {
+                    //update the progress bar
+                    progressBar.Value = message;
+                };
+
+                //new GTF reader (pasing progress as a parameter)
+                var GTFReader = new GTFReader();
+
+                // Note JCO --> the method below placed the reader on a separate thread keeping the UI responsive (alternaively we can use the async await procedure placed in the reader itself
+                //read the GTF file with the async gtf reader
+                DataModelGtfFile GtfFile = await GTFReader.ReadGFF3Async(filePath, progress);
 
 
                 // check if the GTF file is not null, then load the GTF data model in the handler dataview
                 if (GtfFile != null)
                 {
+
+                    //make the progress bar invisible
+                    progressBar.Visible = false;
 
                     //set the GTF file in the handler
                     _handlerImportedGtfFileData.DataModelGtfFile = GtfFile;

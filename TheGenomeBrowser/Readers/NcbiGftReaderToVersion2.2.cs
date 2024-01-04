@@ -12,61 +12,18 @@ namespace TheGenomeBrowser.Readers
     public class NcbiGftReaderToVersion2
     {
 
-        /// <summary>
-        /// parse a GFF3 file
-        /// </summary>
-        /// <param name="filePath"></param>
-        public void ReadGftFile(string filePath)
-        {
-
-            //read GTF file
-            var GtfFile = GTFReader.ReadGFF3(filePath);
-
-            // Note JCO --> reading a file in this way take less thatn 10 seconds for a file with 1.000.000 lines
-            // Note that the debug print here is very slow (remove it if you want to speed up the reading)
-            // For troubleshooting its nice to have the debug print
-
-            //loop through the features
-            foreach (var feature in GtfFile.FeaturesList)
-            {
-
-                //print the information of the feature in the debug window (if we are in debug mode)
-                Debug.WriteLine("Seqname: {0}", feature.Seqname);
-                Debug.WriteLine("Source: {0}", feature.Source);
-                Debug.WriteLine("FeatureType: {0}", feature.FeatureType);
-                Debug.WriteLine("Start: {0}", feature.Start);
-                Debug.WriteLine("End: {0}", feature.End);
-                Debug.WriteLine("Score: {0}", feature.Score);
-                Debug.WriteLine("Strand: {0}", feature.Strand);
-                Debug.WriteLine("Frame: {0}", feature.Frame);
-                //print gbkey
-                Debug.WriteLine("gbkey: {0}", feature.GbKey);
-                //print the other attributes of the feature into the debug window (if we are in debug mode)
-                //print gene id
-                Debug.WriteLine("GeneId: {0}", feature.GeneId);
-                //print transcript id
-                Debug.WriteLine("TranscriptId: {0}", feature.TranscriptId);
-                //print exon number
-                Debug.WriteLine("ExonNumber: {0}", feature.ExonNumber);
-                //print gene name
-                Debug.WriteLine("GeneName: {0}", feature.Gene);
-
-                //print the attributes of the feature into the debug window (if we are in debug mode)
-                Debug.WriteLine("Attributes:");
-
-
-            }
-        }
 
     }
 
     /// <summary>
     /// class to read GFF3 files
     /// </summary>
-    public static class GTFReader
+    public class GTFReader
     {
 
+
         #region properties
+
 
         // Example line from GTF file: chr1 wgEncodeGencodeBasicV26 exon	11189341	11189955	.	+	.	gene_id "ANGPTL7"; transcript_id "ENST00000376819.3"; exon_number "1"; exon_id "ENST00000376819.3.1"; gene_name "ANGPTL7";
         // Example line from GTF file version 2.2= gene_id "WASH7P"; transcript_id "NR_024540.1"; db_xref "GeneID:653635"; gene "WASH7P"; product "WASP family homolog 7, pseudogene"; pseudo "true"; transcript_biotype "transcript"; exon_number "1";
@@ -118,7 +75,39 @@ namespace TheGenomeBrowser.Readers
         #endregion
 
 
+        #region constructor
+
+ 
+        #endregion
+
+
         #region methods
+
+
+        /// <summary>
+        /// read GTF file async (note that the original void procedure is kept for reference below this procedure)
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public async Task<DataModelGtfFile> ReadGFF3Async(string filePath, IProgress<int> progress)
+        {
+
+            //var for the data model
+            DataModelGtfFile DataModelGtfFile = new DataModelGtfFile();
+
+            //read GTF file async
+            await Task.Run(() =>
+            {
+                //read GTF file
+                DataModelGtfFile = ReadGFF3(filePath, progress);
+
+            });
+
+            //return the data model
+            return DataModelGtfFile;
+
+         
+        }
 
 
         /// <summary>
@@ -129,10 +118,18 @@ namespace TheGenomeBrowser.Readers
         //  #!annotation-date 11/19/2021
         /// </summary>
         /// <param name="filePath"></param>
-        public static DataModelGtfFile ReadGFF3(string filePath)
+        public DataModelGtfFile ReadGFF3(string filePath, IProgress<int> progress)
         {
             //create a new GFF3Reader
             var DataModelGtfFile = new TheGenomeBrowser.DataModels.NCBIImportedData.DataModelGtfFile();
+
+            //local var for line counter
+            int LineCounter = 0;
+            //counter that counts for progress (every 1000 lines)
+            int ProgressCounter = 0;
+
+            //get total number of lines in the file
+            int TotalNumberOfLines = File.ReadLines(filePath).Count();
 
             //read the file line by line
             foreach (string line in File.ReadLines(filePath))
@@ -327,11 +324,9 @@ namespace TheGenomeBrowser.Readers
                     }
 
 
-
-
                     //add the attribute to the string builder
                     sb.Append(pair + ";");
-                    
+
                     //increase the counter
                     counter++;
                 }
@@ -341,12 +336,28 @@ namespace TheGenomeBrowser.Readers
 
                 //add the feature to the list of features
                 DataModelGtfFile.FeaturesList.Add(feature);
+
+                //check if the progress counter is 1000
+                if (ProgressCounter == 1000)
+                {
+                    //update the progress
+                    progress.Report((LineCounter * 100) / TotalNumberOfLines);
+
+                    //reset the progress counter
+                    ProgressCounter = 0;
+                }
+
+                //increase the line counter
+                LineCounter++;
+                //increase the progress counter
+                ProgressCounter++;
             }
 
             //return the list of features
             return DataModelGtfFile;
 
         }
+
 
         #endregion
 
