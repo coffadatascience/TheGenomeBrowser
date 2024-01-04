@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheGenomeBrowser.DataModels.NCBIImportedData;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TheGenomeBrowser.Readers
 {
@@ -56,8 +57,6 @@ namespace TheGenomeBrowser.Readers
 
             }
         }
-
-
 
     }
 
@@ -120,6 +119,7 @@ namespace TheGenomeBrowser.Readers
 
 
         #region methods
+
 
         /// <summary>
         /// parse a GFF3 file

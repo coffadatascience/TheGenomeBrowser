@@ -274,7 +274,7 @@ namespace TheGenomeBrowser
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void buttonImportGTF3_Click(object? sender, EventArgs e)
+        private async void buttonImportGTF3_Click(object? sender, EventArgs e)
         {
 
             //open a file dialog to select a GFF3 file
@@ -289,8 +289,10 @@ namespace TheGenomeBrowser
                 //get the file path
                 string filePath = openFileDialog.FileName;
 
-                //read GTF file
-                var GtfFile = GTFReader.ReadGFF3(filePath);
+                //setup the task to read the GTF file
+                DataModelGtfFile GtfFile = await Task<DataModelGtfFile>.Run(() => GTFReader.ReadGFF3(filePath));
+
+
 
                 // check if the GTF file is not null, then load the GTF data model in the handler dataview
                 if (GtfFile != null)
@@ -346,10 +348,9 @@ namespace TheGenomeBrowser
 
         }
 
-
-
-
-
         #endregion
+
+
+
     }
 }
