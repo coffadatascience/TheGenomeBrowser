@@ -32,6 +32,16 @@ namespace TheGenomeBrowser.DataModels.Genes
         /// </summary>
         public string ElementSymbol { get; set; }
 
+        /// <summary>
+        /// var for start location
+        /// </summary>
+        public int StartLocation { get; set; }
+
+        /// <summary>
+        /// var for end location
+        /// </summary>
+        public int EndLocation { get; set; }
+
         #endregion
 
         #region constructor
@@ -39,7 +49,25 @@ namespace TheGenomeBrowser.DataModels.Genes
         /// <summary>
         /// constructor
         /// </summary>
+        /// <param name="elementName"></param>
+        /// <param name="elementSymbol"></param>
+        public void DataModelLookupGeneElementSetupNewItem(string elementName, string elementSymbol, int startLocation, int endLocation)
+        {
+            //set the id
+            Id = Guid.NewGuid();
 
+            //set the element name
+            ElementName = elementName;
+
+            //set the element symbol
+            ElementSymbol = elementSymbol;
+
+            //set the start location
+            StartLocation = startLocation;
+
+            //set the end location
+            EndLocation = endLocation;
+        }
 
         #endregion
 

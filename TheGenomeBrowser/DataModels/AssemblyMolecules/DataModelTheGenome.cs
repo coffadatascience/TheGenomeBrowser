@@ -44,6 +44,8 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #region methods
 
+        //
+
 
         #endregion
 

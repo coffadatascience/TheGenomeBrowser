@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheGenomeBrowser.DataModels.AssemblyMolecules;
+using TheGenomeBrowser.DataModels.Genes;
 using TheGenomeBrowser.DataModels.NCBIImportedData;
 using TheGenomeBrowser.ViewModels.Settings;
 using TheGenomeBrowser.ViewModels.View;
@@ -19,6 +21,16 @@ namespace TheGenomeBrowser.ViewModels
     {
 
         #region properties
+
+        /// <summary>
+        /// constant for used name of start line of gene information (states gene)
+        /// </summary>
+        public const string _startLineGene = "gene";
+
+        /// <summary>
+        /// constant for used name of start line of transcript information (states transcript)
+        /// </summary>
+        public const string _startLineTranscript = "transcript";
 
         /// <summary>
         /// var for column width
@@ -57,7 +69,13 @@ namespace TheGenomeBrowser.ViewModels
         /// </summary>
         public DataModels.Genes.DataModelLookupGeneList DataModelLookupGeneList { get; set; }
 
+        /// <summary>
+        /// var for assembly source data model
+        /// </summary>
+        public DataModels.AssemblyMolecules.DataModelAssemblySource DataModelAssemblySource { get; set; }
+
         #endregion
+
 
         #region ViewModels
 
@@ -177,13 +195,231 @@ namespace TheGenomeBrowser.ViewModels
 
         #endregion
 
-        #region methods "processing GTF file imported data"
+
+        //Note JCO -- > this region processes the GTF file feature list up into sources and molecules, rather than trying immediatly to genes
+        //              this approach may remove a lot of double which makes the gene list smaller and more manageable (also with extra structure there is a more appropriate hierarchy, minimizing the number of elements in the list)
+        #region  methods "processing the gene list and establishing TheGenome data model"
 
         /// <summary>
-        /// async procedure that processes the GTF file imported data set view
+        /// procedure that takes the datamodelGtfFile and the annotation file and processes that into appropriate data models by source, molecule, gene, transcript, and then start_codon, end_codon, exon, cds
+        /// Rather than filling out all the data, we will first create the main layers and split the data in to sources, molecules, genes, transcripts. When the list is processes, then we can add the other type in their appropriate places.
+        /// --> Note that (even though the annotation list seem sorted, we cannot take this for sure with objects) we will need to go through the entire list to get all genes (by feature entree "gene"), this first has to be finished before getting the transcripts, else we may encounter a transcript without having made an entree for the gene (note that the list seems sorted, but we cannot rely on that), as such we will pass a few time through the list to make all required hierarchical levels.
+        /// ---> we may however collect collect all unique transcript names and then process the list again to get the transcripts, but this may be more complicated than just passing through the list a few times
         /// </summary>
-        /// <returns></returns>
-        public async Task<bool> ProcessGtfFileImportedDataSetViewAsync(IProgress<int> progress)
+        /// <param name="progress"></param>
+        public void ProcessNcbiDataToAssemblyBySource() //IProgress<int> progress)
+        {
+
+            //boolean that remembers if the user responds positive to continue import of the GTF file wihout an assembly report
+            bool continueImportWithoutAssemblyReport = false;
+            //int with total number of features
+            int totalNumberOfFeatures = DataModelGtfFile.FeaturesList.Count;
+            // int to count the number of features
+            int numberOfFeatures = 0;
+            //int to coutn update on every 100 features
+            int numberOfFeaturesUpdate = 0;
+
+            //create a new dictionary that has the source as key and the data model assembly source as value
+            Dictionary<string, DataModels.AssemblyMolecules.DataModelAssemblySource> dictionarySourceDataModelAssemblySource = new Dictionary<string, DataModels.AssemblyMolecules.DataModelAssemblySource>();
+
+
+            //loop all features in the GTF file
+            foreach (GTFFeature feature in DataModelGtfFile.FeaturesList)
+            {
+
+                //----------------------------------------------------
+                // 1. process the source
+                //----------------------------------------------------
+
+                //var for source
+                string source = feature.Source;
+
+                //local var for DataModelAssemblySource (either from the dictionary or a new one)
+                DataModels.AssemblyMolecules.DataModelAssemblySource dataModelAssemblySource = null;
+
+                //check if the source is in the dictionarySourceDataModelAssemblySource, if not add it by creating a new DataModelAssemblySource
+                if (!dictionarySourceDataModelAssemblySource.ContainsKey(source))
+                {
+                    //create a new DataModelAssemblySource
+                    dataModelAssemblySource = new DataModels.AssemblyMolecules.DataModelAssemblySource(source);
+                    //add the data model assembly source to the dictionary
+                    dictionarySourceDataModelAssemblySource.Add(source, dataModelAssemblySource);
+                }
+                else
+                {
+                    //get the data model assembly source from the dictionary
+                    dataModelAssemblySource = dictionarySourceDataModelAssemblySource[source];
+                }
+
+
+                //----------------------------------------------------
+                // 2. process the molecule
+                //----------------------------------------------------
+
+                //var for object that holds the molecule (this is typically a chromosome, but can also be a plasmid or other molecule)
+                DataModels.AssemblyMolecules.DataModelMolecule dataModelMolecule = null;
+
+                //use GetChromosomeNumber, to get the chromosome number
+                string MoleculeChromosome = GetChromosomeNumber(DataModelGtfAssemblyReport, feature, ref continueImportWithoutAssemblyReport);
+
+                //check if the molecule is in the dictionary, if not add it by creating a new DataModelMolecule
+                if (!dataModelAssemblySource.DictionaryOfMolecules.ContainsKey(MoleculeChromosome))
+                {
+                    //create a new DataModelMolecule
+                    dataModelMolecule = new DataModels.AssemblyMolecules.DataModelMolecule(MoleculeChromosome);
+                    //add the data model molecule to the dictionary
+                    dataModelAssemblySource.DictionaryOfMolecules.Add(MoleculeChromosome, dataModelMolecule);
+                }
+                else
+                {
+                    //get the data model molecule from the dictionary
+                    dataModelMolecule = dataModelAssemblySource.DictionaryOfMolecules[MoleculeChromosome];
+
+                }
+
+                //----------------------------------------------------
+                // 3. process the gene (seq id)
+                //----------------------------------------------------
+
+                //var for feature type
+                string featureType = feature.FeatureType;
+
+                //get the enum for the feature type (GetFeatureType)
+                var featureTypeEnum = SettingsAssemblySource.GetFeatureType(featureType);
+
+                //check if the feature type is gene (if it is a gene we need to create a new seq id and add it to the dictionary of seq ids)
+                if (featureTypeEnum == SettingsAssemblySource.FeatureType.gene)
+                {
+                    //local object for DataModelGeneId
+                    DataModels.AssemblyMolecules.DataModelGeneId DataModelGeneId = null;
+
+                    //var for the gene id
+                    string geneId = feature.GeneId;
+
+                    //check if the gene id is not null or empty
+                    if (!string.IsNullOrEmpty(geneId))
+                    {
+
+                        //check if the gene id is not yet in the dictionary
+                        if (!dataModelMolecule.GeneIds.ContainsKey(geneId))
+                        {
+
+                            // Note JCO --> here we may recognize that it is not very useful to try to untanlge the GTF file direct (we may thus remove a lot of filed of the data model reads and instead retain the lines)
+                            // Alternatively we may see how far we get with what we have
+
+                            //local var with features needed to construct DataModelGeneId
+                            string geneName = feature.Gene;
+                            string geneDescription = feature.AttributesString;
+                            string strand = feature.Strand;
+                            int startLocation = feature.Start;
+                            int endLocation = feature.End;
+                            string db_Xref_One = feature.DbXref;
+                            string db_Xref_Two = feature.DbXref;
+                            string gb_Key = feature.GbKey;
+                            string gene_Biotype = feature.TranscriptBiotype;
+                            string gene_Synonym = feature.GeneId;
+
+                            //create a new DataModelGeneId
+                            DataModelGeneId = new DataModels.AssemblyMolecules.DataModelGeneId(geneId, geneName, geneDescription, strand, startLocation, endLocation, db_Xref_One, db_Xref_Two, gb_Key, gene_Biotype, gene_Synonym);
+                            
+                            //add the gene to the dictionary
+                            dataModelMolecule.GeneIds.Add(geneId, DataModelGeneId);
+
+                        }
+                        else
+                        {
+                            //check if we are in debug mode
+                            if (System.Diagnostics.Debugger.IsAttached)
+                            {
+                                //print message in debugger
+                                System.Diagnostics.Debug.WriteLine("Gene id is already in the dictionary: " + geneId);
+                            }
+                        }
+
+                    }
+                    //create and else if, that prints a message in the debugger that the gene id is null or empty, but that includes the AttributesString
+                    else if (!string.IsNullOrEmpty(feature.AttributesString))
+                    {
+                        //check if we are in debug mode
+                        if (System.Diagnostics.Debugger.IsAttached)
+                        {
+                            //print message in debugger
+                            System.Diagnostics.Debug.WriteLine("Gene id is null or empty, but AttributesString is not null or empty: " + feature.AttributesString);
+                        }
+
+                    }
+
+                }
+
+
+            }
+
+
+            //increase the number of features
+            numberOfFeatures++;
+            //increase the number of features update
+            numberOfFeaturesUpdate++;
+        }
+
+    
+
+    /// <summary>
+    /// procedure that takes a DataModelGtfAssemblyReport, GTFFeature feature, as well as a boolean (continueImportWithoutAssemblyReport) and returns a chromosome (string)
+    /// </summary>
+    /// <param name="dataModelAssemblyReport"></param>
+    /// <param name="feature"></param>
+    /// <param name="continueImportWithoutAssemblyReport"></param>
+    /// <returns></returns>
+    private string GetChromosomeNumber(DataModelAssemblyReport dataModelAssemblyReport, GTFFeature feature, ref bool continueImportWithoutAssemblyReport)
+    {
+        //set a var for the chromosome
+        string chromosome = "?";
+
+        //check if we have a DataModelGtfAssemblyReport
+        if (dataModelAssemblyReport != null)
+        {
+            //get the chromosome number from the DataModelGtfAssemblyReport
+            chromosome = dataModelAssemblyReport.GetChromosomeNumber(feature.Seqname);
+        }
+        else
+        {
+
+            //ask the user if he/she wants to continue without an assembly report
+            if (!continueImportWithoutAssemblyReport)
+            {
+                //ask the user if he/she wants to continue without an assembly report
+                continueImportWithoutAssemblyReport = ViewModelGtfFile.AskUserToContinueWithoutAssemblyReport();
+            }
+
+            //check if the user wants to continue without an assembly report
+            if (continueImportWithoutAssemblyReport)
+            {
+                //set the chromosome to the seqname
+                chromosome = feature.Seqname;
+            }
+            else
+            {
+                //stop the import
+                return null;
+            }
+
+        }
+
+        //return the chromosome
+        return chromosome;
+    }
+
+
+    #endregion
+
+
+    #region methods "processing GTF file imported data into unique gene list"
+
+    /// <summary>
+    /// async procedure that processes the GTF file imported data set view
+    /// </summary>
+    /// <returns></returns>
+    public async Task<bool> ProcessGtfFileImportedDataSetViewAsync(IProgress<int> progress)
         {
 
             //read GTF file async
@@ -276,37 +512,142 @@ namespace TheGenomeBrowser.ViewModels
                     if (!dictionaryGeneNameGeneObject.ContainsKey(geneId))
                     {
 
+                        //----------------------------------------------------
+                        // New Dictionary Item
+                        //----------------------------------------------------
+
                         //get location start
                         int locationStart = feature.Start;
                         int locationEnd = feature.End;
-                        //var for seqname
-                        string seqname = feature.Seqname;
 
                         //create a new data model lookup gene object
                         DataModels.Genes.DataModelLookupGene dataModelLookupGene = new DataModels.Genes.DataModelLookupGene();
 
+                        //---------------------------------------------
+                        // Note JCO --> we cannot set the start and end here, as we only have a single feature
+                        // The start and end thus need to be established afterwards (or obtained from the innner list of elements)
+                        //---------------------------------------------
+
                         //set the gene name, chromosome and start and end location
-                        dataModelLookupGene.DataModelLookupGeneSetupNewItem(geneId, chromosome, locationStart, locationEnd, seqname);
-
-                        //create a new list of gene elements
-                        List<DataModels.Genes.DataModelLookupGeneElement> listGeneElements = new List<DataModels.Genes.DataModelLookupGeneElement>();
-
-                        //set the list of gene elements
-                        dataModelLookupGene.GeneElements = listGeneElements;
+                        dataModelLookupGene.DataModelLookupGeneSetupNewItem(geneId, chromosome, feature.Seqname);
 
                         //add the gene to the dictionary
                         dictionaryGeneNameGeneObject.Add(geneId, dataModelLookupGene);
 
+                        //new element item
+                        DataModels.Genes.DataModelLookupGeneElement dataModelLookupGeneElement = new DataModels.Genes.DataModelLookupGeneElement();
+
+                        //create a key for the element
+                        string key = feature.GeneId + "-" + feature.Start + "-[0]";
+
+                        //setup item
+                        dataModelLookupGeneElement.DataModelLookupGeneElementSetupNewItem(feature.FeatureType, feature.ExonNumber, feature.Start, feature.End);
+
+                        //add the gene element to the list of gene elements
+                        dataModelLookupGene.Elements.Add(key + "-" + feature.Start, dataModelLookupGeneElement);
+
+                        //Ignore the unique elements for feature type: gene and transcript, as denoted by constant _startLineGene and _startLineTranscript
+                        if (feature.FeatureType != _startLineGene && feature.FeatureType != _startLineTranscript)
+                        {
+                            // var key for unique elements is feature type + exon number
+                            string ValueUniqueElements = feature.FeatureType + "-" + feature.ExonNumber;
+
+                            //add new items to the dictionary unique elements
+                            dataModelLookupGene.UniqueElements.Add(feature.Start, ValueUniqueElements);
+                        }
+                        //----------------------------------------------------
+
+                    }
+                    else
+                    {
+
+                        //----------------------------------------------------
+                        // process existing dictionary item (gene)
+                        //----------------------------------------------------
+
+                        //get the gene object from the dictionary
+                        DataModels.Genes.DataModelLookupGene dataModelLookupGeneFromDictionary = dictionaryGeneNameGeneObject[geneId];
+
+
+                        //----------------------------------------------------
+                        // Note JCO --> it may be true that there are alternative accession numbers to the same gene
+                        //----------------------------------------------------
+                        // check if the current accession number is equal to that of the gene object
+                        if (dataModelLookupGeneFromDictionary.GenBankAccn != feature.Seqname)
+                        {
+
+                            //if the alternative positions is empty, then add the current seqname, if its not empty add a comma and the seqname
+                            if (string.IsNullOrEmpty(dataModelLookupGeneFromDictionary.AlternativeAccn))
+                            {
+                                //set the alternative positions
+                                dataModelLookupGeneFromDictionary.AlternativeAccn = feature.Seqname;
+                            }
+                            else
+                            {
+                                //add the alternative positions
+                                dataModelLookupGeneFromDictionary.AlternativeAccn += ", " + feature.Seqname;
+                            }
+          
+                        }
+                        //----------------------------------------------------
+
+
+                        //----------------------------------------------------
+                        // Process Element
+                        //----------------------------------------------------
+
+                        //create a key for the element
+                        string key = feature.GeneId + "-" + feature.Start;
+
+                        // add a tag that the denoted the number of this element as it is being in the list by + "-[n]";
+                        // Note JCO --> this allows adding of doubles so we may investigate double data and what we do not need
+                        key += "-[" + dataModelLookupGeneFromDictionary.Elements.Count + "]";
+
+                        //check if the element is not yet in the dictionary
+                        if (!dataModelLookupGeneFromDictionary.Elements.ContainsKey(key))
+                        {
+
+                            //new element item
+                            DataModels.Genes.DataModelLookupGeneElement dataModelLookupGeneElement = new DataModels.Genes.DataModelLookupGeneElement();
+
+                            //setup item
+                            dataModelLookupGeneElement.DataModelLookupGeneElementSetupNewItem(feature.FeatureType, feature.ExonNumber, feature.Start, feature.End);
+
+                            //add the gene element to the list of gene elements
+                            dataModelLookupGeneFromDictionary.Elements.Add(key, dataModelLookupGeneElement);
+
+                        }
+                        else
+                        {
+                            //check if we are in debug mode
+                            if (System.Diagnostics.Debugger.IsAttached)
+                            {
+                                //print message in debugger
+                                System.Diagnostics.Debug.WriteLine("This should be a unique counter. Fault at line : " + feature.AttributesString);
+                            }
+                        }
+                        //----------------------------------------------------
+
+                        //----------------------------------------------------
+                        //check if the unique elements dictionary contains the start location
+                        //----------------------------------------------------
+                        if (!dataModelLookupGeneFromDictionary.UniqueElements.ContainsKey(feature.Start))
+                        {
+
+                            //Ignore the unique elements for feature type: gene and transcript, as denoted by constant _startLineGene and _startLineTranscript
+                            if (feature.FeatureType != _startLineGene && feature.FeatureType != _startLineTranscript)
+                            {
+                                // var key for unique elements is feature type + exon number
+                                string ValueUniqueElements = feature.FeatureType + "-" + feature.ExonNumber;
+
+                                //add new items to the dictionary unique elements
+                                dataModelLookupGeneFromDictionary.UniqueElements.Add(feature.Start, ValueUniqueElements);
+                            }
+
+                        }
+
                     }
 
-                    //get the gene object from the dictionary
-                    DataModels.Genes.DataModelLookupGene dataModelLookupGeneFromDictionary = dictionaryGeneNameGeneObject[geneId];
-
-                    //create a new gene element
-                    DataModels.Genes.DataModelLookupGeneElement dataModelLookupGeneElement = new DataModels.Genes.DataModelLookupGeneElement();
-
-                    //add the gene element to the list of gene elements
-                    dataModelLookupGeneFromDictionary.GeneElements.Add(dataModelLookupGeneElement);
 
                 }
                 //create and else if, that prints a message in the debugger that the gene id is null or empty, but that includes the AttributesString
@@ -350,6 +691,9 @@ namespace TheGenomeBrowser.ViewModels
                 numberOfFeaturesUpdate++;
             }
 
+            //sort all the unique elements by start location
+            this.DataModelLookupGeneList.SortAllUniqueElementsByStartLocation();
+
             //create a new view data grid gene list
             ViewDataGridGeneList = new ViewDataGridGeneList("ViewDataGridGeneList");
 
@@ -357,8 +701,6 @@ namespace TheGenomeBrowser.ViewModels
             ViewDataGridGeneList.CreateView(this.DataModelLookupGeneList);
 
         }
-
-
 
         #endregion
 

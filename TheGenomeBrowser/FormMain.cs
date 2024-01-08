@@ -41,6 +41,11 @@ namespace TheGenomeBrowser
         private const string BUTTON_PROCESS_GTF = "Process GTF file";
 
         /// <summary>
+        /// private const string for button Untangle GTF data
+        /// </summary>
+        private const string BUTTON_UNTANGLE_GTF = "Untangle GTF data";
+
+        /// <summary>
         /// constant for name of data grid view of GTF datamodel
         /// </summary>
         private const string DATA_GRID_VIEW_GTF_DATA_MODEL = "ViewDataGridImportedDataGtfFile";
@@ -54,6 +59,7 @@ namespace TheGenomeBrowser
 
 
         #region constructors
+
 
         /// <summary>
         /// constructor
@@ -144,6 +150,22 @@ namespace TheGenomeBrowser
             //add the combo box from the handler in the form just below the first button (import GTF file) and set the event handler for the combo box (this.comboBoxConditionalFormatExperimentView )
             splitContainerMain.Panel1.Controls.Add(_handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView);
 
+            //add button that executes the untangle procedure for GTF data into the datamodel assembly source (this is a different way than going to gene lists and more attuned to the form of the genome and its underlying structures / regulations)
+            Button buttonUntangleGtfData = new Button();
+            //set name of button BUTTON_PROCESS_GTF
+            buttonUntangleGtfData.Name = BUTTON_UNTANGLE_GTF;
+            //set text of button
+            buttonUntangleGtfData.Text = "Untangle GTF data";
+            //set location of button
+            buttonUntangleGtfData.Location = new Point(450, 10);
+            //set size of button
+            buttonUntangleGtfData.Size = new Size(150, 50);
+            //add event handler
+            buttonUntangleGtfData.Click += new EventHandler(buttonUntangleGtfData_Click);
+            //add button to split container 1
+            splitContainerMain.Panel1.Controls.Add(buttonUntangleGtfData);
+
+
             //add the text box to the form just below the combo box
             _handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView.SelectedIndexChanged += new EventHandler(ComboBoxViewDataGridImportedDataGtfFile_SelectedIndexChanged);
 
@@ -151,11 +173,31 @@ namespace TheGenomeBrowser
 
 
 
-
-
         #endregion
 
         #region events
+
+        /// <summary>
+        /// event that triggers the untangle procedure for GTF data into the datamodel assembly source (this is a different way than going to gene lists and more attuned to the form of the genome and its underlying structures / regulations)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void buttonUntangleGtfData_Click(object? sender, EventArgs e)
+        {
+            //check if we have a data model in the GTF file handler, if not return appropiate message
+            if (_handlerImportedGtfFileData.DataModelGtfFile == null)
+            {
+                MessageBox.Show("No GTF file imported yet, please import a GTF file first");
+                return;
+            }
+
+            //trigger ProcessNcbiDataToAssemblyBySource in the handler
+            _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySource();
+
+
+        }
+
 
         /// <summary>
         /// event hanlder that switched between the different views of the imported GTF data (1. DataModelGtfFile, 2. DataAssemblyReportComments, 3. DataAssemblyReport, 4. DataModelLookupGeneList)

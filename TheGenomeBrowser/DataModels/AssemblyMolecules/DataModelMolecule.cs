@@ -17,9 +17,15 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         #region properties
 
         /// <summary>
-        /// list of seqids (genes) that are located on the molecule
+        /// the name of the molecule (typically a chromosome)
         /// </summary>
-        public List<DataModelSeqId> ListOfSeqIds { get; set; }
+        private string moleculeChromosome;
+
+        /// <summary>
+        /// dictionary with all the seqids (genes) that are located on the molecule
+        /// </summary>
+        public Dictionary<string, DataModelGeneId> GeneIds { get; set; }
+
 
         #endregion
 
@@ -29,10 +35,14 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// constructor
         /// </summary>
-        public DataModelMolecule()
+        /// <param name="moleculeChromosome"></param>
+        public DataModelMolecule(string moleculeChromosome)
         {
-            //init the list of seqids
-            ListOfSeqIds = new List<DataModelSeqId>();
+            //set the molecule chromosome
+            this.moleculeChromosome = moleculeChromosome;
+
+            //init the dictionary with the seqids
+            GeneIds = new Dictionary<string, DataModelGeneId>();
         }
 
         #endregion

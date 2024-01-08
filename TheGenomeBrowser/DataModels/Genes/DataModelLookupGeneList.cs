@@ -39,9 +39,27 @@ namespace TheGenomeBrowser.DataModels.Genes
 
         #endregion
 
+        #region methods
+
+        /// <summary>
+        /// procedure that loops all the genes and sorts all the unique elements of UniqueElements dictionary so they are sorted by start location
+        /// </summary>
+        public void SortAllUniqueElementsByStartLocation()
+        {
+            //loop the genes
+            foreach (var gene in Genes)
+            {
+                //sort the unique elements by key UniqueElements dictionary so they are sorted by start location
+                gene.Value.UniqueElements = gene.Value.UniqueElements.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+            }
+        }
+
+
+        #endregion
+
 
     }
 
 
-   
+
 }
