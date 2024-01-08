@@ -66,6 +66,14 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         /// <summary>
         /// constructor, that takes the string source name as noted in the file and converts it to the enum
+        /// Note JCO --> on scanning the entire file we find the following sources (to understand if they are complete we need to check the file, note also that some are results of analysis, and some only denote transcript or signaling rnas)
+        ///     1. {[BestRefSeq. {TheGenomeBrowser.DataModels.AssemblyMolecules.DataModelAssemblySource}]}
+        //      2. {IGnomon, {TheGenomeBrowser.DataModels.AssemblyMolecules.DataModelAssemblySource}])
+        //      3. {[Curated Genomic, {TheGenomeBrowser.DataModels.AssemblyMolecules.DataModelAssemblySource}]}
+        //      4. {[BestRefSeq% 2CGnomon,(TheGenomeBrowser.DataModels.AssemblyMolecules.DataModelAssemblySource}]]
+        //      5. {(tRNAscan - SE, (TheGenomeBrowser.DataModels.AssemblyMolecules.DataModelAssemblySource}]}
+        //      6. [[RefSeq, {TheGenomeBrowser.DataModels.AssemblyMolecules.DataModelAssemblySource}1
+        //      ---> it would seem true that the first 4 are complete in chromsome count, tRNA is a separate thing and RefSeq seem to be related to MT (>?methionine could also be mitochondrial)
         /// </summary>
         /// <param name="source"></param>
         /// <exception cref="Exception"></exception>
@@ -87,7 +95,8 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             }
             else
             {
-                throw new Exception("The source type is not recognized");
+                SourceType = SettingsAssemblySource.AssemblySource.Other;
+                //throw new Exception("The source type is not recognized");
             }
 
             //init the dictionary of molecules

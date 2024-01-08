@@ -46,16 +46,117 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #endregion
 
+        #region constant headers annotation file
+
+
+        // Note: note all elements in the file have a header name on the line, some are position based (e.g. the first 8 elements of the file are always the same)
+        // this is true for 1. Seqname 2. source 3. feature 4. start 5. end 6. score 7. score 8. strand 9. frame 10. attribute Example = NC_000001.11	BestRefSeq	gene	11874	14409	.	+	.	
+
+        //-------------------------------------
+        // list of constants used for gene entree
+        //--------------------------------------
+
+        // Example line of a gene entree
+        // NC_000001.11	BestRefSeq	gene	14362	29370	.	-	.	gene_id "WASH7P"; transcript_id ""; db_xref "GeneID:653635"; db_xref "HGNC:HGNC:38034"; description "WASP family homolog 7, pseudogene"; gbkey "Gene"; gene "WASH7P"; gene_biotype "transcribed_pseudogene"; gene_synonym "FAM39F"; gene_synonym "WASH5P"; pseudo "true"; 
+
+        /// <summary>
+        /// constant for the header name of the gene id
+        /// </summary>
+        public const string GeneIdHeaderName = "gene_id";
+
+        /// <summary>
+        /// var for db_xref (note that there may be multiple entrees with the same db_xref header name)
+        /// </summary>
+        public const string DbXrefHeaderName = "db_xref";
+
+        /// <summary>
+        /// constant for description
+        /// </summary>
+        public const string DescriptionHeaderName = "description";
+
+        /// <summary>
+        /// constant name for gbkey
+        /// </summary>
+        public const string gbkeyHeaderName = "gbkey";
+
+        /// <summary>
+        /// constant for the header name of the gene name
+        /// </summary>
+        public const string GeneNameHeaderName = "gene";
+
+        /// <summary>
+        /// constant for gene_synonym 
+        /// </summary>
+        public const string GeneSynonymHeaderName = "gene_synonym";
+
+        /// <summary>
+        /// var for pseudo (true or false)
+        /// </summary>
+        public const string PseudoHeaderName = "pseudo";
+
+        /// <summary>
+        /// var for gene_biotype
+        /// </summary>
+        public const string GeneBiotypeHeaderName = "gene_biotype";
+        //--------------------------------------
+
+
+        //--------------------------------------
+        // list used for Transcript entree (note that the entree below are unique for transcript but that they may include field described above)
+        //--------------------------------------
+
+        // Example line of a transcript entree
+        // NC_000001.11	BestRefSeq	transcript	14362	29370	.	-	.	gene_id "WASH7P"; transcript_id "NR_024540.1"; db_xref "GeneID:653635"; gbkey "misc_RNA"; gene "WASH7P"; product "WASP family homolog 7, pseudogene"; pseudo "true"; transcript_biotype "transcript"; 
+
+        /// <summary>
+        /// constant for the header name of the transcript id
+        /// </summary>
+        public const string TranscriptIdHeaderName = "transcript_id";
+
+        /// <summary>
+        /// constant for product
+        /// </summary>
+        public const string ProductHeaderName = "product";
+
+        /// <summary>
+        /// var for transcript_biotype
+        /// </summary>
+        public const string TranscriptBiotypeHeaderName = "transcript_biotype";
+
+
+        //--------------------------------------
+        // list used for Gene element (exon) entree (note that the entree below are unique for exon but that they may include field described above)
+        //--------------------------------------
+
+        // Example line of a gene element (exon) entree
+        // NC_000001.11	BestRefSeq	exon	29321	29370	.	-	.	gene_id "WASH7P"; transcript_id "NR_024540.1"; db_xref "GeneID:653635"; gene "WASH7P"; product "WASP family homolog 7, pseudogene"; pseudo "true"; transcript_biotype "transcript"; exon_number "1"; 
+
+        /// <summary>
+        /// constant for the header name of the exon number
+        /// </summary>
+        public const string ExonNumberHeaderName = "exon_number";
+
+
+
+
+
+
+        #endregion
+
+
+
         #region enums
 
         /// <summary>
         /// enum for the different assembly sources (BesteRefSeq, Gnomon, CuratedRefSeq)
+        /// Other will contain all other sources that are currently unmatched against the other sources
         /// </summary>
         public enum AssemblySource
         {
             BestRefSeq,
             Gnomon,
-            CuratedRefSeq
+            CuratedRefSeq,
+            Other
         }
 
         /// <summary>

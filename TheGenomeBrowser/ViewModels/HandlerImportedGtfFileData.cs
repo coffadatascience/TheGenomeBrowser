@@ -307,21 +307,9 @@ namespace TheGenomeBrowser.ViewModels
                             // Note JCO --> here we may recognize that it is not very useful to try to untanlge the GTF file direct (we may thus remove a lot of filed of the data model reads and instead retain the lines)
                             // Alternatively we may see how far we get with what we have
 
-                            //local var with features needed to construct DataModelGeneId
-                            string geneName = feature.Gene;
-                            string geneDescription = feature.AttributesString;
-                            string strand = feature.Strand;
-                            int startLocation = feature.Start;
-                            int endLocation = feature.End;
-                            string db_Xref_One = feature.DbXref;
-                            string db_Xref_Two = feature.DbXref;
-                            string gb_Key = feature.GbKey;
-                            string gene_Biotype = feature.TranscriptBiotype;
-                            string gene_Synonym = feature.GeneId;
+                            //create a new DataModelGeneId passing the first 8 feature items and the attribute line feed
+                            DataModelGeneId = new DataModels.AssemblyMolecules.DataModelGeneId(feature.Seqname, feature.Source, feature.FeatureType, feature.Start, feature.End, feature.Score, feature.Strand, feature.Frame, geneId, feature.AttributesString);
 
-                            //create a new DataModelGeneId
-                            DataModelGeneId = new DataModels.AssemblyMolecules.DataModelGeneId(geneId, geneName, geneDescription, strand, startLocation, endLocation, db_Xref_One, db_Xref_Two, gb_Key, gene_Biotype, gene_Synonym);
-                            
                             //add the gene to the dictionary
                             dataModelMolecule.GeneIds.Add(geneId, DataModelGeneId);
 

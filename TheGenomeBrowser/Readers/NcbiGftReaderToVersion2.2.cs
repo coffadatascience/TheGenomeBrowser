@@ -25,52 +25,7 @@ namespace TheGenomeBrowser.Readers
         #region properties
 
 
-        // Example line from GTF file: chr1 wgEncodeGencodeBasicV26 exon	11189341	11189955	.	+	.	gene_id "ANGPTL7"; transcript_id "ENST00000376819.3"; exon_number "1"; exon_id "ENST00000376819.3.1"; gene_name "ANGPTL7";
-        // Example line from GTF file version 2.2= gene_id "WASH7P"; transcript_id "NR_024540.1"; db_xref "GeneID:653635"; gene "WASH7P"; product "WASP family homolog 7, pseudogene"; pseudo "true"; transcript_biotype "transcript"; exon_number "1";
-        /// <summary>
-        /// constant for the header name of the gene id
-        /// </summary>
-        public const string GeneIdHeaderName = "gene_id";
-
-        /// <summary>
-        /// constant for the header name of the exon number
-        /// </summary>
-        public const string ExonNumberHeaderName = "exon_number";
-
-        /// <summary>
-        /// constant for the header name of the transcript id
-        /// </summary>
-        public const string TranscriptIdHeaderName = "transcript_id";
-
-        /// <summary>
-        /// var for db_xref
-        /// </summary>
-        public const string DbXrefHeaderName = "db_xref";
-
-        /// <summary>
-        /// constant name for gbkey
-        /// </summary>
-        public const string gbkeyHeaderName = "gbkey";
-
-        /// <summary>
-        /// constant for the header name of the gene name
-        /// </summary>
-        public const string GeneNameHeaderName = "Gene";
-
-        /// <summary>
-        /// constant for product
-        /// </summary>
-        public const string ProductHeaderName = "product";
-
-        /// <summary>
-        /// var for pseudo
-        /// </summary>
-        public const string PseudoHeaderName = "pseudo";
-
-        /// <summary>
-        /// var for transcript_biotype
-        /// </summary>
-        public const string TranscriptBiotypeHeaderName = "transcript_biotype";
+    
 
         #endregion
 
@@ -181,13 +136,13 @@ namespace TheGenomeBrowser.Readers
                     string CurrentPair = pair.Trim();
 
                     // Position 01: process the gene id
-                    if (CurrentPair.Contains(GeneIdHeaderName))
+                    if (CurrentPair.Contains( TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneIdHeaderName))
                     {
                         //var for GeneId
                         string GeneId = "";
 
                         //remove the constant string
-                        GeneId = CurrentPair.Replace(GeneIdHeaderName, "");
+                        GeneId = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneIdHeaderName, "");
 
                         //remove the double quotes
                         GeneId = GeneId.Replace("\"", "");
@@ -197,13 +152,13 @@ namespace TheGenomeBrowser.Readers
                     }
 
                     // Position 02: process the transcript id
-                    else if (CurrentPair.Contains(TranscriptIdHeaderName))
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.TranscriptIdHeaderName))
                     {
                         //var for transcript id
                         string TranscriptId = "";
 
                         //remove the constant string
-                        TranscriptId = CurrentPair.Replace(TranscriptIdHeaderName, "");
+                        TranscriptId = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.TranscriptIdHeaderName, "");
 
                         //remove the double quotes
                         TranscriptId = TranscriptId.Replace("\"", "");
@@ -212,13 +167,13 @@ namespace TheGenomeBrowser.Readers
                         feature.TranscriptId = TranscriptId;
                     }
                     // Position 03: process the db_xref
-                    else if (CurrentPair.Contains(DbXrefHeaderName))
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.DbXrefHeaderName))
                     {
                         //var for db_xref
                         string DbXref = "";
 
                         //remove the constant string
-                        DbXref = CurrentPair.Replace(DbXrefHeaderName, "");
+                        DbXref = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.DbXrefHeaderName, "");
 
                         //remove the double quotes
                         DbXref = DbXref.Replace("\"", "");
@@ -227,13 +182,13 @@ namespace TheGenomeBrowser.Readers
                         feature.DbXref = DbXref;
                     }
                     // position 04: process the gbkeyHeaderName
-                    else if (CurrentPair.Contains(gbkeyHeaderName))
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.gbkeyHeaderName))
                     {
                         //var for gbkeyHeaderName
                         string gbkey = "";
 
                         //remove the constant string
-                        gbkey = CurrentPair.Replace(gbkeyHeaderName, "");
+                        gbkey = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.gbkeyHeaderName, "");
 
                         //remove the double quotes
                         gbkey = gbkey.Replace("\"", "");
@@ -246,13 +201,13 @@ namespace TheGenomeBrowser.Readers
                     // position 05: process the gene name
                     // !!!!! note that the tag Gene is often used for the gene name, but not always. Sometimes the tag gene is used for the gene id. So we need to check if the tag gene is used for the gene name or for the gene id
                     // we may thus also need to use the position of the tag to determine if the tag is used for the gene name or for the gene id
-                    else if ((CurrentPair.Contains(GeneNameHeaderName)) & (CurrentPair.Contains(feature.GeneId)))
+                    else if ((CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName)) & (CurrentPair.Contains(feature.GeneId)))
                     {
                         //var for gene name
                         string GeneName = "";
 
                         //remove the constant string
-                        GeneName = CurrentPair.Replace(GeneNameHeaderName, "");
+                        GeneName = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName, "");
 
                         //remove the double quotes
                         GeneName = GeneName.Replace("\"", "");
@@ -262,13 +217,13 @@ namespace TheGenomeBrowser.Readers
                     }
 
                     // position 06: process the product
-                    else if (CurrentPair.Contains(ProductHeaderName))
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ProductHeaderName))
                     {
                         //var for product
                         string Product = "";
 
                         //remove the constant string
-                        Product = CurrentPair.Replace(ProductHeaderName, "");
+                        Product = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ProductHeaderName, "");
 
                         //remove the double quotes
                         Product = Product.Replace("\"", "");
@@ -277,13 +232,13 @@ namespace TheGenomeBrowser.Readers
                         feature.Product = Product;
                     }
                     // position 07: process the pseudo
-                    else if (CurrentPair.Contains(PseudoHeaderName))
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName))
                     {
                         //var for pseudo
                         string Pseudo = "";
 
                         //remove the constant string
-                        Pseudo = CurrentPair.Replace(PseudoHeaderName, "");
+                        Pseudo = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName, "");
 
                         //remove the double quotes
                         Pseudo = Pseudo.Replace("\"", "");
@@ -292,13 +247,13 @@ namespace TheGenomeBrowser.Readers
                         feature.Pseudo = Pseudo;
                     }
                     // position 08: process the transcript_biotype
-                    else if (CurrentPair.Contains(TranscriptBiotypeHeaderName))
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.TranscriptBiotypeHeaderName))
                     {
                         //var for transcript_biotype
                         string TranscriptBiotype = "";
 
                         //remove the constant string
-                        TranscriptBiotype = CurrentPair.Replace(TranscriptBiotypeHeaderName, "");
+                        TranscriptBiotype = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.TranscriptBiotypeHeaderName, "");
 
                         //remove the double quotes
                         TranscriptBiotype = TranscriptBiotype.Replace("\"", "");
@@ -308,13 +263,13 @@ namespace TheGenomeBrowser.Readers
                     }
 
                     // Position 09: process the exon number
-                    else if (CurrentPair.Contains(ExonNumberHeaderName))
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ExonNumberHeaderName))
                     {
                         //local var
                         string ExonNumber = "";
 
                         //remove the constant string
-                        ExonNumber = CurrentPair.Replace(ExonNumberHeaderName, "");
+                        ExonNumber = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ExonNumberHeaderName, "");
 
                         //remove the double quotes
                         ExonNumber = ExonNumber.Replace("\"", "");
