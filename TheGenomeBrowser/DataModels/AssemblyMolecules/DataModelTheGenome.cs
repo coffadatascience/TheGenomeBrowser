@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheGenomeBrowser.DataModels.NCBIImportedData;
 
 namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 {
@@ -27,6 +28,22 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         public Dictionary<string, DataModelMolecule> DictionaryOfMolecules { get; set; }
 
+        /// <summary>
+        /// list of Line feeds of the GTF file that could not be identified in the annotation report file (for correct processing of the GTF file)
+        /// TODO JCO --> implement this in the code in the future in the reader (so we ensure we have all lines processed)
+        /// </summary>
+        public List<string> ListOfLineFeedsOfGtfFileThatCouldNotBeIdentifiedInAnnotationReportFile { get; set; }
+
+        /// <summary>
+        /// list of GeneId of which we have no information to link to a molecule (keep GtfFeature)
+        /// </summary>
+        public List<GTFFeature> ListOfGeneIdsWithNoMolecule { get; set; }
+
+        /// <summary>
+        /// list of transcripts that have no molecule or gene id (keep GtfFeature) -- > but have the specific feature type transcript
+        /// </summary>
+        public List<GTFFeature> ListOfTranscriptsThatHaveNoMoleculeOrGeneId { get; set; }
+
         #endregion
 
 
@@ -39,6 +56,17 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         {
             //init the dictionary of molecules
             DictionaryOfMolecules = new Dictionary<string, DataModelMolecule>();
+
+            //init the list of line feeds of the GTF file that could not be identified in the annotation report file
+            ListOfLineFeedsOfGtfFileThatCouldNotBeIdentifiedInAnnotationReportFile = new List<string>();
+
+            //init the list of gene ids with no molecule
+            ListOfGeneIdsWithNoMolecule = new List<GTFFeature>();
+
+            //init the list of transcripts that have no molecule or gene id
+            ListOfTranscriptsThatHaveNoMoleculeOrGeneId = new List<GTFFeature>();
+
+
         }
 
         #endregion
@@ -60,6 +88,30 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             {
                 //return the molecule
                 return DictionaryOfMolecules[moleculeName];
+            }
+            else
+            {
+                //return null
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// procedure that take a Molecule name and a gene id and returns the gene id
+        /// </summary>
+        /// <param name="moleculeName"></param>
+        /// <param name="geneId"></param>
+        /// <returns></returns>
+        public DataModelGeneId GetGeneId(string moleculeName, string geneId)
+        {
+            //get the molecule
+            var molecule = GetMolecule(moleculeName);
+
+            //check if the molecule is not null
+            if (molecule != null)
+            {
+                //return the gene id
+                return molecule.GetGeneId(geneId);
             }
             else
             {

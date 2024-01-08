@@ -177,6 +177,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     GeneName = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName + " ", "");
                     //remove the double quotes
                     GeneName = GeneName.Replace("\"", "");
+                    //remove the semi colon
+                    GeneName = GeneName.Replace(";", "");
+                    //trim the gene name
+                    GeneName = GeneName.Trim();
                 }
 
                 //check if the current item is the gene description
@@ -186,6 +190,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     Description = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.DescriptionHeaderName + " ", "");
                     //remove the double quotes
                     Description = Description.Replace("\"", "");
+                    //remove the semi colon
+                    Description = Description.Replace(";", "");
+                    //trim the gene description
+                    Description = Description.Trim();
                 }
          
                 //check if the current item is the db xref one
@@ -199,6 +207,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                         Db_Xref_One = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.DbXrefHeaderName + " ", "");
                         //remove the double quotes
                         Db_Xref_One = Db_Xref_One.Replace("\"", "");
+                        //remove the semi colon
+                        Db_Xref_One = Db_Xref_One.Replace(";", "");
+                        //trim the db xref one
+                        Db_Xref_One = Db_Xref_One.Trim();
                     }
                     else
                     {
@@ -206,6 +218,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                         Db_Xref_Two = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.DbXrefHeaderName + " ", "");
                         //remove the double quotes
                         Db_Xref_Two = Db_Xref_Two.Replace("\"", "");
+                        //remove the semi colon
+                        Db_Xref_Two = Db_Xref_Two.Replace(";", "");
+                        //trim the db xref two
+                        Db_Xref_Two = Db_Xref_Two.Trim();
                     }
 
                 }
@@ -217,6 +233,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     Gb_Key = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.gbkeyHeaderName + " ", "");
                     //remove the double quotes
                     Gb_Key = Gb_Key.Replace("\"", "");
+                    //remove the semi colon
+                    Gb_Key = Gb_Key.Replace(";", "");
+                    //trim the gb key
+                    Gb_Key = Gb_Key.Trim();
                 }
 
                 //process the gene synonym
@@ -230,6 +250,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                         Gene_Synonym_One = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneSynonymHeaderName + " ", "");
                         //remove the double quotes
                         Gene_Synonym_One = Gene_Synonym_One.Replace("\"", "");
+                        //remove the semi colon
+                        Gene_Synonym_One = Gene_Synonym_One.Replace(";", "");
+                        //trim the gene synonym one
+                        Gene_Synonym_One = Gene_Synonym_One.Trim();
                     }
                     else
                     {
@@ -237,6 +261,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                         Gene_Synonym_Two = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneSynonymHeaderName + " ", "");
                         //remove the double quotes
                         Gene_Synonym_Two = Gene_Synonym_Two.Replace("\"", "");
+                        //remove the semi colon
+                        Gene_Synonym_Two = Gene_Synonym_Two.Replace(";", "");
+                        //trim the gene synonym two
+                        Gene_Synonym_Two = Gene_Synonym_Two.Trim();
                     }
 
                 }
@@ -248,6 +276,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     Pseudo = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName + " ", "");
                     //remove the double quotes
                     Pseudo = Pseudo.Replace("\"", "");
+                    //remove the semi colon
+                    Pseudo = Pseudo.Replace(";", "");
+                    //trim the pseudo
+                    Pseudo = Pseudo.Trim();
                 }
                 
                 //check if the current item is the gene biotype
@@ -257,6 +289,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     Gene_Biotype = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneBiotypeHeaderName + " ", "");
                     //remove the double quotes
                     Gene_Biotype = Gene_Biotype.Replace("\"", "");
+                    //remove the semi colon
+                    Gene_Biotype = Gene_Biotype.Replace(";", "");
+                    //trim the gene biotype
+                    Gene_Biotype = Gene_Biotype.Trim();
                 }
 
             }
@@ -328,10 +364,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #region methods
 
-        //procedure that resturns the gene transcript for a given transcript id
-
-
-
+        
         #endregion
 
 

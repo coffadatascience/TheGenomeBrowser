@@ -147,6 +147,9 @@ namespace TheGenomeBrowser.Readers
                         //remove the double quotes
                         GeneId = GeneId.Replace("\"", "");
 
+                        //trim the string
+                        GeneId = GeneId.Trim();
+
                         //add the attribute to the feature
                         feature.GeneId = GeneId;
                     }
@@ -163,6 +166,9 @@ namespace TheGenomeBrowser.Readers
                         //remove the double quotes
                         TranscriptId = TranscriptId.Replace("\"", "");
 
+                        //trim the string
+                        TranscriptId = TranscriptId.Trim();
+
                         //add the attribute to the feature
                         feature.TranscriptId = TranscriptId;
                     }
@@ -178,6 +184,9 @@ namespace TheGenomeBrowser.Readers
                         //remove the double quotes
                         DbXref = DbXref.Replace("\"", "");
 
+                        //trim the string
+                        DbXref = DbXref.Trim();
+
                         //add the attribute to the feature
                         feature.DbXref = DbXref;
                     }
@@ -192,6 +201,9 @@ namespace TheGenomeBrowser.Readers
 
                         //remove the double quotes
                         gbkey = gbkey.Replace("\"", "");
+
+                        //trim the string
+                        gbkey = gbkey.Trim();
 
                         //add the attribute to the feature
                         feature.GbKey = gbkey;
@@ -212,6 +224,9 @@ namespace TheGenomeBrowser.Readers
                         //remove the double quotes
                         GeneName = GeneName.Replace("\"", "");
 
+                        //trim the string
+                        GeneName = GeneName.Trim();
+
                         //add the attribute to the feature
                         feature.Gene = GeneName;
                     }
@@ -228,6 +243,9 @@ namespace TheGenomeBrowser.Readers
                         //remove the double quotes
                         Product = Product.Replace("\"", "");
 
+                        //trim the string
+                        Product = Product.Trim();
+
                         //add the attribute to the feature
                         feature.Product = Product;
                     }
@@ -242,6 +260,9 @@ namespace TheGenomeBrowser.Readers
 
                         //remove the double quotes
                         Pseudo = Pseudo.Replace("\"", "");
+
+                        //trim the string
+                        Pseudo = Pseudo.Trim();
 
                         //add the attribute to the feature
                         feature.Pseudo = Pseudo;
@@ -258,6 +279,9 @@ namespace TheGenomeBrowser.Readers
                         //remove the double quotes
                         TranscriptBiotype = TranscriptBiotype.Replace("\"", "");
 
+                        //trim the string
+                        TranscriptBiotype = TranscriptBiotype.Trim();
+
                         //add the attribute to the feature
                         feature.TranscriptBiotype = TranscriptBiotype;
                     }
@@ -273,6 +297,9 @@ namespace TheGenomeBrowser.Readers
 
                         //remove the double quotes
                         ExonNumber = ExonNumber.Replace("\"", "");
+
+                        //trim the string
+                        ExonNumber = ExonNumber.Trim();
 
                         //add the attribute to the feature
                         feature.ExonNumber = ExonNumber;

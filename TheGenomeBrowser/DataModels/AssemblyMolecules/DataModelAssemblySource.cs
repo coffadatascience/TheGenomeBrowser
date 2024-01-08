@@ -29,14 +29,55 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// constructor
         /// </summary>
-        public DataModelAssemblySourceList() { }
+        public DataModelAssemblySourceList() 
+        { 
+            //init the list
+            ListOfAssemblySources = new List<DataModelAssemblySource>();
+        }
 
         #endregion
 
         #region methods
+         
+        /// <summary>
+        /// procedure that loops all the sources to get a gene id (take a molecule name and a gene id and return the gene id)
+        /// Note that this procedure exists to always get a gene id, but also to see how the different sources relate to each other
+        /// </summary>
+        /// <param name="moleculeName"></param>
+        /// <param name="geneId"></param>
+        /// <returns></returns>
+        public DataModelGeneId ReturnGeneId(string moleculeName, string geneId)
+        {
+            //loop the list of sources
+            foreach (var DataModelAssemblySource in this.ListOfAssemblySources)
+            {
+                //get the molecule
+                var molecule = DataModelAssemblySource.TheGenome.GetMolecule(moleculeName);
 
+                //check if the molecule is not null
+                if (molecule != null)
+                {
+                    //get the gene id
+                    var geneIdToReturn = molecule.GetGeneId(geneId);
 
-        //procedure that loops the list of source and return the proper list based on the provided enum type
+                    //check if the gene id is not null
+                    if (geneIdToReturn != null)
+                    {
+                        //return the gene id
+                        return geneIdToReturn;
+                    }
+                }
+            }
+
+            //return null
+            return null;
+        }
+
+        /// <summary>
+        /// procedure that loops the list of source and return the proper list based on the provided enum type
+        /// </summary>
+        /// <param name="sourceType"></param>
+        /// <returns></returns>
         public DataModelAssemblySource ReturnDataModelAssemblySource(SettingsAssemblySource.AssemblySource sourceType)
         {
             //loop list
@@ -110,12 +151,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         #region methods
 
 
-    
+ 
 
 
-
-
-#endregion
+        #endregion
 
     }
 
