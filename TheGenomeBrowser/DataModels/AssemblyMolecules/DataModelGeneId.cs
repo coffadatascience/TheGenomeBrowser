@@ -22,6 +22,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
     public class DataModelGeneId
     {
 
+
         #region properties
 
         /// <summary>
@@ -120,9 +121,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         public string Gene_Synonym_Two { get; set; }
 
         /// <summary>
-        /// list of entities (exons, introns, etc) that are located on the seq id
+        /// list of transcript elements
         /// </summary>
-        public List<DataModelGeneElement> ListOfGeneElements { get; set; }
+        public List<DataModelGeneTranscript> ListGeneTranscripts { get; set; }
 
 
         #endregion
@@ -260,10 +261,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
             }
 
+            //set the list of transcript elements
+            ListGeneTranscripts = new List<DataModelGeneTranscript>();
     
         }
-
-
 
 
         /// <summary>
@@ -299,9 +300,6 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             //set the end location
             End = endLocation;
 
-            //set the list of gene elements
-            ListOfGeneElements = new List<DataModelGeneElement>();
-
             //set the db xref one
             Db_Xref_One = db_Xref_One;
 
@@ -319,6 +317,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
             //set the gene synonym
             Gene_Synonym_Two = gene_Synonym_Two;
+
+            //set the list of gene elements
+            ListGeneTranscripts = new List<DataModelGeneTranscript>();
         }
 
 
@@ -326,6 +327,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
 
         #region methods
+
+        //procedure that resturns the gene transcript for a given transcript id
+
 
 
         #endregion

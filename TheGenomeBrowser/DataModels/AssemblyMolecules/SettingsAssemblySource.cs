@@ -25,6 +25,15 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         //constant for the name of the CuratedRefSeq assembly source
         public const string CURATEDREFSEQ = "Curated Genomic";
 
+        //constant for the name of the BestRefSeq% 2CGnomon
+        public const string BESTREFSEQGNOMON = "BestRefSeq%2CGnomon";
+
+        //constant for the name of the tRNAscan
+        public const string TRNASCAN = "tRNAscan";
+
+        //constant for the name of the RefSeq
+        public const string REFSEQ = "RefSeq";
+
         //constant for feature type transcript
         public const string TRANSCRIPT = "transcript";
 
@@ -156,6 +165,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             BestRefSeq,
             Gnomon,
             CuratedRefSeq,
+            BestRefSeqGnomon,
+            tRNAscan,
+            RefSeq,
             Other
         }
 
@@ -213,6 +225,46 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             else
             {
                 throw new Exception("The feature type " + featureType + " is not recognized");
+            }
+
+        }
+
+        /// <summary>
+        /// procedure that return the enum for the source type based on the string
+        /// </summary>
+        /// <param name="sourceName"></param>
+        public static SettingsAssemblySource.AssemblySource ReturnSourceEnumByString(string source)
+        {
+
+            //set the source type
+            if (source == SettingsAssemblySource.BESTREFSEQ)
+            {
+                return SettingsAssemblySource.AssemblySource.BestRefSeq;
+            }
+            else if (source == SettingsAssemblySource.GNOMON)
+            {
+                return SettingsAssemblySource.AssemblySource.Gnomon;
+            }
+            else if (source == SettingsAssemblySource.CURATEDREFSEQ)
+            {
+                return SettingsAssemblySource.AssemblySource.CuratedRefSeq;
+            }
+            else if (source == SettingsAssemblySource.BESTREFSEQGNOMON)
+            {
+                return SettingsAssemblySource.AssemblySource.BestRefSeqGnomon;
+            }
+            else if (source == SettingsAssemblySource.TRNASCAN)
+            {
+                return SettingsAssemblySource.AssemblySource.tRNAscan;
+            }
+            else if (source == SettingsAssemblySource.REFSEQ)
+            {
+                return SettingsAssemblySource.AssemblySource.RefSeq;
+            }
+            else
+            {
+                return SettingsAssemblySource.AssemblySource.Other;
+                //throw new Exception("The source type is not recognized");
             }
 
         }

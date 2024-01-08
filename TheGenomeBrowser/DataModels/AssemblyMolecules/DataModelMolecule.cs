@@ -50,6 +50,25 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #region methods
 
+        /// <summary>
+        /// procedure that returns the gene id for a given seqid
+        /// </summary>
+        /// <param name="seqid"></param>
+        /// <returns></returns>
+        public DataModelGeneId GetGeneId(string seqid)
+        {
+            //check if the seqid is in the dictionary
+            if (GeneIds.ContainsKey(seqid))
+            {
+                //return the gene id
+                return GeneIds[seqid];
+            }
+            else
+            {
+                //return null
+                return null;
+            }
+        }
 
         #endregion
 

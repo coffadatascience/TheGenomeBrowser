@@ -70,9 +70,10 @@ namespace TheGenomeBrowser.ViewModels
         public DataModels.Genes.DataModelLookupGeneList DataModelLookupGeneList { get; set; }
 
         /// <summary>
-        /// var for assembly source data model
+        /// var for list of data sources (DataModelAssemblySourceList)
         /// </summary>
-        public DataModels.AssemblyMolecules.DataModelAssemblySource DataModelAssemblySource { get; set; }
+        public DataModels.AssemblyMolecules.DataModelAssemblySourceList DataModelAssemblySourceList { get; set; }
+
 
         #endregion
 
@@ -153,6 +154,9 @@ namespace TheGenomeBrowser.ViewModels
             //create data model
             DataModelGtfFile = new DataModels.NCBIImportedData.DataModelGtfFile();
 
+            // new DataModelAssemblySourceList
+            DataModelAssemblySourceList = new DataModels.AssemblyMolecules.DataModelAssemblySourceList();
+
             //create view model
             ViewModelGtfFile = new ViewModelGtfFile();
             //create view model for the assembly report comments
@@ -222,6 +226,11 @@ namespace TheGenomeBrowser.ViewModels
             //create a new dictionary that has the source as key and the data model assembly source as value
             Dictionary<string, DataModels.AssemblyMolecules.DataModelAssemblySource> dictionarySourceDataModelAssemblySource = new Dictionary<string, DataModels.AssemblyMolecules.DataModelAssemblySource>();
 
+            // create a local dictionary that collects all the lines that denote feature type "transcript"
+            // we collect these during the first run, so we may process them afterwards, in the second run, all hierarchies are then present to be placed in the proper levels
+            // The Key for a transcript is the transcript ID, the value is the transcript object, note we do not expected multiple transcript lines with the same transcript ID (so if we find those then we may crash)
+            // Note --> this is a separate look to ensure we already have all the gene features, so that afterwards the transcript features can be placed in the correct gene 
+            Dictionary<TranscriptInfo, GTFFeature> dictionaryTranscriptFeature = new Dictionary<TranscriptInfo, GTFFeature>();
 
             //loop all features in the GTF file
             foreach (GTFFeature feature in DataModelGtfFile.FeaturesList)
@@ -263,17 +272,17 @@ namespace TheGenomeBrowser.ViewModels
                 string MoleculeChromosome = GetChromosomeNumber(DataModelGtfAssemblyReport, feature, ref continueImportWithoutAssemblyReport);
 
                 //check if the molecule is in the dictionary, if not add it by creating a new DataModelMolecule
-                if (!dataModelAssemblySource.DictionaryOfMolecules.ContainsKey(MoleculeChromosome))
+                if (!dataModelAssemblySource.TheGenome.DictionaryOfMolecules.ContainsKey(MoleculeChromosome))
                 {
                     //create a new DataModelMolecule
                     dataModelMolecule = new DataModels.AssemblyMolecules.DataModelMolecule(MoleculeChromosome);
                     //add the data model molecule to the dictionary
-                    dataModelAssemblySource.DictionaryOfMolecules.Add(MoleculeChromosome, dataModelMolecule);
+                    dataModelAssemblySource.TheGenome.DictionaryOfMolecules.Add(MoleculeChromosome, dataModelMolecule);
                 }
                 else
                 {
                     //get the data model molecule from the dictionary
-                    dataModelMolecule = dataModelAssemblySource.DictionaryOfMolecules[MoleculeChromosome];
+                    dataModelMolecule = dataModelAssemblySource.TheGenome.DictionaryOfMolecules[MoleculeChromosome];
 
                 }
 
@@ -340,25 +349,85 @@ namespace TheGenomeBrowser.ViewModels
                 }
 
 
+                //----------------------------------------------------
+                // 4. process the transcript
+                //----------------------------------------------------
+                //check if the feature type is "transcript", if so then check if the dictionary already has it, if not add it to the dictionary
+                if (featureTypeEnum == SettingsAssemblySource.FeatureType.transcript)
+                {
+
+                    //create a new TranscriptInfo object (add the transcript id and the MoleculeChromosome)
+                    TranscriptInfo transcriptInfo = new TranscriptInfo(feature.TranscriptId, MoleculeChromosome);
+
+
+                    //check if the transcript is not yet in the dictionary
+                    if (!dictionaryTranscriptFeature.ContainsKey(transcriptInfo))
+                    {
+                        dictionaryTranscriptFeature.Add(transcriptInfo, feature);
+                    }
+                    
+                }
+
+                //increase the number of features
+                numberOfFeatures++;
+                //increase the number of features update
+                numberOfFeaturesUpdate++;
+
+            }
+
+            //pass the dictionary to the DataModelAssemblySourceList in the handler (this allows the first layers to be present so we may continue processing the transcript features)
+            DataModelAssemblySourceList.ListOfAssemblySources = dictionarySourceDataModelAssemblySource.Values.ToList();
+
+
+        }
+
+        /// <summary>
+        /// procedure that processes the list of transcript features and places them in the correct gene in the DataModelAssemblySourceList
+        /// </summary>
+        public void ProcessNcbiDataToAssemblyBySourceTranscripts(Dictionary<TranscriptInfo, GTFFeature> dictionaryTranscriptFeature)
+        {
+
+            //loop all features in the GTF file
+            foreach (var DicItem in dictionaryTranscriptFeature)
+            {
+
+                //get GTFFeature
+                var GtfFeature = DicItem.Value;
+                //get chromosome
+                var Molecule = DicItem.Key.moleculeChromosome;
+                //get transcript id
+                var TranscriptId = DicItem.Key.TranscriptId;
+
+                //var for source
+                string source = GtfFeature.Source;
+
+                //get enum for the source
+                var sourceType = SettingsAssemblySource.ReturnSourceEnumByString(source);
+
+                // 1. get the source from DataModelAssemblySourceList
+                var DataModelAssemblySource = this.DataModelAssemblySourceList.ReturnDataModelAssemblySource(sourceType);
+
+                // 2. get the correct molecule from the genome in the source
+
+
+
+
             }
 
 
-            //increase the number of features
-            numberOfFeatures++;
-            //increase the number of features update
-            numberOfFeaturesUpdate++;
         }
 
-    
 
-    /// <summary>
-    /// procedure that takes a DataModelGtfAssemblyReport, GTFFeature feature, as well as a boolean (continueImportWithoutAssemblyReport) and returns a chromosome (string)
-    /// </summary>
-    /// <param name="dataModelAssemblyReport"></param>
-    /// <param name="feature"></param>
-    /// <param name="continueImportWithoutAssemblyReport"></param>
-    /// <returns></returns>
-    private string GetChromosomeNumber(DataModelAssemblyReport dataModelAssemblyReport, GTFFeature feature, ref bool continueImportWithoutAssemblyReport)
+
+
+        /// <summary>
+        /// procedure that takes a DataModelGtfAssemblyReport, GTFFeature feature, as well as a boolean (continueImportWithoutAssemblyReport) and returns a chromosome (string)
+        /// </summary>
+        /// <param name="dataModelAssemblyReport"></param>
+        /// <param name="feature"></param>
+        /// <param name="continueImportWithoutAssemblyReport"></param>
+        /// <returns></returns>
+        private string GetChromosomeNumber(DataModelAssemblyReport dataModelAssemblyReport, GTFFeature feature, ref bool continueImportWithoutAssemblyReport)
     {
         //set a var for the chromosome
         string chromosome = "?";

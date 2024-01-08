@@ -11,7 +11,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
     /// class that holds a data model for a single entity (exon, intron, etc)
     /// and entitiy is typically a part of a seqid (gene) and has a location on the seqid 
     /// </summary>
-    public class DataModelGeneElement
+    public class DataModelGeneTranscriptElement
     {
 
         #region properties

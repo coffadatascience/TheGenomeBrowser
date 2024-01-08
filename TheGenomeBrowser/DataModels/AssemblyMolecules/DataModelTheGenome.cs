@@ -20,10 +20,12 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #region properties
 
+
         /// <summary>
-        /// var list of molecules (chromosomes, plasmids, etc)
+        /// dictionary that holds the different molecules (key is the molecule name, value is the molecule)
+        /// Note JCO --> we use dictionaries because we want to use the molecule name as a key to quickly find the molecule (this may results in problems for saving)
         /// </summary>
-        public List<DataModelMolecule> ListOfMolecules { get; set; }
+        public Dictionary<string, DataModelMolecule> DictionaryOfMolecules { get; set; }
 
         #endregion
 
@@ -35,19 +37,41 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         public DataModelTheGenome()
         {
-            //init the list of molecules
-            ListOfMolecules = new List<DataModelMolecule>();
+            //init the dictionary of molecules
+            DictionaryOfMolecules = new Dictionary<string, DataModelMolecule>();
         }
 
         #endregion
 
 
+
+
         #region methods
 
-        //
+        /// <summary>
+        /// procedure that returns the molecule with the given name
+        /// </summary>
+        /// <param name="moleculeName"></param>
+        /// <returns></returns>
+        public DataModelMolecule GetMolecule(string moleculeName)
+        {
+            //check if the molecule is in the dictionary
+            if (DictionaryOfMolecules.ContainsKey(moleculeName))
+            {
+                //return the molecule
+                return DictionaryOfMolecules[moleculeName];
+            }
+            else
+            {
+                //return null
+                return null;
+            }
+        }
 
 
         #endregion
+
+
 
 
     }

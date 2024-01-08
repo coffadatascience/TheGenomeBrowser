@@ -33,6 +33,25 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #endregion
 
+        #region methods
+
+
+        //procedure that loops the list of source and return the proper list based on the provided enum type
+        public DataModelAssemblySource ReturnDataModelAssemblySource(SettingsAssemblySource.AssemblySource sourceType)
+        {
+            //loop list
+            foreach (var DataModelAssemblySource in this.ListOfAssemblySources)
+            {
+                //match enum
+                if (DataModelAssemblySource.SourceType == sourceType) return DataModelAssemblySource;
+            }
+
+            //return null
+            return null;
+        }
+
+        #endregion
+
     }
 
     /// <summary>
@@ -51,12 +70,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         public SettingsAssemblySource.AssemblySource SourceType { get; set; }
 
-
         /// <summary>
-        /// dictionary that holds the different molecules (key is the molecule name, value is the molecule)
-        /// Note JCO --> we use dictionaries because we want to use the molecule name as a key to quickly find the molecule (this may results in problems for saving)
+        /// Data Model of the Genome for this source based on annotation file (note that we may get other data models from this source that may be in this class
         /// </summary>
-        public Dictionary<string, DataModelMolecule> DictionaryOfMolecules { get; set; }
+        public DataModelTheGenome TheGenome { get; set; }
 
 
         #endregion
@@ -80,33 +97,25 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         public DataModelAssemblySource(string source)
         {
 
-            //set the source type
-            if (source == SettingsAssemblySource.BESTREFSEQ)
-            {
-                SourceType = SettingsAssemblySource.AssemblySource.BestRefSeq;
-            }
-            else if (source == SettingsAssemblySource.GNOMON)
-            {
-                SourceType = SettingsAssemblySource.AssemblySource.Gnomon;
-            }
-            else if (source == SettingsAssemblySource.CURATEDREFSEQ)
-            {
-                SourceType = SettingsAssemblySource.AssemblySource.CuratedRefSeq;
-            }
-            else
-            {
-                SourceType = SettingsAssemblySource.AssemblySource.Other;
-                //throw new Exception("The source type is not recognized");
-            }
+            //get set the source type
+            SourceType = SettingsAssemblySource.ReturnSourceEnumByString(source);
 
-            //init the dictionary of molecules
-            DictionaryOfMolecules = new Dictionary<string, DataModelMolecule>();
-
+            //list of the genomes
+            TheGenome = new DataModelTheGenome();
         }
 
         #endregion
 
 
+        #region methods
+
+
+    
+
+
+
+
+#endregion
 
     }
 
