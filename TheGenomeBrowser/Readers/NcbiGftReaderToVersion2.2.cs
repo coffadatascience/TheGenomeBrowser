@@ -231,7 +231,7 @@ namespace TheGenomeBrowser.Readers
                         feature.Gene = GeneName;
                     }
 
-                    // position 06: process the product
+                    // position 06a: process the product
                     else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ProductHeaderName))
                     {
                         //var for product
@@ -249,6 +249,25 @@ namespace TheGenomeBrowser.Readers
                         //add the attribute to the feature
                         feature.Product = Product;
                     }
+                    // position 6b: process protein id (note this is only present for CDS)
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ProteinIdHeaderName))
+                    {
+                        //var for protein id
+                        string ProteinId = "";
+
+                        //remove the constant string
+                        ProteinId = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ProteinIdHeaderName, "");
+
+                        //remove the double quotes
+                        ProteinId = ProteinId.Replace("\"", "");
+
+                        //trim the string
+                        ProteinId = ProteinId.Trim();
+
+                        //add the attribute to the feature
+                        feature.ProteinId = ProteinId;
+                    }
+
                     // position 07: process the pseudo
                     else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName))
                     {
@@ -334,6 +353,9 @@ namespace TheGenomeBrowser.Readers
                 //increase the progress counter
                 ProgressCounter++;
             }
+
+            //clear memory of reader
+
 
             //return the list of features
             return DataModelGtfFile;

@@ -4,12 +4,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using TheGenomeBrowser.DataModels.AssemblyMolecules;
 using TheGenomeBrowser.DataModels.Genes;
 using TheGenomeBrowser.DataModels.NCBIImportedData;
 using TheGenomeBrowser.ViewModels.Settings;
 using TheGenomeBrowser.ViewModels.View;
+using TheGenomeBrowser.ViewModels.View.AssemblyMolecules;
 using TheGenomeBrowser.ViewModels.VIewModel;
+using TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules;
 
 namespace TheGenomeBrowser.ViewModels
 {
@@ -90,6 +93,16 @@ namespace TheGenomeBrowser.ViewModels
         /// </summary>
         public ViewModelAssemblyReportComments ViewModelAssemblyReportComments { get; set; }
 
+        /// <summary>
+        /// view model for ViewModelDataAssemblySources
+        /// </summary>
+        public ViewModelDataAssemblySources ViewModelDataAssemblySources { get; set; }
+
+        /// <summary>
+        /// view model for the entire transcirpt list by unique gene id + transcript id
+        /// </summary>
+        public ViewModelDataGeneTranscripts ViewModelDataGeneTranscripts { get; set; }
+
         #endregion
 
 
@@ -114,6 +127,16 @@ namespace TheGenomeBrowser.ViewModels
         /// view for the processed gene list
         /// </summary>
         public ViewDataGridGeneList ViewDataGridGeneList { get; set; }
+
+        /// <summary>
+        /// view for ViewDataGridDataModelAssemblySourceGenesUniqueGeneId (this is the list of all genes as found in all sources)
+        /// </summary>
+        public ViewDataGridDataModelAssemblySourceGenesUniqueGeneId ViewDataGridDataModelAssemblySourceGenesUniqueGeneId { get; set; }
+
+        /// <summary>
+        /// view of the list of all unique transcripts
+        /// </summary>
+        public ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList { get; set; }
 
         #endregion
 
@@ -161,6 +184,11 @@ namespace TheGenomeBrowser.ViewModels
             ViewModelGtfFile = new ViewModelGtfFile();
             //create view model for the assembly report comments
             ViewModelAssemblyReportComments = new ViewModelAssemblyReportComments();
+            //create view model for ViewModelDataAssemblySources
+            ViewModelDataAssemblySources = new ViewModelDataAssemblySources();
+            //create view model for the entire transcirpt list by unique gene id + transcript id
+            ViewModelDataGeneTranscripts = new ViewModelDataGeneTranscripts();
+
 
             //create view data grid imported data GTF file
             ViewDataGridImportedDataGtfFile = new ViewDataGridImportedDataGtfFile("ViewDataGridImportedDataGtfFile");
@@ -168,6 +196,12 @@ namespace TheGenomeBrowser.ViewModels
             ViewDataGridAssemblyReportComments = new ViewDataGridAssemblyReportComments("ViewDataGridAssemblyReportComments");
             //new view data grid assembly report list
             ViewDataGridAssemblyReportList = new ViewDataGridAssemblyReportList("ViewDataGridAssemblyReportList");
+            //new view for the processed gene list
+            ViewDataGridGeneList = new ViewDataGridGeneList("ViewDataGridGeneList");
+            //new view for ViewDataGridDataModelAssemblySourceGenesUniqueGeneId (this is the list of all genes as found in all sources)
+            ViewDataGridDataModelAssemblySourceGenesUniqueGeneId = new ViewDataGridDataModelAssemblySourceGenesUniqueGeneId("ViewDataGridDataModelAssemblySourceGenesUniqueGeneId");
+            //new view of the list of all unique transcripts
+            ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList = new ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList("ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList");
 
         }
 
@@ -245,6 +279,151 @@ namespace TheGenomeBrowser.ViewModels
         #endregion
 
 
+        #region "Methods for placing the individual line element in their transcript items"
+
+
+        // procedure that takes the DataModelAssemblySourceList 
+        /// <summary>
+        /// procedure that processes the dictionaryTranscriptFeature for all element lines that are not featuretype "transcript" or "gene" (so these contain the start_codon, End_Codon, Exon list, CDS list)
+        /// </summary>
+        /// <param name="dictionaryTranscriptFeature"></param>
+        public void ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(bool printDebug)
+        {
+
+            //local var continueImportWithoutAssemblyReport is true (we should already have processed the list before
+            bool continueImportWithoutAssemblyReport = true;
+
+            //loop all features in the GTF file
+            foreach (GTFFeature feature in DataModelGtfFile.FeaturesList)
+            {
+
+                //use GetChromosomeNumber, to get the chromosome number
+                string MoleculeChromosome = GetChromosomeNumber(DataModelGtfAssemblyReport, feature, ref continueImportWithoutAssemblyReport);
+                //get gene id
+                string geneId = feature.GeneId;
+                //get transcript id
+                string transcriptId = feature.TranscriptId;
+                //get the feature type
+                string featureType = feature.FeatureType;
+
+                // var for start
+                int start = feature.Start;
+                // var for end
+                int end = feature.End;
+                //var for exon number
+                string exonNumber = feature.ExonNumber;
+                // var for strand
+                string strand = feature.Strand;
+                // var for frame
+                string frame = feature.Frame;
+                // var for protein id
+                string proteinId = feature.ProteinId;
+
+                //get the enum for the feature type (GetFeatureType)
+                var featureTypeEnum = SettingsAssemblySource.GetFeatureType(featureType);
+
+                //check if the feature type is not "transcript" or "gene", if this is true then skip the line. We match against the constants
+                //check if this field is TRANSCRIPT or GENE, if so then skip the line
+                if (featureType == _startLineGene || featureType == _startLineTranscript)
+                {
+                    //skip the line
+                    continue;
+                }
+
+                //get the transcript from the sources
+                var DataModelGeneTranscript = this.DataModelAssemblySourceList.ReturnGeneTranscript(MoleculeChromosome, geneId, transcriptId);
+
+                //check if we have a DataModelGeneTranscript
+                if (DataModelGeneTranscript != null)
+                {
+
+                    //check if the feature type is start_codon
+                    if (featureTypeEnum == SettingsAssemblySource.FeatureType.start_codon)
+                    {
+                        //init the DataModelGeneTranscriptElementStartCodon
+                        DataModelGeneTranscript.GeneTranscriptObject.DataModelGeneTranscriptElementStartCodon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCodon(featureType, start, end);
+
+                        //-------------------------------------
+                        //Note -- The start coding is also the first exon in the CDS, so we also add a new CDS item here to have the position of exon 1 (or their notation of it)
+                        //-------------------------------------
+
+                        //new DataModelGeneTranscriptElementCDS
+                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId);
+
+                        //add to DataModelGeneTranscript
+                        DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS.Add(DataModelGeneTranscriptElementCDS);
+
+                    }
+                    //check if the feature type is end_codon
+                    else if (featureTypeEnum == SettingsAssemblySource.FeatureType.stop_codon)
+                    {
+                        //init the DataModelGeneTranscriptElementEndCodon
+                        DataModelGeneTranscript.GeneTranscriptObject.DataModelGeneTranscriptElementStopCodon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCodon(featureType, start, end);
+
+                    }
+                    //check if the feature type is exon
+                    else if (featureTypeEnum == SettingsAssemblySource.FeatureType.exon)
+                    {
+
+                        //process the information of the DicItem GtfFeature to create a new element that is placed in the exon list
+                        //create a new DataModelGeneTranscriptElementExon
+                        var DataModelGeneTranscriptElementExon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementExon(start, end, strand, feature.ExonNumber);
+
+                        //add to DataModelGeneTranscript
+                        DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon.Add(DataModelGeneTranscriptElementExon);
+
+
+                    }
+                    //check if the feature type is cds
+                    else if (featureTypeEnum == SettingsAssemblySource.FeatureType.CDS)
+                    {
+
+                        //new DataModelGeneTranscriptElementCDS
+                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId);
+
+                        //add to DataModelGeneTranscript
+                        DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS.Add(DataModelGeneTranscriptElementCDS);
+
+
+
+                    }
+
+
+                }
+
+
+            }
+
+
+        }
+
+
+
+        #endregion
+
+
+        #region "Methods for processing the the transcript of all sources into a single list"
+
+        /// <summary>
+        /// procedure that takes the DataModelAssemblySourceList and processes them in the ViewModelDataGeneTranscripts to make a unique list of all transcripts. After sets the ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList
+        /// </summary>
+        public void ProcessDataModelAssemblySourceListToViewModelDataGeneTranscripts()
+        {
+
+            //process the data model in the ViewModelDataGeneTranscripts
+            ViewModelDataGeneTranscripts.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary(this.DataModelAssemblySourceList.ListOfAssemblySources);
+
+            //set the data source for the grid
+            this.ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList.DataSource = ViewModelDataGeneTranscripts.ListViewModelDataGeneTranscriptItemsList;
+
+            //set the text of the combo box to the current view
+            this.comboBoxConditionalFormatExperimentView.Text = "Transcripts";
+
+        }
+
+        #endregion
+
+
         //Note JCO -- > this region processes the GTF file feature list up into sources and molecules, rather than trying immediatly to genes
         //              this approach may remove a lot of double which makes the gene list smaller and more manageable (also with extra structure there is a more appropriate hierarchy, minimizing the number of elements in the list)
         #region  methods "processing the gene list and establishing TheGenome data model"
@@ -256,7 +435,7 @@ namespace TheGenomeBrowser.ViewModels
         /// ---> we may however collect collect all unique transcript names and then process the list again to get the transcripts, but this may be more complicated than just passing through the list a few times
         /// </summary>
         /// <param name="progress"></param>
-        public void ProcessNcbiDataToAssemblyBySource() //IProgress<int> progress)
+        public void ProcessNcbiDataToAssemblyBySource(bool printDebug) //IProgress<int> progress)
         {
 
             //boolean that remembers if the user responds positive to continue import of the GTF file wihout an assembly report
@@ -392,7 +571,7 @@ namespace TheGenomeBrowser.ViewModels
                             if (System.Diagnostics.Debugger.IsAttached)
                             {
                                 //print message in debugger
-                                System.Diagnostics.Debug.WriteLine("Gene id is already in the dictionary: " + geneId);
+                               if (printDebug == true) System.Diagnostics.Debug.WriteLine("Gene id is already in the dictionary: " + geneId);
                             }
                         }
 
@@ -404,42 +583,7 @@ namespace TheGenomeBrowser.ViewModels
                         if (System.Diagnostics.Debugger.IsAttached)
                         {
                             //print message in debugger
-                            System.Diagnostics.Debug.WriteLine("Gene id is null or empty, but AttributesString is not null or empty: " + feature.AttributesString);
-                        }
-
-                    }
-
-
-                    //--------------------------
-                    // 2. Handle xref dictionary
-                    //--------------------------
-
-                    // Note JCO -- > we create a second dictionary gene for each molecule that has a dictionary based on the XrefId, this is because the gene id is not always present, but the XrefId is always present
-                    //               Because these lines do not have a related line feed feature type gene but we do want to search them, they will be placed under their ref number for searches   
-                    
-                    //set ar to XrefId
-                    string XrefId = DataModelGeneId.Db_Xref_One;
-
-                    //check if the XrefId is not null or empty
-                    if (!string.IsNullOrEmpty(XrefId))
-                    {
-
-                        //check if the XrefId is not yet in the dictionary
-                        if (!dataModelMolecule.XrefIds.ContainsKey(XrefId))
-                        {
-
-                            //add the gene to the dictionary
-                            dataModelMolecule.XrefIds.Add(XrefId, DataModelGeneId);
-
-                        }
-                        else
-                        {
-                            //check if we are in debug mode
-                            if (System.Diagnostics.Debugger.IsAttached)
-                            {
-                                //print message in debugger
-                                System.Diagnostics.Debug.WriteLine("XrefId is already in the dictionary: " + XrefId);
-                            }
+                            if (printDebug == true) System.Diagnostics.Debug.WriteLine("Gene id is null or empty, but AttributesString is not null or empty: " + feature.AttributesString);
                         }
 
                     }
@@ -463,7 +607,7 @@ namespace TheGenomeBrowser.ViewModels
                     {
                         dictionaryTranscriptFeature.Add(transcriptInfo, feature);
                     }
-                    
+
                 }
 
                 //increase the number of features
@@ -483,7 +627,7 @@ namespace TheGenomeBrowser.ViewModels
             if (dictionaryTranscriptFeature.Count > 0)
             {
                 //process the list of transcript features and places them in the correct gene in the DataModelAssemblySourceList
-                ProcessNcbiDataToAssemblyBySourceTranscripts(dictionaryTranscriptFeature);
+                ProcessNcbiDataToAssemblyBySourceTranscripts(dictionaryTranscriptFeature, printDebug);
             }
             else //if the dictionary of transcript features is empty, then we may have a problem, as we may have no transcripts
             {
@@ -495,14 +639,21 @@ namespace TheGenomeBrowser.ViewModels
                 }
             }
 
+            //create a view model for the data model assembly sources
+            ViewModelDataAssemblySources = new ViewModelDataAssemblySources();
 
+            //set the data model in the view model
+            ViewModelDataAssemblySources.ProcessAssemblySourcesToTotalGeneListDictionary(this.DataModelAssemblySourceList.ListOfAssemblySources);
+
+            //set the data source for the grid
+            this.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId.DataSource = ViewModelDataAssemblySources.ListViewModelDataAssemblySourceGenes;
 
         }
 
         /// <summary>
         /// procedure that processes the list of transcript features and places them in the correct gene in the DataModelAssemblySourceList
         /// </summary>
-        public void ProcessNcbiDataToAssemblyBySourceTranscripts(Dictionary<TranscriptInfo, GTFFeature> dictionaryTranscriptFeature)
+        public void ProcessNcbiDataToAssemblyBySourceTranscripts(Dictionary<TranscriptInfo, GTFFeature> dictionaryTranscriptFeature, bool printDebug)
         {
 
             //loop all features in the GTF file
@@ -546,7 +697,7 @@ namespace TheGenomeBrowser.ViewModels
                 {
 
                     //search all sources for the gene id
-                    var DataModelGeneIdOtherSourceThatGtfFeatureLineFeed =  this.DataModelAssemblySourceList.ReturnGeneId(Molecule, GtfFeature.GeneId);
+                    var DataModelGeneIdOtherSourceThatGtfFeatureLineFeed = this.DataModelAssemblySourceList.ReturnGeneId(Molecule, GtfFeature.GeneId);
 
                     //if we find the gene id in another source, then we may add the transcript to the gene id in the other source
                     if (DataModelGeneIdOtherSourceThatGtfFeatureLineFeed != null)
@@ -563,7 +714,7 @@ namespace TheGenomeBrowser.ViewModels
                         if (System.Diagnostics.Debugger.IsAttached)
                         {
                             //print message in debugger
-                            System.Diagnostics.Debug.WriteLine("The gene id is not in the dictionary of gene ids: " + GtfFeature.GeneId + "Source Gtf Transcrip line: " + sourceGtfFeature + " but we found it in another source: " + DataModelGeneIdOtherSourceThatGtfFeatureLineFeed.Source);
+                            if (printDebug == true) System.Diagnostics.Debug.WriteLine("The gene id is not in the dictionary of gene ids: " + GtfFeature.GeneId + "Source Gtf Transcrip line: " + sourceGtfFeature + " but we found it in another source: " + DataModelGeneIdOtherSourceThatGtfFeatureLineFeed.Source);
                         }
 
                         //add to DataModelGeneId
@@ -573,49 +724,23 @@ namespace TheGenomeBrowser.ViewModels
                     else
                     {
 
-
-                        //--------------------------------
-                        // NOTE JCO - > In practice finding something via XrefIds over GeneId doesn't happen because the gene list is usually more extensive
-                        //              We may keep this for troubleshooting and searches but it may be be needed and we may remove to maintain simplicity
-                        //--------------------------------
-
-                        //check if we can get the entree via the Db_Xref_One dictionary
-                        if (DataModelMolecule.XrefIds.ContainsKey(GtfFeature.GeneId))
+                        //check if we have a dataModelMolecule (if this is true then add the future to the list of transcripts that have no gene id on the molecule, if do do not have a molecule found, then place the list in the unknown list of the Genome)
+                        if (DataModelMolecule != null)
                         {
-                            // 3. get the correct gene from the molecule
-                            var DataModelGeneId = DataModelMolecule.XrefIds[GtfFeature.GeneId];
-
-                            // process the transcript (make a new DataModelTranscript passing the first 8 feature items and the attribute line feed)
-                            var DataModelTranscript = new DataModels.AssemblyMolecules.DataModelGeneTranscript(
-                                                                                  TranscriptId, GtfFeature.Seqname, GtfFeature.Start, GtfFeature.End, GtfFeature.Score, GtfFeature.Strand, GtfFeature.Frame, GtfFeature.AttributesString);
-
-                            //add to DataModelGeneId
-                            DataModelGeneId.ListGeneTranscripts.Add(DataModelTranscript);
-
+                            //add to the list of transcripts that have no gene id on the molecule
+                            DataModelMolecule.ListOfTranscriptsThatHaveNoGeneId.Add(GtfFeature);
                         }
-
-                        //--------------------------------
                         else
                         {
-                            //check if we have a dataModelMolecule (if this is true then add the future to the list of transcripts that have no gene id on the molecule, if do do not have a molecule found, then place the list in the unknown list of the Genome)
-                            if (DataModelMolecule != null)
-                            {
-                                //add to the list of transcripts that have no gene id on the molecule
-                                DataModelMolecule.ListOfTranscriptsThatHaveNoGeneId.Add(GtfFeature);
-                            }
-                            else
-                            {
-                                //add to the list of transcripts that have no gene id on the molecule
-                                DataModelAssemblySource.TheGenome.ListOfTranscriptsThatHaveNoMoleculeOrGeneId.Add(GtfFeature);
-                            }
+                            //add to the list of transcripts that have no gene id on the molecule
+                            DataModelAssemblySource.TheGenome.ListOfTranscriptsThatHaveNoMoleculeOrGeneId.Add(GtfFeature);
+                        }
 
-                            //throw a message in the debugger
-                            if (System.Diagnostics.Debugger.IsAttached)
-                            {
-                                //print message in debugger
-                                System.Diagnostics.Debug.WriteLine("The gene id is not in the dictionary of gene ids: " + GtfFeature.GeneId);
-                            }
-
+                        //throw a message in the debugger
+                        if (System.Diagnostics.Debugger.IsAttached)
+                        {
+                            //print message in debugger
+                            if (printDebug == true) System.Diagnostics.Debug.WriteLine("The gene id is not in the dictionary of gene ids: " + GtfFeature.GeneId);
                         }
                         //--------------------------------
 
@@ -635,17 +760,16 @@ namespace TheGenomeBrowser.ViewModels
 
 
 
+        #endregion
 
-    #endregion
 
+        #region methods "processing GTF file imported data into unique gene list"
 
-    #region methods "processing GTF file imported data into unique gene list"
-
-    /// <summary>
-    /// async procedure that processes the GTF file imported data set view
-    /// </summary>
-    /// <returns></returns>
-    public async Task<bool> ProcessGtfFileImportedDataSetViewAsync(IProgress<int> progress)
+        /// <summary>
+        /// async procedure that processes the GTF file imported data set view
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> ProcessGtfFileImportedDataSetViewAsync(IProgress<int> progress)
         {
 
             //read GTF file async
@@ -813,7 +937,7 @@ namespace TheGenomeBrowser.ViewModels
                                 //add the alternative positions
                                 dataModelLookupGeneFromDictionary.AlternativeAccn += ", " + feature.Seqname;
                             }
-          
+
                         }
                         //----------------------------------------------------
 
@@ -910,7 +1034,7 @@ namespace TheGenomeBrowser.ViewModels
 
                     }
                 }
-                
+
                 //increase the number of features
                 numberOfFeatures++;
                 //increase the number of features update

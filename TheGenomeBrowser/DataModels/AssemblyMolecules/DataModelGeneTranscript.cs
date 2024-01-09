@@ -16,8 +16,6 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #region properties
 
-
-
         // A transcript may have multiple fields that are important for us. We will store these in a list of GeneTranscriptElements
         // example line: NC_000001.11	BestRefSeq	transcript	11874	14409	.	+	.	gene_id "DDX11L1"; transcript_id "NR_046018.2"; db_xref "GeneID:100287102"; gbkey "misc_RNA"; gene "DDX11L1"; product "DEAD/H-box helicase 11 like 1 (pseudogene)"; pseudo "true"; transcript_biotype "transcript"; 
         // we may notice that many of the fields are the same as to the gene it originates from. We will store these in the GeneId class. However, start, end, transcipt id, biotype etc are different and we will store these in the GeneTranscriptElement class
@@ -95,20 +93,22 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
 
         /// <summary>
-        /// list of GeneTranscriptsElements
+        /// DataModelGeneTranscriptObject (contains start_codon, end_codon, list of exons, list of CDS)
         /// </summary>
-        public List<DataModelGeneTranscriptElement> ListOfGeneTranscriptElements { get; set; }
+        public DataModelGeneTranscriptObject GeneTranscriptObject{ get; set; }
 
         #endregion
 
 
         #region constructors
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public DataModelGeneTranscript() 
         {
-            //init the list
-            ListOfGeneTranscriptElements = new List<DataModelGeneTranscriptElement>();
-        
+            //init the GeneTranscriptObject
+            GeneTranscriptObject = new DataModelGeneTranscriptObject();
         }
 
         /// <summary>
@@ -124,6 +124,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="attributeLine"></param>
         public DataModelGeneTranscript(string transcripIdUsedKey, string seqName, int start, int end, string score, string strand, string frame, string lineFeedAttributes) : this()
         {
+
+            //new GeneTranscriptObject
+            GeneTranscriptObject = new DataModelGeneTranscriptObject();
+
             //set the properties
             this.SeqName = seqName;
             this.Start = start;

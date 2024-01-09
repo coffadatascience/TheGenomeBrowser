@@ -20,6 +20,11 @@ namespace TheGenomeBrowser
         /// </summary>
         private HandlerImportedGtfFileData _handlerImportedGtfFileData;
 
+        /// <summary>
+        /// var to print the debug in the debug window (we want to turn this off so we can use the console for other things and the processing is much faster)
+        /// but we also want an easy trigger to get the output in the debug window
+        /// </summary>
+        private bool _printDebug = false;
 
         #endregion
 
@@ -44,6 +49,11 @@ namespace TheGenomeBrowser
         /// private const string for button Untangle GTF data
         /// </summary>
         private const string BUTTON_UNTANGLE_GTF = "Untangle GTF data";
+
+        /// <summary>
+        /// constant for name of button used to process all transcript elements
+        /// </summary>
+        private const string BUTTON_PROCESS_TRANSCRIPT_ELEMENTS = "Process Exon/CDS";
 
         /// <summary>
         /// constant for name of data grid view of GTF datamodel
@@ -165,15 +175,122 @@ namespace TheGenomeBrowser
             //add button to split container 1
             splitContainerMain.Panel1.Controls.Add(buttonUntangleGtfData);
 
+            //button that Creates a unique list of all transcripts
+            Button buttonCreateUniqueListTranscripts = new Button();
+            //set name of button BUTTON_PROCESS_GTF
+            buttonCreateUniqueListTranscripts.Name = "buttonCreateUniqueListTranscripts";
+            //set text of button
+            buttonCreateUniqueListTranscripts.Text = "Create unique list of transcripts";
+            //set location of button
+            buttonCreateUniqueListTranscripts.Location = new Point(610, 10);
+            //set size of button
+            buttonCreateUniqueListTranscripts.Size = new Size(150, 50);
+            //add event handler
+            buttonCreateUniqueListTranscripts.Click += new EventHandler(buttonCreateUniqueListTranscripts_Click);
+            //add button to split container 1
+            splitContainerMain.Panel1.Controls.Add(buttonCreateUniqueListTranscripts);
+
+            //button that places all entree in the GftFeature list that are stop_codon, end_codon, exon, and CDS is the right object (button name BUTTON_PROCESS_TRANSCRIPT_ELEMENTS)
+            Button buttonProcessTranscriptElements = new Button();
+            //set name of button BUTTON_PROCESS_GTF
+            buttonProcessTranscriptElements.Name = BUTTON_PROCESS_TRANSCRIPT_ELEMENTS;
+            //set text of button
+            buttonProcessTranscriptElements.Text = "Process Exon/CDS";
+            //set location of button
+            buttonProcessTranscriptElements.Location = new Point(770, 10);
+            //set size of button
+            buttonProcessTranscriptElements.Size = new Size(150, 50);
+            //add event handler
+            buttonProcessTranscriptElements.Click += new EventHandler(buttonProcessTranscriptElements_Click);
+            //add button to split container 1
+            splitContainerMain.Panel1.Controls.Add(buttonProcessTranscriptElements);
+
 
             //add the text box to the form just below the combo box
             _handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView.SelectedIndexChanged += new EventHandler(ComboBoxViewDataGridImportedDataGtfFile_SelectedIndexChanged);
 
         }
 
+
+
+
         #endregion
 
         #region events
+
+        /// <summary>
+        /// triggers event that places all entree in the GftFeature list that are stop_codon, end_codon, exon, and CDS is the right object (button name BUTTON_PROCESS_TRANSCRIPT_ELEMENTS)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void buttonProcessTranscriptElements_Click(object? sender, EventArgs e)
+        {
+            //check if we have a data model in the GTF file handler, if not return appropiate message
+            if (_handlerImportedGtfFileData.DataModelGtfFile == null)
+            {
+                MessageBox.Show("No GTF file imported yet, please import a GTF file first");
+                return;
+            }
+
+            //check if we have sources in the handler, if not return appropiate message
+            if (_handlerImportedGtfFileData.ViewModelDataAssemblySources.ListViewModelDataAssemblySourceGenes.Count() == 0)
+            {
+                MessageBox.Show("No sources found, please untangle the GTF data first");
+                return;
+            }
+
+            //check if we have a list in ProcessAssemblySourcesToTotalGeneTranscriptListDictionary, if not response to user with appropiate message
+            if (_handlerImportedGtfFileData.ViewModelDataAssemblySources.ListViewModelDataAssemblySourceGenes.Count() == 0)
+            {
+                MessageBox.Show("No sources found, please process the transcripts first");
+                return;
+            }
+
+            //trigger ProcessAssemblySourcesToTotalGeneTranscriptListDictionary in the handler
+            _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(this._printDebug);
+
+
+        }
+
+        /// <summary>
+        /// event handler that creates a unique list of all transcripts
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void buttonCreateUniqueListTranscripts_Click(object? sender, EventArgs e)
+        {
+            //check if we have a data model in the GTF file handler, if not return appropiate message
+            if (_handlerImportedGtfFileData.DataModelGtfFile == null)
+            {
+                MessageBox.Show("No GTF file imported yet, please import a GTF file first");
+                return;
+            }
+
+            //check if we have sources in the handler, if not return appropiate message
+            if (_handlerImportedGtfFileData.ViewModelDataAssemblySources.ListViewModelDataAssemblySourceGenes.Count() == 0)
+            {
+                MessageBox.Show("No sources found, please untangle the GTF data first");
+                return;
+            }
+
+            //trigger CreateUniqueListTranscripts in the handler
+            _handlerImportedGtfFileData.ProcessDataModelAssemblySourceListToViewModelDataGeneTranscripts();
+
+            //get the split container 1 and add the grid view to it (panel 2)
+            var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
+
+            //clear the split container 1
+            splitContainer1.Panel2.Controls.Clear();
+
+            //add the grid view to the split container 1
+            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList);
+
+            //return a message that the procedure is finished and give the total of unique transcripts
+            MessageBox.Show("Procedure finished, found " + _handlerImportedGtfFileData.ViewModelDataGeneTranscripts.ListViewModelDataGeneTranscriptItemsList.Count() + " unique transcripts");
+
+        }
 
         /// <summary>
         /// event that triggers the untangle procedure for GTF data into the datamodel assembly source (this is a different way than going to gene lists and more attuned to the form of the genome and its underlying structures / regulations)
@@ -191,8 +308,19 @@ namespace TheGenomeBrowser
             }
 
             //trigger ProcessNcbiDataToAssemblyBySource in the handler
-            _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySource();
+            _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySource(_printDebug);
 
+            //get the split container 1 and add the grid view to it (panel 2)
+            var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
+
+            //clear the split container 1
+            splitContainer1.Panel2.Controls.Clear();
+
+            //add the grid view to the split container 1
+            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId);
+
+            //throw a message box that the untangle procedure is finished and report the number of genes found with a unique gene id
+            MessageBox.Show("Untangle procedure finished, found " + _handlerImportedGtfFileData.ViewModelDataAssemblySources.ListViewModelDataAssemblySourceGenes.Count() + " genes with a unique gene id");
 
         }
 

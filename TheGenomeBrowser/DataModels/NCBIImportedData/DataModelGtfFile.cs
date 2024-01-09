@@ -126,6 +126,11 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         public string Product { get; internal set; }
 
         /// <summary>
+        /// var for proteint id
+        /// </summary>
+        public string ProteinId { get; internal set; }
+
+        /// <summary>
         /// var for gene biotype
         /// </summary>
         public string Pseudo { get; internal set; }

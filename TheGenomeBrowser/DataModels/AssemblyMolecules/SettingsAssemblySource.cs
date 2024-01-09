@@ -128,6 +128,11 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         public const string ProductHeaderName = "product";
 
         /// <summary>
+        /// constant for protein_id
+        /// </summary>
+        public const string ProteinIdHeaderName = "protein_id";
+
+        /// <summary>
         /// var for transcript_biotype
         /// </summary>
         public const string TranscriptBiotypeHeaderName = "transcript_biotype";
@@ -265,6 +270,37 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             {
                 return SettingsAssemblySource.AssemblySource.Other;
                 //throw new Exception("The source type is not recognized");
+            }
+
+        }
+
+        /// <summary>
+        /// procedure that return the string for the source type based on the enum
+        /// </summary>
+        /// <param name="sourceType"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        internal static string ReturnSourceStringByEnum(AssemblySource sourceType)
+        { 
+            //translate the source type enum to a string in a readable format
+            switch (sourceType)
+            {
+                case AssemblySource.BestRefSeq:
+                    return BESTREFSEQ;
+                case AssemblySource.Gnomon:
+                    return GNOMON;
+                case AssemblySource.CuratedRefSeq:
+                    return CURATEDREFSEQ;
+                case AssemblySource.BestRefSeqGnomon:
+                    return BESTREFSEQGNOMON;
+                case AssemblySource.tRNAscan:
+                    return TRNASCAN;
+                case AssemblySource.RefSeq:
+                    return REFSEQ;
+                case AssemblySource.Other:
+                    return "Other";
+                default:
+                    throw new NotImplementedException();
             }
 
         }

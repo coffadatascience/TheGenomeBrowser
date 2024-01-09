@@ -358,13 +358,36 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             ListGeneTranscripts = new List<DataModelGeneTranscript>();
         }
 
+        /// <summary>
+        /// searches the list of gene transcripts for a given gene transcript id and returns the gene transcript
+        /// </summary>
+        /// <param name="geneIdTranscriptId"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public DataModelGeneTranscript GetGeneTranscript(string geneIdTranscriptId)
+        {
+            //loop the list of gene transcripts
+            foreach (var geneTranscript in ListGeneTranscripts)
+            {
+                //check if the gene transcript id is the same as the input
+                if (geneTranscript.TranscriptId == geneIdTranscriptId)
+                {
+                    //return the gene transcript
+                    return geneTranscript;
+                }
+            }
+
+            //return null
+            return null;
+        }
+
 
         #endregion
 
 
         #region methods
 
-        
+
         #endregion
 
 

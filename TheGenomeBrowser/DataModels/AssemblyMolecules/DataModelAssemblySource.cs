@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 {
@@ -39,6 +40,49 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #region methods
          
+
+        /// <summary>
+        /// procedure that returns the transcript by using the MoleculeName and the GeneIdTranscriptId as key to search in the dictionary of all sources
+        /// </summary>
+        /// <param name="moleculeName"></param>
+        /// <param name="geneIdTranscriptId"></param>
+        /// <returns></returns>
+        public DataModelGeneTranscript ReturnGeneTranscript(string moleculeName, string geneId, string geneIdTranscriptId)
+        {
+            //loop the list of sources
+            foreach (var DataModelAssemblySource in this.ListOfAssemblySources)
+            {
+                //get the molecule
+                var molecule = DataModelAssemblySource.TheGenome.GetMolecule(moleculeName);
+
+                //check if the molecule is not null
+                if (molecule != null) //(it may be in a different source)
+                {
+                    //get the gene id from the molecule
+                    var geneIdToReturn = molecule.GetGeneId(geneId);
+
+                    //check if we have found the gene (it may be in a different source)
+                    if (geneIdToReturn != null)
+                    {
+                        //get the gene id transcript id
+                        var geneIdTranscriptIdToReturn = geneIdToReturn.GetGeneTranscript(geneIdTranscriptId);
+
+                        //check if the gene id transcript id is not null
+                        if (geneIdTranscriptIdToReturn != null)
+                        {
+                            //return the gene id transcript id
+                            return geneIdTranscriptIdToReturn;
+                        }
+                    }
+
+
+                }
+            }
+
+            //return null
+            return null;
+        }
+
         /// <summary>
         /// procedure that loops all the sources to get a gene id (take a molecule name and a gene id and return the gene id)
         /// Note that this procedure exists to always get a gene id, but also to see how the different sources relate to each other
@@ -105,6 +149,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
 
         #region properties
+
+        //var that return the name of the source as string
+        public string SourceName { get { return SettingsAssemblySource.ReturnSourceStringByEnum(SourceType); } }
 
         /// <summary>
         /// enum that holds the source type

@@ -71,10 +71,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #endregion
 
-
-
-
         #region methods
+
+
 
         /// <summary>
         /// procedure that returns the molecule with the given name
