@@ -70,7 +70,7 @@ public class ViewModelDataGeneTranscripts
                             DictionaryViewModelDataGeneTranscriptItems[key].NumberOfTranscripts++;
 
                             //throw a message to the debug window
-                            System.Diagnostics.Debug.WriteLine("!!!UNEXPECTED!!! ViewModelDataGeneTranscripts.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary: key already in dictionary: " + key);
+                            //System.Diagnostics.Debug.WriteLine("!!!UNEXPECTED!!! ViewModelDataGeneTranscripts.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary: key already in dictionary: " + key);
 
                         }
                         else
@@ -109,7 +109,11 @@ public class ViewModelDataGeneTranscripts
                             viewModelDataGeneTranscriptItem.NumberOfTranscripts = 1;
 
                             //set the NumberOfExons -- > inner list
-                            //viewModelDataGeneTranscriptItem.NumberOfExons = transcript.ex;
+                            viewModelDataGeneTranscriptItem.NumberOfExons = transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon.Count();
+
+                            //set the TotalNumberOfEntriesForTranscript (if the count of the number of exons, and the number in the CDS and the number in the UTR are the same then we have a complete transcript)
+                            viewModelDataGeneTranscriptItem.TotalNumberOfEntriesForTranscript = transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon.Count() + transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS.Count;
+
 
                             //set the TotalNumberOfEntriesFor
 

@@ -250,6 +250,18 @@ namespace TheGenomeBrowser
             //trigger ProcessAssemblySourcesToTotalGeneTranscriptListDictionary in the handler
             _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(this._printDebug);
 
+            //get the split container 1 and add the grid view to it (panel 2)
+            var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
+
+            //clear the split container 1
+            splitContainer1.Panel2.Controls.Clear();
+
+            //add the grid view to the split container 1
+            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscriptItems);
+
+            //return a message that the procedure is finished and give the total of unique transcripts
+            MessageBox.Show("Procedure finished, found " + _handlerImportedGtfFileData.ViewModelDataGeneTranscriptItems._listViewModelDataGeneTranscriptItems.Count() + " items");
+
 
         }
 
