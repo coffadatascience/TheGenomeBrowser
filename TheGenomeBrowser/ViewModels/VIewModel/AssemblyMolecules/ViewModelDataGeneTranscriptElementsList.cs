@@ -80,15 +80,18 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                             //-------------------------------------------
                             if (includeExonList == true)
                             {
+                                //key for exon list
+                                int EntreeNumberExon = 0;
 
                                 //loop the list of items
                                 foreach (var GeneTranscriptElementExon in transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon)
                                 {
-                                    //var exon number (also used in key)
-                                    int exonNumber = GeneTranscriptElementExon.ExonNumber;
+
+                                    //var that denotes EntreeNumberExon with 3 digits
+                                    string EntreeNumberExonString = EntreeNumberExon.ToString("D3");
 
                                     //create the key
-                                    string key = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId +  "_exon (n-" + exonNumber + ")";
+                                    string key = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId +  "_exon (n-" + EntreeNumberExonString + ")";
 
                                     //check if the item is already in the dictionary
                                     if (_dictionaryViewModelDataGeneTranscriptElements.ContainsKey(key))
@@ -111,7 +114,9 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                                     int start = GeneTranscriptElementExon.Start;
                                     //var end
                                     int end = GeneTranscriptElementExon.End;
-  
+                                    //var exon number (also used in key)
+                                    int exonNumber = GeneTranscriptElementExon.ExonNumber;
+
                                     //var product
                                     string product = "na";
                                     //var protein id
@@ -123,7 +128,8 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                                     //add the item to the dictionary
                                     _dictionaryViewModelDataGeneTranscriptElements.Add(key, item);
 
-
+                                    //count one up
+                                    EntreeNumberExon++;
                                 }
 
                             }
@@ -140,8 +146,15 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                                 // 2a. create entree for the start codon
                                 //-------------------------------------------
 
+                                //note that we count start codon as EntreeNumberCDS = 0 and end codon as EntreeNumberCDS +1
+                                //note that in the CDS the exon numbering may nog be unique (so for the key we use a counter)
+                                int EntreeNumberCDS = 0;
+                                //string that denotes EntreeNumberCDS with 3 digits
+                                string EntreeNumberCDSString = EntreeNumberCDS.ToString("D3");
                                 //create the key
-                                string keyStartCodon = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId + "_" + "start_list";
+                                string keyStartCodon = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId + "_(CDS_entree nr. " + EntreeNumberCDSString + " - start)";
+                                //count one up
+                                EntreeNumberCDS++;
 
                                 //check if the item is already in the dictionary
                                 if (_dictionaryViewModelDataGeneTranscriptElements.ContainsKey(keyStartCodon))
@@ -202,16 +215,16 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                                 // 2b. Process the list of CDS items
                                 //-------------------------------------------
 
-                                //note that in the CDS the exon numbering may nog be unique (so for the key we use a counter)
-                                int EntreeNumberCDS = 0;
 
                                 //loop the list of items
                                 foreach (var GeneTranscriptElementCDS in transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS)
                                 {
 
+                                    //var that denotes EntreeNumberCDS with 3 digits
+                                    EntreeNumberCDSString = EntreeNumberCDS.ToString("D3");
 
                                     //create the key
-                                    string key = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId + "_(CDS_entree nr. " + EntreeNumberCDS + ")";
+                                    string key = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId + "_(CDS_entree nr. " + EntreeNumberCDSString + ")";
 
                                     //check if the item is already in the dictionary
                                     if (_dictionaryViewModelDataGeneTranscriptElements.ContainsKey(key))
@@ -256,8 +269,12 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                                 // 2c. create entree for the stop codon
                                 //-------------------------------------------
 
+                                //note that the last of the loop counts one for the end codon
+                                //var that denotes EntreeNumberCDS with 3 digits
+                                EntreeNumberCDSString = EntreeNumberCDS.ToString("D3");
+
                                 //create the key
-                                string keyStopCodon = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId + "_" + "end_list";
+                                string keyStopCodon = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId + "_(CDS_entree nr. " + EntreeNumberCDSString + " - end)";
 
                                 //check if the item is already in the dictionary
                                 if (_dictionaryViewModelDataGeneTranscriptElements.ContainsKey(keyStopCodon))

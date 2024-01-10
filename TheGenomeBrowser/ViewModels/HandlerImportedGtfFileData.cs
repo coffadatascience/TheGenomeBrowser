@@ -133,7 +133,7 @@ namespace TheGenomeBrowser.ViewModels
         /// <summary>
         /// view of the list of all unique transcripts
         /// </summary>
-        public ViewDataGridDataModelAssemblySourceGeneTranscriptElementList ViewDataGridDataModelAssemblySourceGeneTranscriptElementList { get; set; }
+        public ViewDataGridDataModelAssemySourceGeneTranscripts ViewDataGridDataModelAssemySourceGeneTranscripts { get; set; }
 
         /// <summary>
         /// var for gene list ViewDataGridGeneList
@@ -143,12 +143,12 @@ namespace TheGenomeBrowser.ViewModels
         /// <summary>
         /// view for the list of all ViewDataGrid for Exome
         /// </summary>
-        public ViewDataGridDataModelAssemySourceGeneTranscriptItems ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome { get; set; }
+        public ViewDataGridDataModelAssemblySourceGeneTranscriptElementList ViewDataGridDataModelAssemySourceGeneTranscriptsElementsExome { get; set; }
 
         /// <summary>
         /// view for the list of all ViewDataGrid for CDS
         /// </summary>
-        public ViewDataGridDataModelAssemySourceGeneTranscriptItems ViewDataGridDataModelAssemySourceGeneTranscriptItemsCds { get; set; }
+        public ViewDataGridDataModelAssemblySourceGeneTranscriptElementList ViewDataGridDataModelAssemySourceGeneTranscripsElementsCds { get; set; }
 
         #endregion
 
@@ -212,13 +212,13 @@ namespace TheGenomeBrowser.ViewModels
             //new view for ViewDataGridDataModelAssemblySourceGenesUniqueGeneId (this is the list of all genes as found in all sources)
             ViewDataGridDataModelAssemblySourceGenesUniqueGeneId = new ViewDataGridDataModelAssemblySourceGenesUniqueGeneId("ViewDataGridDataModelAssemblySourceGenesUniqueGeneId");
             //new view of the list of all unique transcripts
-            ViewDataGridDataModelAssemblySourceGeneTranscriptElementList = new ViewDataGridDataModelAssemblySourceGeneTranscriptElementList("ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList");
+            ViewDataGridDataModelAssemySourceGeneTranscripts = new ViewDataGridDataModelAssemySourceGeneTranscripts("ViewDataGridDataModelAssemySourceGeneTranscripts");   
             //new view for gene list ViewDataGridGeneList
             ViewDataGridGeneList = new ViewDataGridGeneList("ViewDataGridGeneList");
             //new view for the list of all ViewDataGrid for Exome
-            ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome = new ViewDataGridDataModelAssemySourceGeneTranscriptItems("ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome");
+            ViewDataGridDataModelAssemySourceGeneTranscriptsElementsExome = new ViewDataGridDataModelAssemblySourceGeneTranscriptElementList("ViewDataGridDataModelAssemySourceGeneTranscriptsElementsExome");
             //new view for the list of all ViewDataGrid for CDS
-            ViewDataGridDataModelAssemySourceGeneTranscriptItemsCds = new ViewDataGridDataModelAssemySourceGeneTranscriptItems("ViewDataGridDataModelAssemySourceGeneTranscriptItemsCds");
+            ViewDataGridDataModelAssemySourceGeneTranscripsElementsCds = new ViewDataGridDataModelAssemblySourceGeneTranscriptElementList("ViewDataGridDataModelAssemySourceGeneTranscripsElementsCds");
         }
 
         #endregion
@@ -441,7 +441,7 @@ namespace TheGenomeBrowser.ViewModels
             //process the ListOfAssemblySources for the ViewModelDataGeneTranscriptItems
             ExomeViewModelDataGeneTranscriptElementsList.ProcessAssemblySources(this.DataModelAssemblySourceList.ListOfAssemblySources, true, false);
             //set the data source for the grid
-            this.ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome.CreateDataGrid(ExomeViewModelDataGeneTranscriptElementsList);
+            this.ViewDataGridDataModelAssemySourceGeneTranscriptsElementsExome.CreateDataGrid(ExomeViewModelDataGeneTranscriptElementsList);
 
 
             //viewmodel for exome
@@ -449,7 +449,7 @@ namespace TheGenomeBrowser.ViewModels
             //process the ListOfAssemblySources for the ViewModelDataGeneTranscriptItems
             CdsViewModelDataGeneTranscriptElementsList.ProcessAssemblySources(this.DataModelAssemblySourceList.ListOfAssemblySources, false, true);
             //set the data source for the grid
-            this.ViewDataGridDataModelAssemySourceGeneTranscriptItemsCds.CreateDataGrid(CdsViewModelDataGeneTranscriptElementsList);
+            this.ViewDataGridDataModelAssemySourceGeneTranscripsElementsCds.CreateDataGrid(CdsViewModelDataGeneTranscriptElementsList);
 
         }
 
@@ -464,11 +464,14 @@ namespace TheGenomeBrowser.ViewModels
         public void ProcessDataModelAssemblySourceListToViewModelDataGeneTranscripts()
         {
 
+            //reset the list of the ViewModelDataGeneTranscriptsList
+            ViewModelDataGeneTranscriptsList.ListViewModelDataGeneTranscriptsList = new List<ViewModelDataGeneTranscript>();
+
             //process the data model in the ViewModelDataGeneTranscripts
             ViewModelDataGeneTranscriptsList.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary(this.DataModelAssemblySourceList.ListOfAssemblySources);
 
             //set the data source for the grid
-            this.ViewDataGridDataModelAssemblySourceGeneTranscriptElementList.DataSource = ViewModelDataGeneTranscriptsList.ListViewModelDataGeneTranscriptsList;
+            this.ViewDataGridDataModelAssemySourceGeneTranscripts.CreateDataGrid(ViewModelDataGeneTranscriptsList);
 
             //set the text of the combo box to the current view
             this.comboBoxConditionalFormatExperimentView.Text = "Transcripts";

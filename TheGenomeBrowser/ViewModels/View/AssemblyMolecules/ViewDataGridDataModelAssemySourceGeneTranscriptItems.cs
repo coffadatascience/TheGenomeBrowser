@@ -11,7 +11,7 @@ namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
     /// <summary>
     /// data grid class use to show the view model of ViewModelDataGeneTranscriptItems
     /// </summary>
-    public class ViewDataGridDataModelAssemySourceGeneTranscriptItems : ViewDataGridBase
+    public class ViewDataGridDataModelAssemySourceGeneTranscripts : ViewDataGridBase
     {
 
         #region constructors
@@ -20,7 +20,7 @@ namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
         /// constructor that takes the name of the grid view as input
         /// </summary>
         /// <param name="nameGridView"></param>
-        public ViewDataGridDataModelAssemySourceGeneTranscriptItems(string nameGridView) : base(nameGridView)
+        public ViewDataGridDataModelAssemySourceGeneTranscripts(string nameGridView) : base(nameGridView)
         {
 
 
@@ -34,10 +34,10 @@ namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
         /// procedure that takes the ViewModelDataGeneTranscriptItems and create the data grid
         /// </summary>
         /// <param name="viewModelDataGeneTranscriptItems"></param>
-        public void CreateDataGrid(ViewModelDataGeneTranscriptElementsList viewModelDataGeneTranscriptElementsList)
+        public void CreateDataGrid(ViewModelDataGeneTranscriptsList viewModelDataGeneTranscriptsList)
         {
             //set the data source for the grid
-            DataSource = viewModelDataGeneTranscriptElementsList._listElements;
+            DataSource = viewModelDataGeneTranscriptsList.ListViewModelDataGeneTranscriptsList;
 
             //adjust column width
             AdjustColumnWidth(_columnWidth);

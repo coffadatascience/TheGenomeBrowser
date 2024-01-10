@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules;
 
 namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
 {
@@ -32,10 +33,10 @@ namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
         /// method that takes ViewModelDataGeneTranscripts and create the data grid
         /// </summary>
         /// <param name="viewModelDataGeneTranscripts"></param>
-        public void CreateDataGrid(ViewModelDataGeneTranscriptsList viewModelDataGeneTranscripts)
+        public void CreateDataGrid(ViewModelDataGeneTranscriptElementsList viewModelDataGeneTranscriptElementsList)
         {
             //set the data source for the grid
-            DataSource = viewModelDataGeneTranscripts.ListViewModelDataGeneTranscriptsList;
+            DataSource = viewModelDataGeneTranscriptElementsList._listElements;
 
             //adjust column width
             AdjustColumnWidth(_columnWidth);

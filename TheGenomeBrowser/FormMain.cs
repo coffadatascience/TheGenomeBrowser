@@ -254,7 +254,7 @@ namespace TheGenomeBrowser
             splitContainer1.Panel2.Controls.Clear();
 
             //add the grid view to the split container 1
-            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome);
+            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscriptsElementsExome);
 
             //return a message that the procedure is finished and give the total of unique transcripts
             MessageBox.Show("Procedure finished, found " + ProcessedItems + " items");
@@ -294,7 +294,7 @@ namespace TheGenomeBrowser
             splitContainer1.Panel2.Controls.Clear();
 
             //add the grid view to the split container 1
-            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGeneTranscriptElementList);
+            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscripts);
 
             //return a message that the procedure is finished and give the total of unique transcripts
             MessageBox.Show("Procedure finished, found " + _handlerImportedGtfFileData.ViewModelDataGeneTranscriptsList.ListViewModelDataGeneTranscriptsList.Count() + " unique transcripts");
@@ -384,15 +384,15 @@ namespace TheGenomeBrowser
                         break;
                     case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelTranscriptList:
                         //add the grid view to the split container 1
-                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId);
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscripts);
                         break;
                     case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelExonList:
                         //add the grid view to the split container 1
-                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGeneTranscriptElementList);
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscriptsElementsExome);
                         break;
                     case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelCdsList:
                         //add the grid view to the split container 1
-                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGeneTranscriptElementList);
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscripsElementsCds);
                         break;
                     default:
                         throw new NotImplementedException();
