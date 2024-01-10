@@ -99,7 +99,6 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// </summary>
         public string ExonNumber { get; set; }
 
-
         /// <summary>
         /// var for transcript id
         /// </summary>

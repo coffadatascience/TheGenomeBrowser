@@ -87,10 +87,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="proteinId"></param>
-        public void AddDataModelGeneTranscriptElementCDS(int start, int end, string exonNumber, string strand, string frame, string proteinId)
+        public void AddDataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product)
         {
             //create a new DataModelGeneTranscriptElementCDS
-            var dataModelGeneTranscriptElementCDS = new DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId);
+            var dataModelGeneTranscriptElementCDS = new DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product);
 
             //add the DataModelGeneTranscriptElementCDS to the list
             ListDataModelGeneTranscriptElementCDS.Add(dataModelGeneTranscriptElementCDS);
@@ -122,13 +122,19 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// var int start_codon (start)
         /// </summary>
-        public int start { get; set; }
+        public int Start { get; set; }
 
         /// <summary>
         /// var for start_codon (end)
         /// </summary>
         public int End { get; set; }
-            
+
+        /// <summary>
+        /// exon notation (often simply the first and the last number of the exon --> we add for link to lists in between)
+        /// </summary>
+        public int Exon { get; set; }
+
+
         #endregion
 
 
@@ -136,17 +142,19 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         /// <summary>
         /// constructor taking the all the fields as input
+        /// Note that there is an exon notation (often simply the first and the last number of the exon --> we add for link to lists in between)
         /// </summary>
         /// <param name="startCodonStart"></param>
         /// <param name="startCodonEnd"></param>
         /// <param name="endCodonStart"></param>
         /// <param name="endCodonEnd"></param>
-        public DataModelGeneTranscriptElementCodon(string name, int startCodonStart, int startCodonEnd)
+        public DataModelGeneTranscriptElementCodon(string name, int start, int end, int exon)
         {
             //set the fields 
             Name = name;
-            start = startCodonStart;
-            End = startCodonEnd;
+            Start = start;
+            End = end;
+            Exon = exon;
         }
 
         #endregion
@@ -180,7 +188,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// var for exon number (note this relates to the exon this cds is part of) Note that some splicing variants may make use of alternative splice sites and thus have different CDSs
         ///  ---> we may thus have multiple exon with the same number in the CDS list, but there should only be one in the exon list (this is also the list that is interesting for probe design, as it constitutes of the data that is on the genome. Transcripts are more interesting for RNA -seq analysis or proteomics)
         /// </summary>
-        public string ExonNumber { get; set; }
+        public int ExonNumber { get; set; }
         
         /// <summary>
         /// var for strand
@@ -197,6 +205,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         public string ProteinId { get; set; }
 
+        /// <summary>
+        /// produce as found
+        /// </summary>
+        public string Product { get; set; }
 
         #endregion
 
@@ -212,7 +224,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="proteinId"></param>
-        public DataModelGeneTranscriptElementCDS(int start, int end, string exonNumber, string strand, string frame, string proteinId)
+        public DataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product)
         {
             //set the fields
             Start = start;
@@ -221,6 +233,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             Strand = strand;
             Frame = frame;
             ProteinId = proteinId;
+            Product = product;
         }
 
                                                                                                                

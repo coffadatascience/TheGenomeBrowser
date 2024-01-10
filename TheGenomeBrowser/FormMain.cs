@@ -211,9 +211,6 @@ namespace TheGenomeBrowser
 
         }
 
-
-
-
         #endregion
 
         #region events
@@ -248,7 +245,7 @@ namespace TheGenomeBrowser
             }
 
             //trigger ProcessAssemblySourcesToTotalGeneTranscriptListDictionary in the handler
-            _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(this._printDebug);
+            var ProcessedItems = _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(this._printDebug);
 
             //get the split container 1 and add the grid view to it (panel 2)
             var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
@@ -257,10 +254,10 @@ namespace TheGenomeBrowser
             splitContainer1.Panel2.Controls.Clear();
 
             //add the grid view to the split container 1
-            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscriptItems);
+            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome);
 
             //return a message that the procedure is finished and give the total of unique transcripts
-            MessageBox.Show("Procedure finished, found " + _handlerImportedGtfFileData.ViewModelDataGeneTranscriptItems._listViewModelDataGeneTranscriptItems.Count() + " items");
+            MessageBox.Show("Procedure finished, found " + ProcessedItems + " items");
 
 
         }
@@ -297,10 +294,10 @@ namespace TheGenomeBrowser
             splitContainer1.Panel2.Controls.Clear();
 
             //add the grid view to the split container 1
-            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList);
+            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGeneTranscriptElementList);
 
             //return a message that the procedure is finished and give the total of unique transcripts
-            MessageBox.Show("Procedure finished, found " + _handlerImportedGtfFileData.ViewModelDataGeneTranscripts.ListViewModelDataGeneTranscriptItemsList.Count() + " unique transcripts");
+            MessageBox.Show("Procedure finished, found " + _handlerImportedGtfFileData.ViewModelDataGeneTranscriptsList.ListViewModelDataGeneTranscriptsList.Count() + " unique transcripts");
 
         }
 
@@ -335,7 +332,6 @@ namespace TheGenomeBrowser
             MessageBox.Show("Untangle procedure finished, found " + _handlerImportedGtfFileData.ViewModelDataAssemblySources.ListViewModelDataAssemblySourceGenes.Count() + " genes with a unique gene id");
 
         }
-
 
         /// <summary>
         /// event hanlder that switched between the different views of the imported GTF data (1. DataModelGtfFile, 2. DataAssemblyReportComments, 3. DataAssemblyReport, 4. DataModelLookupGeneList)
@@ -382,9 +378,21 @@ namespace TheGenomeBrowser
                         //adjust column width (note JCO: we have to do this after the load)
                         _handlerImportedGtfFileData.ViewDataGridAssemblyReportList.AdjustColumnWidth(120);
                         break;
-                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelLookupGeneList:
+                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelGeneList:
                         //add the grid view to the split container 1
-                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridGeneList);
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId);
+                        break;
+                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelTranscriptList:
+                        //add the grid view to the split container 1
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId);
+                        break;
+                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelExonList:
+                        //add the grid view to the split container 1
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGeneTranscriptElementList);
+                        break;
+                    case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelCdsList:
+                        //add the grid view to the split container 1
+                        splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGeneTranscriptElementList);
                         break;
                     default:
                         throw new NotImplementedException();

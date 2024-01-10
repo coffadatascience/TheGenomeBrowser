@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -101,12 +102,8 @@ namespace TheGenomeBrowser.ViewModels
         /// <summary>
         /// view model for the entire transcirpt list by unique gene id + transcript id
         /// </summary>
-        public ViewModelDataGeneTranscripts ViewModelDataGeneTranscripts { get; set; }
+        public ViewModelDataGeneTranscriptsList ViewModelDataGeneTranscriptsList { get; set; }
 
-        /// <summary>
-        /// view model for ViewModelDataGeneTranscriptItems
-        /// </summary>
-        public ViewModelDataGeneTranscriptItems ViewModelDataGeneTranscriptItems { get; set; }
 
         #endregion
 
@@ -129,11 +126,6 @@ namespace TheGenomeBrowser.ViewModels
         public ViewDataGridAssemblyReportList ViewDataGridAssemblyReportList { get; set; }
 
         /// <summary>
-        /// view for the processed gene list
-        /// </summary>
-        public ViewDataGridGeneList ViewDataGridGeneList { get; set; }
-
-        /// <summary>
         /// view for ViewDataGridDataModelAssemblySourceGenesUniqueGeneId (this is the list of all genes as found in all sources)
         /// </summary>
         public ViewDataGridDataModelAssemblySourceGenesUniqueGeneId ViewDataGridDataModelAssemblySourceGenesUniqueGeneId { get; set; }
@@ -141,12 +133,22 @@ namespace TheGenomeBrowser.ViewModels
         /// <summary>
         /// view of the list of all unique transcripts
         /// </summary>
-        public ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList { get; set; }
+        public ViewDataGridDataModelAssemblySourceGeneTranscriptElementList ViewDataGridDataModelAssemblySourceGeneTranscriptElementList { get; set; }
 
         /// <summary>
-        /// view for the list of all ViewDataGridDataModelAssemySourceGeneTranscriptItems
+        /// var for gene list ViewDataGridGeneList
         /// </summary>
-        public ViewDataGridDataModelAssemySourceGeneTranscriptItems ViewDataGridDataModelAssemySourceGeneTranscriptItems { get; set; }
+        public ViewDataGridGeneList ViewDataGridGeneList { get; set; }
+
+        /// <summary>
+        /// view for the list of all ViewDataGrid for Exome
+        /// </summary>
+        public ViewDataGridDataModelAssemySourceGeneTranscriptItems ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome { get; set; }
+
+        /// <summary>
+        /// view for the list of all ViewDataGrid for CDS
+        /// </summary>
+        public ViewDataGridDataModelAssemySourceGeneTranscriptItems ViewDataGridDataModelAssemySourceGeneTranscriptItemsCds { get; set; }
 
         #endregion
 
@@ -197,9 +199,8 @@ namespace TheGenomeBrowser.ViewModels
             //create view model for ViewModelDataAssemblySources
             ViewModelDataAssemblySources = new ViewModelDataAssemblySources();
             //create view model for the entire transcirpt list by unique gene id + transcript id
-            ViewModelDataGeneTranscripts = new ViewModelDataGeneTranscripts();
-            //create view model for ViewModelDataGeneTranscriptItems
-            ViewModelDataGeneTranscriptItems = new ViewModelDataGeneTranscriptItems();
+            ViewModelDataGeneTranscriptsList = new ViewModelDataGeneTranscriptsList();
+
 
             //create view data grid imported data GTF file
             ViewDataGridImportedDataGtfFile = new ViewDataGridImportedDataGtfFile("ViewDataGridImportedDataGtfFile");
@@ -207,15 +208,17 @@ namespace TheGenomeBrowser.ViewModels
             ViewDataGridAssemblyReportComments = new ViewDataGridAssemblyReportComments("ViewDataGridAssemblyReportComments");
             //new view data grid assembly report list
             ViewDataGridAssemblyReportList = new ViewDataGridAssemblyReportList("ViewDataGridAssemblyReportList");
-            //new view for the processed gene list
-            ViewDataGridGeneList = new ViewDataGridGeneList("ViewDataGridGeneList");
+
             //new view for ViewDataGridDataModelAssemblySourceGenesUniqueGeneId (this is the list of all genes as found in all sources)
             ViewDataGridDataModelAssemblySourceGenesUniqueGeneId = new ViewDataGridDataModelAssemblySourceGenesUniqueGeneId("ViewDataGridDataModelAssemblySourceGenesUniqueGeneId");
             //new view of the list of all unique transcripts
-            ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList = new ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList("ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList");
-            //new view for the list of all ViewDataGridDataModelAssemySourceGeneTranscriptItems
-            ViewDataGridDataModelAssemySourceGeneTranscriptItems = new ViewDataGridDataModelAssemySourceGeneTranscriptItems("ViewDataGridDataModelAssemySourceGeneTranscriptItems");
-
+            ViewDataGridDataModelAssemblySourceGeneTranscriptElementList = new ViewDataGridDataModelAssemblySourceGeneTranscriptElementList("ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList");
+            //new view for gene list ViewDataGridGeneList
+            ViewDataGridGeneList = new ViewDataGridGeneList("ViewDataGridGeneList");
+            //new view for the list of all ViewDataGrid for Exome
+            ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome = new ViewDataGridDataModelAssemySourceGeneTranscriptItems("ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome");
+            //new view for the list of all ViewDataGrid for CDS
+            ViewDataGridDataModelAssemySourceGeneTranscriptItemsCds = new ViewDataGridDataModelAssemySourceGeneTranscriptItems("ViewDataGridDataModelAssemySourceGeneTranscriptItemsCds");
         }
 
         #endregion
@@ -295,14 +298,15 @@ namespace TheGenomeBrowser.ViewModels
         #region "Methods for placing the individual line element in their transcript items"
 
 
-        // procedure that takes the DataModelAssemblySourceList 
         /// <summary>
         /// procedure that processes the dictionaryTranscriptFeature for all element lines that are not featuretype "transcript" or "gene" (so these contain the start_codon, End_Codon, Exon list, CDS list)
         /// </summary>
         /// <param name="dictionaryTranscriptFeature"></param>
-        public void ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(bool printDebug)
+        public int ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(bool printDebug)
         {
 
+            //int for items processed
+            int itemsProcessed = 0;
             //local var continueImportWithoutAssemblyReport is true (we should already have processed the list before
             bool continueImportWithoutAssemblyReport = true;
 
@@ -323,19 +327,23 @@ namespace TheGenomeBrowser.ViewModels
                 int start = feature.Start;
                 // var for end
                 int end = feature.End;
-                //var for exon number
-                string exonNumber = feature.ExonNumber;
                 // var for strand
                 string strand = feature.Strand;
                 // var for frame
                 string frame = feature.Frame;
-                // var for protein id
                 string proteinId = feature.ProteinId;
+                // var for product
+                string product = feature.Product;
+
+                //try part exon number to int (fill -1  if it fails)
+                int exonNumber = -1;
+                //try to parse the exon number using Helpers TextParser.ParseStringToInt
+                exonNumber = Helpers.TextParser.ParseStringToInt(feature.ExonNumber);
 
                 //get the enum for the feature type (GetFeatureType)
                 var featureTypeEnum = SettingsAssemblySource.GetFeatureType(featureType);
 
-                //check if the feature type is not "transcript" or "gene", if this is true then skip the line. We match against the constants
+                //check if the feature type is "transcript" or "gene", if this is true then skip the line. We match against the constants
                 //check if this field is TRANSCRIPT or GENE, if so then skip the line
                 if (featureType == _startLineGene || featureType == _startLineTranscript)
                 {
@@ -355,25 +363,30 @@ namespace TheGenomeBrowser.ViewModels
                     {
 
                         //init the DataModelGeneTranscriptElementStartCodon
-                        DataModelGeneTranscript.GeneTranscriptObject.DataModelGeneTranscriptElementStartCodon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCodon(featureType, start, end);
+                        DataModelGeneTranscript.GeneTranscriptObject.DataModelGeneTranscriptElementStartCodon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCodon(featureType, start, end, exonNumber);
 
                         //-------------------------------------
                         //Note -- The start coding is also the first exon in the CDS, so we also add a new CDS item here to have the position of exon 1 (or their notation of it)
                         //-------------------------------------
 
                         //new DataModelGeneTranscriptElementCDS
-                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId);
+                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product);
 
                         //add to DataModelGeneTranscript
                         DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS.Add(DataModelGeneTranscriptElementCDS);
+
+                        //count the number of items processed
+                        itemsProcessed++;
 
                     }
                     //check if the feature type is end_codon
                     else if (featureTypeEnum == SettingsAssemblySource.FeatureType.stop_codon)
                     {
                         //init the DataModelGeneTranscriptElementEndCodon
-                        DataModelGeneTranscript.GeneTranscriptObject.DataModelGeneTranscriptElementStopCodon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCodon(featureType, start, end);
+                        DataModelGeneTranscript.GeneTranscriptObject.DataModelGeneTranscriptElementStopCodon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCodon(featureType, start, end, exonNumber);
 
+                        //count the number of items processed
+                        itemsProcessed++;
                     }
                     //check if the feature type is exon
                     else if (featureTypeEnum == SettingsAssemblySource.FeatureType.exon)
@@ -386,19 +399,21 @@ namespace TheGenomeBrowser.ViewModels
                         //add to DataModelGeneTranscript
                         DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon.Add(DataModelGeneTranscriptElementExon);
 
-
+                        //count the number of items processed
+                        itemsProcessed++;
                     }
                     //check if the feature type is cds
                     else if (featureTypeEnum == SettingsAssemblySource.FeatureType.CDS)
                     {
 
                         //new DataModelGeneTranscriptElementCDS
-                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId);
+                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product);
 
                         //add to DataModelGeneTranscript
                         DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS.Add(DataModelGeneTranscriptElementCDS);
 
-
+                        //count the number of items processed
+                        itemsProcessed++;
 
                     }
 
@@ -408,15 +423,35 @@ namespace TheGenomeBrowser.ViewModels
 
             }
 
-            //process the ListOfAssemblySources for the ViewModelDataGeneTranscriptItems
-            ViewModelDataGeneTranscriptItems.ProcessAssemblySources(this.DataModelAssemblySourceList.ListOfAssemblySources);
+            //process to view model and view
+            ProcessTranscriptELementsToViewModelsAndView(true, true);
 
-            //set the data source for the grid
-            this.ViewDataGridDataModelAssemySourceGeneTranscriptItems.CreateDataGrid(ViewModelDataGeneTranscriptItems);
-
+            //return numer of items
+            return itemsProcessed;
         }
 
+        /// <summary>
+        /// procedure that accepts the enum for viewing the different imported sources and prepares a view model and view for (Exom, CDS, combined Exon and CDS, and transcript)
+        /// </summary>
+        public void ProcessTranscriptELementsToViewModelsAndView(bool includeExons, bool includeCDSandCodons)
+        {
 
+            //new view model for Exome 
+            var ExomeViewModelDataGeneTranscriptElementsList = new ViewModelDataGeneTranscriptElementsList();
+            //process the ListOfAssemblySources for the ViewModelDataGeneTranscriptItems
+            ExomeViewModelDataGeneTranscriptElementsList.ProcessAssemblySources(this.DataModelAssemblySourceList.ListOfAssemblySources, true, false);
+            //set the data source for the grid
+            this.ViewDataGridDataModelAssemySourceGeneTranscriptItemsExome.CreateDataGrid(ExomeViewModelDataGeneTranscriptElementsList);
+
+
+            //viewmodel for exome
+            var CdsViewModelDataGeneTranscriptElementsList = new ViewModelDataGeneTranscriptElementsList();
+            //process the ListOfAssemblySources for the ViewModelDataGeneTranscriptItems
+            CdsViewModelDataGeneTranscriptElementsList.ProcessAssemblySources(this.DataModelAssemblySourceList.ListOfAssemblySources, false, true);
+            //set the data source for the grid
+            this.ViewDataGridDataModelAssemySourceGeneTranscriptItemsCds.CreateDataGrid(CdsViewModelDataGeneTranscriptElementsList);
+
+        }
 
         #endregion
 
@@ -430,10 +465,10 @@ namespace TheGenomeBrowser.ViewModels
         {
 
             //process the data model in the ViewModelDataGeneTranscripts
-            ViewModelDataGeneTranscripts.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary(this.DataModelAssemblySourceList.ListOfAssemblySources);
+            ViewModelDataGeneTranscriptsList.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary(this.DataModelAssemblySourceList.ListOfAssemblySources);
 
             //set the data source for the grid
-            this.ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList.DataSource = ViewModelDataGeneTranscripts.ListViewModelDataGeneTranscriptItemsList;
+            this.ViewDataGridDataModelAssemblySourceGeneTranscriptElementList.DataSource = ViewModelDataGeneTranscriptsList.ListViewModelDataGeneTranscriptsList;
 
             //set the text of the combo box to the current view
             this.comboBoxConditionalFormatExperimentView.Text = "Transcripts";
@@ -526,6 +561,15 @@ namespace TheGenomeBrowser.ViewModels
 
                 //use GetChromosomeNumber, to get the chromosome number
                 string MoleculeChromosome = GetChromosomeNumber(DataModelGtfAssemblyReport, feature, ref continueImportWithoutAssemblyReport);
+
+                //check if MoleculeChromosome == null (then the user repsonded negative to continue without an annotation report
+                if (MoleculeChromosome == null)
+                {
+                    //check continueImportWithoutAssemblyReport (if answer no, then we exit)
+                    if (!continueImportWithoutAssemblyReport) return;
+                }
+
+
 
                 //check if the molecule is in the dictionary, if not add it by creating a new DataModelMolecule
                 if (!dataModelAssemblySource.TheGenome.DictionaryOfMolecules.ContainsKey(MoleculeChromosome))
@@ -776,7 +820,6 @@ namespace TheGenomeBrowser.ViewModels
 
 
         }
-
 
 
         #endregion

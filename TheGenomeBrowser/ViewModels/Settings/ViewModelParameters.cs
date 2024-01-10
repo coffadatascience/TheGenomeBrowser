@@ -36,8 +36,14 @@ namespace TheGenomeBrowser.ViewModels.Settings
             DataAssemblyReportComments,
             [Description("Assembly report")]
             DataAssemblyReport,
-            [Description("Lookup gene list")]
-            DataModelLookupGeneList
+            [Description("Gene list")]
+            DataModelGeneList,
+            [Description("Transcript list")]
+            DataModelTranscriptList,
+            [Description("Exome")]
+            DataModelExonList,
+            [Description("CDS")]
+            DataModelCdsList,
         }
 
 

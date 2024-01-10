@@ -34,10 +34,10 @@ namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
         /// procedure that takes the ViewModelDataGeneTranscriptItems and create the data grid
         /// </summary>
         /// <param name="viewModelDataGeneTranscriptItems"></param>
-        public void CreateDataGrid(ViewModelDataGeneTranscriptItems viewModelDataGeneTranscriptItems)
+        public void CreateDataGrid(ViewModelDataGeneTranscriptElementsList viewModelDataGeneTranscriptElementsList)
         {
             //set the data source for the grid
-            DataSource = viewModelDataGeneTranscriptItems._listViewModelDataGeneTranscriptItems;
+            DataSource = viewModelDataGeneTranscriptElementsList._listElements;
 
             //adjust column width
             AdjustColumnWidth(_columnWidth);

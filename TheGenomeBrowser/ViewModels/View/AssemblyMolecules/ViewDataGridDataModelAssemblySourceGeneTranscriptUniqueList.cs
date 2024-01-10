@@ -10,7 +10,7 @@ namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
     /// <summary>
     /// view model class that represent the data for the view model class ViewModelDataGeneTranscript. This view model is used to create a list of all unique transcripts (currently 20240108 with decent source of the annotation file about 60000 genes are listed over 5 different sources)
     /// </summary>
-    public class ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList : ViewDataGridBase
+    public class ViewDataGridDataModelAssemblySourceGeneTranscriptElementList : ViewDataGridBase
     {
 
         #region fields
@@ -19,7 +19,7 @@ namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
 
         #region constructors
 
-        public ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList(string nameGridView) : base(nameGridView)
+        public ViewDataGridDataModelAssemblySourceGeneTranscriptElementList(string nameGridView) : base(nameGridView)
         {
 
         }
@@ -32,10 +32,10 @@ namespace TheGenomeBrowser.ViewModels.View.AssemblyMolecules
         /// method that takes ViewModelDataGeneTranscripts and create the data grid
         /// </summary>
         /// <param name="viewModelDataGeneTranscripts"></param>
-        public void CreateDataGrid(ViewModelDataGeneTranscripts viewModelDataGeneTranscripts)
+        public void CreateDataGrid(ViewModelDataGeneTranscriptsList viewModelDataGeneTranscripts)
         {
             //set the data source for the grid
-            DataSource = viewModelDataGeneTranscripts.ListViewModelDataGeneTranscriptItemsList;
+            DataSource = viewModelDataGeneTranscripts.ListViewModelDataGeneTranscriptsList;
 
             //adjust column width
             AdjustColumnWidth(_columnWidth);

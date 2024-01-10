@@ -5,7 +5,7 @@ using TheGenomeBrowser.DataModels.AssemblyMolecules;
 /// view model class that represent the data for the view model class ViewModelDataGeneTranscript. This view model is used to create a list of all unique transcripts (currently 20240108 with decent source of the annotation file about 60000 genes are listed over 5 different sources)
 /// we use this view model to create a list of all unique transcripts 
 /// </summary>
-public class ViewModelDataGeneTranscripts
+public class ViewModelDataGeneTranscriptsList
 {
 
     #region fields
@@ -13,27 +13,28 @@ public class ViewModelDataGeneTranscripts
     /// <summary>
     /// dictionary that represent the list of all unique transcripts (we will use the GeneIdTranscriptId as key)
     /// </summary>
-    public Dictionary<string, ViewModelDataGeneTranscriptItem> DictionaryViewModelDataGeneTranscriptItems { get; set; }
+    public Dictionary<string, ViewModelDataGeneTranscript> DictionaryViewModelDataGeneTranscripts { get; set; }
 
     /// <summary>
     /// list of all unique transcripts (we use this list for the data grid view)
     /// </summary>
-    public List<ViewModelDataGeneTranscriptItem> ListViewModelDataGeneTranscriptItemsList { get; set; }
+    public List<ViewModelDataGeneTranscript> ListViewModelDataGeneTranscriptsList { get; set; }
 
     #endregion
+
 
     #region constructors
 
     /// <summary>
     /// constructor
     /// </summary>
-    public ViewModelDataGeneTranscripts()
+    public ViewModelDataGeneTranscriptsList()
     {
         //create the dictionary
-        DictionaryViewModelDataGeneTranscriptItems = new Dictionary<string, ViewModelDataGeneTranscriptItem>();
+        DictionaryViewModelDataGeneTranscripts = new Dictionary<string, ViewModelDataGeneTranscript>();
 
         //create the list
-        ListViewModelDataGeneTranscriptItemsList = new List<ViewModelDataGeneTranscriptItem>();
+        ListViewModelDataGeneTranscriptsList = new List<ViewModelDataGeneTranscript>();
 
     }
 
@@ -64,10 +65,10 @@ public class ViewModelDataGeneTranscripts
                         string key = DicItemGenId.Value.GeneId + " - " + transcript.TranscriptId;
 
                         //check if the key is already in the dictionary
-                        if (DictionaryViewModelDataGeneTranscriptItems.ContainsKey(key) == true)
+                        if (DictionaryViewModelDataGeneTranscripts.ContainsKey(key) == true)
                         {
                             //increase the number of transcripts
-                            DictionaryViewModelDataGeneTranscriptItems[key].NumberOfTranscripts++;
+                            DictionaryViewModelDataGeneTranscripts[key].NumberOfTranscripts++;
 
                             //throw a message to the debug window
                             //System.Diagnostics.Debug.WriteLine("!!!UNEXPECTED!!! ViewModelDataGeneTranscripts.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary: key already in dictionary: " + key);
@@ -76,7 +77,7 @@ public class ViewModelDataGeneTranscripts
                         else
                         {
                             //create the new ViewModelDataGeneTranscriptItem
-                            ViewModelDataGeneTranscriptItem viewModelDataGeneTranscriptItem = new ViewModelDataGeneTranscriptItem();
+                            ViewModelDataGeneTranscript viewModelDataGeneTranscriptItem = new ViewModelDataGeneTranscript();
 
                             //set the GeneIdTranscriptId
                             viewModelDataGeneTranscriptItem.GeneIdTranscriptId = key;
@@ -120,7 +121,7 @@ public class ViewModelDataGeneTranscripts
                             //set the TotalNumberOfEntriesForExon
 
                             //add the new ViewModelDataGeneTranscriptItem to the dictionary
-                            DictionaryViewModelDataGeneTranscriptItems.Add(key, viewModelDataGeneTranscriptItem);
+                            DictionaryViewModelDataGeneTranscripts.Add(key, viewModelDataGeneTranscriptItem);
 
 
                         }
@@ -135,10 +136,10 @@ public class ViewModelDataGeneTranscripts
         }
 
         //sort the dictionary
-        DictionaryViewModelDataGeneTranscriptItems = DictionaryViewModelDataGeneTranscriptItems.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+        DictionaryViewModelDataGeneTranscripts = DictionaryViewModelDataGeneTranscripts.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
 
         //create the list
-        ListViewModelDataGeneTranscriptItemsList = DictionaryViewModelDataGeneTranscriptItems.Values.ToList();
+        ListViewModelDataGeneTranscriptsList = DictionaryViewModelDataGeneTranscripts.Values.ToList();
 
     }
 
@@ -150,7 +151,7 @@ public class ViewModelDataGeneTranscripts
 /// <summary>
 /// class that represent the data for the view model class ViewModelDataGeneTranscriptItem. This view model is used to create a list of all unique transcripts (currently 20240108 with decent source of the annotation file about 60000 genes are listed over 5 different sources)
 /// </summary>
-public class ViewModelDataGeneTranscriptItem
+public class ViewModelDataGeneTranscript
 {
 
 
