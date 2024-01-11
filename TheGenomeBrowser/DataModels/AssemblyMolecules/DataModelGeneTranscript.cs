@@ -266,6 +266,102 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
     }
 
+    /// <summary>
+    /// class that holds a data model for a single entity (exon, intron, etc)
+    /// and entitiy is typically a part of a seqid (gene) and has a location on the seqid 
+    /// We have nothing to sort anymore in this class so we add a full list of all the data
+    /// Depending on the type of entity we have different properties
+    /// NOTE --> 1. transcript heeft een lijst met exons, start en stop codon en CDS
+    /// </summary>
+    public class DataModelGeneTranscriptObject
+    {
+
+
+        #region properties
+
+        /// <summary>
+        /// var with DataModelGeneTranscriptElementStartEndCodon information for this transcript
+        /// </summary>
+        public DataModelGeneTranscriptElementCodon DataModelGeneTranscriptElementStartCodon { get; set; }
+
+        /// <summary>
+        /// var with DataModelGeneTranscriptElementStartEndCodon information for this transcript
+        /// </summary>
+        public DataModelGeneTranscriptElementCodon DataModelGeneTranscriptElementStopCodon { get; set; }
+
+        /// <summary>
+        /// list of all coding sequences (CDS) for this transcript
+        /// </summary>
+        public List<DataModelGeneTranscriptElementCDS> ListDataModelGeneTranscriptElementCDS { get; set; }
+
+        /// <summary>
+        /// list of all exons for this transcript
+        /// </summary>
+        public List<DataModelGeneTranscriptElementExon> ListDataModelGeneTranscriptElementExon { get; set; }
+
+        #endregion
+
+
+        #region constructors
+
+        /// <summary>
+        /// constructor setting the lists
+        /// </summary>
+        public DataModelGeneTranscriptObject()
+        {
+            //init the lists
+            ListDataModelGeneTranscriptElementCDS = new List<DataModelGeneTranscriptElementCDS>();
+            ListDataModelGeneTranscriptElementExon = new List<DataModelGeneTranscriptElementExon>();
+            //init the codon
+            DataModelGeneTranscriptElementStartCodon = null;
+            DataModelGeneTranscriptElementStopCodon = null;
+        }
+
+        #endregion
+
+
+        #region methods
+
+        /// <summary>
+        /// procedure that take all necessary information to create a new DataModelGeneTranscriptElementExon and add it to the list
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="exonNumber"></param>
+        /// <param name="strand"></param>
+        public void AddDataModelGeneTranscriptElementExon(int start, int end, string exonNumber, string strand)
+        {
+            //create a new DataModelGeneTranscriptElementExon
+            var dataModelGeneTranscriptElementExon = new DataModelGeneTranscriptElementExon(start, end, exonNumber, strand);
+
+            //add the DataModelGeneTranscriptElementExon to the list
+            ListDataModelGeneTranscriptElementExon.Add(dataModelGeneTranscriptElementExon);
+        }
+
+
+        /// <summary>
+        /// procedure that take all necessary information to create a new DataModelGeneTranscriptElementCDS and add it to the list
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="exonNumber"></param>
+        /// <param name="strand"></param>
+        /// <param name="frame"></param>
+        /// <param name="proteinId"></param>
+        public void AddDataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product)
+        {
+            //create a new DataModelGeneTranscriptElementCDS
+            var dataModelGeneTranscriptElementCDS = new DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product);
+
+            //add the DataModelGeneTranscriptElementCDS to the list
+            ListDataModelGeneTranscriptElementCDS.Add(dataModelGeneTranscriptElementCDS);
+        }
+
+
+        #endregion
+
+
+    }
 
     /// <summary>
     /// Struct class that contains the transcript id and the chromosome. We use this class to speed up the process of finding the gene related to a transcript
@@ -304,7 +400,6 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         #endregion
 
     }
-
 
 
 

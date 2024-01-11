@@ -221,7 +221,7 @@ namespace TheGenomeBrowser
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void buttonProcessTranscriptElements_Click(object? sender, EventArgs e)
+        private async void buttonProcessTranscriptElements_Click(object? sender, EventArgs e)
         {
             //check if we have a data model in the GTF file handler, if not return appropiate message
             if (_handlerImportedGtfFileData.DataModelGtfFile == null)
@@ -244,15 +244,31 @@ namespace TheGenomeBrowser
                 return;
             }
 
+            //make the progress bar visible
+            progressBar.Visible = true;
+
+            //setup a progress bar
+            var progress = new Progress<int>();
+
+            //set the progress bar to the text box
+            progress.ProgressChanged += (s, message) =>
+            {
+                //update the progress bar
+                progressBar.Value = message;
+            };
+
+
             //trigger ProcessAssemblySourcesToTotalGeneTranscriptListDictionary in the handler
-            var ProcessedItems = _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(this._printDebug);
+            var ProcessedItems = await _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDSAsync(this._printDebug, progress);
+
+
+            //make the progress bar invisible
+            progressBar.Visible = false;
 
             //get the split container 1 and add the grid view to it (panel 2)
             var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
-
             //clear the split container 1
             splitContainer1.Panel2.Controls.Clear();
-
             //add the grid view to the split container 1
             splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscriptsElementsExome);
 
@@ -268,7 +284,7 @@ namespace TheGenomeBrowser
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void buttonCreateUniqueListTranscripts_Click(object? sender, EventArgs e)
+        private async void buttonCreateUniqueListTranscripts_Click(object? sender, EventArgs e)
         {
             //check if we have a data model in the GTF file handler, if not return appropiate message
             if (_handlerImportedGtfFileData.DataModelGtfFile == null)
@@ -284,15 +300,29 @@ namespace TheGenomeBrowser
                 return;
             }
 
+            //make the progress bar visible
+            progressBar.Visible = true;
+
+            //setup a progress bar
+            var progress = new Progress<int>();
+
+            //set the progress bar to the text box
+            progress.ProgressChanged += (s, message) =>
+            {
+                //update the progress bar
+                progressBar.Value = message;
+            };
+
             //trigger CreateUniqueListTranscripts in the handler
-            _handlerImportedGtfFileData.ProcessDataModelAssemblySourceListToViewModelDataGeneTranscripts();
+            await _handlerImportedGtfFileData.ProcessDataModelAssemblySourceListToViewModelDataGeneTranscriptsAsync(progress);
+
+            //make the progress bar invisible
+            progressBar.Visible = false;
 
             //get the split container 1 and add the grid view to it (panel 2)
             var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
-
             //clear the split container 1
             splitContainer1.Panel2.Controls.Clear();
-
             //add the grid view to the split container 1
             splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscripts);
 
@@ -307,7 +337,7 @@ namespace TheGenomeBrowser
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void buttonUntangleGtfData_Click(object? sender, EventArgs e)
+        private async void buttonUntangleGtfData_Click(object? sender, EventArgs e)
         {
             //check if we have a data model in the GTF file handler, if not return appropiate message
             if (_handlerImportedGtfFileData.DataModelGtfFile == null)
@@ -316,15 +346,30 @@ namespace TheGenomeBrowser
                 return;
             }
 
+            //make the progress bar visible
+            progressBar.Visible = true;
+
+            //setup a progress bar
+            var progress = new Progress<int>();
+
+            //set the progress bar to the text box
+            progress.ProgressChanged += (s, message) =>
+            {
+                //update the progress bar
+                progressBar.Value = message;
+            };
+
+
             //trigger ProcessNcbiDataToAssemblyBySource in the handler
-            _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySource(_printDebug);
+            await _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySourceAsync(_printDebug, progress);
+
+            //make the progress bar invisible
+            progressBar.Visible = false;
 
             //get the split container 1 and add the grid view to it (panel 2)
             var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
-
             //clear the split container 1
             splitContainer1.Panel2.Controls.Clear();
-
             //add the grid view to the split container 1
             splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId);
 
@@ -492,7 +537,6 @@ namespace TheGenomeBrowser
             }
 
         }
-
 
         /// <summary>
         /// event handler for the button that imports a GFF3 file

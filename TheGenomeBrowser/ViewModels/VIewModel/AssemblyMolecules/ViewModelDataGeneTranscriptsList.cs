@@ -45,8 +45,18 @@ public class ViewModelDataGeneTranscriptsList
     /// <summary>
     /// procedure that takes List<DataModelAssemblySource> assemblySources as input and create the ListViewModelDataGeneTranscriptItems of all unique transcripts by using the GeneIdTranscriptId as key and all ViewModelDataGeneTranscriptItem as value
     /// <summary>
-    public void ProcessAssemblySourcesToTotalGeneTranscriptListDictionary(List<DataModelAssemblySource> assemblySources)
+    public void ProcessAssemblySourcesToTotalGeneTranscriptListDictionary(List<DataModelAssemblySource> assemblySources, IProgress<int> progress)
     {
+
+        //init the progress
+        progress.Report(0);
+        //init the counter
+        int counter = 0;
+        //init the number of features update
+        int numberOfFeaturesUpdate = 0;
+
+        //get total number of transcripts
+        int totalNumberOfTranscripts = assemblySources.Sum(x => x.TheGenome.DictionaryOfMolecules.Sum(y => y.Value.GeneIds.Sum(z => z.Value.ListGeneTranscripts.Count)));
 
         //loop over all assembly sources
         foreach (DataModelAssemblySource assemblySource in assemblySources)
@@ -126,6 +136,32 @@ public class ViewModelDataGeneTranscriptsList
 
                         }
 
+
+                        //check if the progress is not null
+                        if (progress != null)
+                        {
+
+                            //check if we need to update the progress
+                            if (numberOfFeaturesUpdate > 100)
+                            {
+                                //reset the number of features update
+                                numberOfFeaturesUpdate = 0;
+
+                                //var for the progress percentage in double
+                                double progressPercentageDouble = ((double)counter / (double)totalNumberOfTranscripts) * 100;
+
+                                //calculate the progress
+                                int progressPercentage = (int)Math.Round(progressPercentageDouble);
+
+                                //report the progress
+                                progress.Report(progressPercentage);
+
+
+                            }
+                        }
+
+                        //increase the counter
+                        counter++;
                     }
 
                 }

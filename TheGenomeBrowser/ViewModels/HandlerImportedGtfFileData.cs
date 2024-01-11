@@ -297,18 +297,44 @@ namespace TheGenomeBrowser.ViewModels
 
         #region "Methods for placing the individual line element in their transcript items"
 
+        /// <summary>
+        /// Async version that calls: procedure that processes the dictionaryTranscriptFeature for all element lines that are not featuretype "transcript" or "gene" (so these contain the start_codon, End_Codon, Exon list, CDS list)
+        /// </summary>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        public async Task<bool> ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDSAsync(bool printDebug, IProgress<int> progress)
+        {
+
+            //read GTF file async
+            await Task.Run(() =>
+            {
+                //process the data model
+                ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(printDebug, progress);
+
+            });
+
+            //return true
+            return true;
+
+        }
 
         /// <summary>
         /// procedure that processes the dictionaryTranscriptFeature for all element lines that are not featuretype "transcript" or "gene" (so these contain the start_codon, End_Codon, Exon list, CDS list)
         /// </summary>
         /// <param name="dictionaryTranscriptFeature"></param>
-        public int ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(bool printDebug)
+        public int ProcessNcbiDataToAssemblyBySourceTranscriptElementsExonCDS(bool printDebug, IProgress<int> progress)
         {
 
+            //int with total number of features
+            int totalNumberOfFeatures = DataModelGtfFile.FeaturesList.Count;
             //int for items processed
             int itemsProcessed = 0;
             //local var continueImportWithoutAssemblyReport is true (we should already have processed the list before
             bool continueImportWithoutAssemblyReport = true;
+            // int to count the number of features
+            int numberOfFeatures = 0;
+            //int to coutn update on every 100 features
+            int numberOfFeaturesUpdate = 0;
 
             //loop all features in the GTF file
             foreach (GTFFeature feature in DataModelGtfFile.FeaturesList)
@@ -420,7 +446,33 @@ namespace TheGenomeBrowser.ViewModels
 
                 }
 
+                //check if the progress is not null
+                if (progress != null)
+                {
 
+                    //check if we need to update the progress
+                    if (numberOfFeaturesUpdate > 100)
+                    {
+                        //reset the number of features update
+                        numberOfFeaturesUpdate = 0;
+
+                        //var for the progress percentage in double
+                        double progressPercentageDouble = ((double)numberOfFeatures / (double)totalNumberOfFeatures) * 100;
+
+                        //calculate the progress
+                        int progressPercentage = (int)Math.Round(progressPercentageDouble);
+
+                        //report the progress
+                        progress.Report(progressPercentage);
+
+
+                    }
+                }
+
+                //count the number of features
+                numberOfFeatures++;
+                //count the number of features update
+                numberOfFeaturesUpdate++;
             }
 
             //process to view model and view
@@ -459,22 +511,40 @@ namespace TheGenomeBrowser.ViewModels
         #region "Methods for processing the the transcript of all sources into a single list"
 
         /// <summary>
+        /// Async version that calls: procedure that takes the DataModelAssemblySourceList and processes them in the ViewModelDataGeneTranscripts to make a unique list of all transcripts. After sets the ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList
+        /// </summary>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        public async Task<bool> ProcessDataModelAssemblySourceListToViewModelDataGeneTranscriptsAsync(IProgress<int> progress)
+        {
+
+            //read GTF file async
+            await Task.Run(() =>
+            {
+                //process the data model
+                ProcessDataModelAssemblySourceListToViewModelDataGeneTranscripts(progress);
+
+            });
+
+            //return true
+            return true;
+
+        }
+
+        /// <summary>
         /// procedure that takes the DataModelAssemblySourceList and processes them in the ViewModelDataGeneTranscripts to make a unique list of all transcripts. After sets the ViewDataGridDataModelAssemblySourceGeneTranscriptUniqueList
         /// </summary>
-        public void ProcessDataModelAssemblySourceListToViewModelDataGeneTranscripts()
+        public  void ProcessDataModelAssemblySourceListToViewModelDataGeneTranscripts(IProgress<int> progress)
         {
 
             //reset the list of the ViewModelDataGeneTranscriptsList
             ViewModelDataGeneTranscriptsList.ListViewModelDataGeneTranscriptsList = new List<ViewModelDataGeneTranscript>();
 
             //process the data model in the ViewModelDataGeneTranscripts
-            ViewModelDataGeneTranscriptsList.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary(this.DataModelAssemblySourceList.ListOfAssemblySources);
+            ViewModelDataGeneTranscriptsList.ProcessAssemblySourcesToTotalGeneTranscriptListDictionary(this.DataModelAssemblySourceList.ListOfAssemblySources, progress);
 
             //set the data source for the grid
             this.ViewDataGridDataModelAssemySourceGeneTranscripts.CreateDataGrid(ViewModelDataGeneTranscriptsList);
-
-            //set the text of the combo box to the current view
-            this.comboBoxConditionalFormatExperimentView.Text = "Transcripts";
 
         }
 
@@ -485,6 +555,28 @@ namespace TheGenomeBrowser.ViewModels
         //              this approach may remove a lot of double which makes the gene list smaller and more manageable (also with extra structure there is a more appropriate hierarchy, minimizing the number of elements in the list)
         #region  methods "processing the gene list and establishing TheGenome data model"
 
+
+        /// <summary>
+        /// process NCBI data to assembly by source Async procedure
+        /// </summary>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        public async Task<bool> ProcessNcbiDataToAssemblyBySourceAsync(bool printDebug, IProgress<int> progress)
+        {
+
+            //read GTF file async
+            await Task.Run(() =>
+            {
+                //process the data model
+                ProcessNcbiDataToAssemblyBySource(printDebug, progress);
+
+            });
+
+            //return true
+            return true;
+
+        }
+
         /// <summary>
         /// procedure that takes the datamodelGtfFile and the annotation file and processes that into appropriate data models by source, molecule, gene, transcript, and then start_codon, end_codon, exon, cds
         /// Rather than filling out all the data, we will first create the main layers and split the data in to sources, molecules, genes, transcripts. When the list is processes, then we can add the other type in their appropriate places.
@@ -492,7 +584,7 @@ namespace TheGenomeBrowser.ViewModels
         /// ---> we may however collect collect all unique transcript names and then process the list again to get the transcripts, but this may be more complicated than just passing through the list a few times
         /// </summary>
         /// <param name="progress"></param>
-        public void ProcessNcbiDataToAssemblyBySource(bool printDebug) //IProgress<int> progress)
+        public void ProcessNcbiDataToAssemblyBySource(bool printDebug, IProgress<int> progress)
         {
 
             //boolean that remembers if the user responds positive to continue import of the GTF file wihout an assembly report
@@ -676,6 +768,30 @@ namespace TheGenomeBrowser.ViewModels
 
                 }
 
+
+                //check if the progress is not null
+                if (progress != null)
+                {
+
+                    //check if we need to update the progress
+                    if (numberOfFeaturesUpdate > 100)
+                    {
+                        //reset the number of features update
+                        numberOfFeaturesUpdate = 0;
+
+                        //var for the progress percentage in double
+                        double progressPercentageDouble = ((double)numberOfFeatures / (double)totalNumberOfFeatures) * 100;
+
+                        //calculate the progress
+                        int progressPercentage = (int)Math.Round(progressPercentageDouble);
+
+                        //report the progress
+                        progress.Report(progressPercentage);
+
+
+                    }
+                }
+
                 //increase the number of features
                 numberOfFeatures++;
                 //increase the number of features update
@@ -715,6 +831,7 @@ namespace TheGenomeBrowser.ViewModels
             this.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId.DataSource = ViewModelDataAssemblySources.ListViewModelDataAssemblySourceGenes;
 
         }
+
 
         /// <summary>
         /// procedure that processes the list of transcript features and places them in the correct gene in the DataModelAssemblySourceList
