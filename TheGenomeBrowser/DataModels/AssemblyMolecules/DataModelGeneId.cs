@@ -111,14 +111,65 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         public string Pseudo { get; set; }
 
         /// <summary>
-        /// var for Gene_Synonym (alternative gene names)
+        /// list of all known synonyms for the gene name (note that this list has multiple entries, that all have the same header name, but different values)
         /// </summary>
-        public string Gene_Synonym_One { get; set; }
+        public List<string> Gene_Synonyms { get; set; }
 
         /// <summary>
-        /// var for Gene_Synonym (alternative gene names) -- > note that these may be lists but we only take the first two alternative (so that already 3)
+        /// read only proerty that returns the gene synonyms as a string
         /// </summary>
-        public string Gene_Synonym_Two { get; set; }
+        public string GeneSynonymsAsString
+        {
+            get
+            {
+                //var for the gene synonyms as a string
+                string GeneSynonymsAsString = "";
+
+                //loop the list of gene synonyms
+                foreach (var geneSynonym in Gene_Synonyms)
+                {
+                    //add the gene synonym to the string
+                    GeneSynonymsAsString += geneSynonym + "; ";
+                }
+
+                //return the gene synonyms as a string
+                return GeneSynonymsAsString;
+            }
+        }
+
+        /// <summary>
+        /// read only property that returns the number of transcripts
+        /// </summary>
+        public int NumberOfTranscripts
+        {
+            get
+            {
+                //return the number of transcripts
+                return ListGeneTranscripts.Count;
+            }
+        }
+
+        /// <summary>
+        /// read only property that return the number of exons
+        /// </summary>
+        public int NumberOfExons
+        {
+            get
+            {
+                //var for the number of exons
+                int NumberOfExons = 0;
+
+                //loop the list of gene transcripts
+                foreach (var geneTranscript in ListGeneTranscripts)
+                {
+                    //add the number of exons to the total
+                    NumberOfExons += geneTranscript.NumberOfExons;
+                }
+
+                //return the number of exons
+                return NumberOfExons;
+            }
+        }
 
         /// <summary>
         /// list of transcript elements
@@ -159,6 +210,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             //set the gene id
             GeneId = geneId;
 
+            //init the list of gene synonyms
+            Gene_Synonyms = new List<string>();
+
             //split the line feed --> note that how we store the line, or take it from the field (either we read and store to our own format or keep the original line and format)
             string[] splitLineFeed = lineFeedAttributes.Split(';');
 
@@ -169,9 +223,12 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
                 //var for the pair (pair is how we will save the entree (not the same as how we recognize the entree)
                 string CurrentPair = splitLineFeed[i].Trim();
+                //bool that remembers if the gene name is found for the attribute list
+                bool GeneNameFound = false;
+
 
                 //check if the current item is the gene name
-                if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName))
+                if ((GeneNameFound == false) & CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName))
                 {
                     //set the gene name
                     GeneName = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName + " ", "");
@@ -181,6 +238,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     GeneName = GeneName.Replace(";", "");
                     //trim the gene name
                     GeneName = GeneName.Trim();
+
+                    //set the gene name found to true
+                    GeneNameFound = true;
                 }
 
                 //check if the current item is the gene description
@@ -239,36 +299,6 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     Gb_Key = Gb_Key.Trim();
                 }
 
-                //process the gene synonym
-                if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneSynonymHeaderName))
-                {
-
-                    //check if we have already set the gene synonym one
-                    if (Gene_Synonym_One == null)
-                    {
-                        //set the gene synonym one
-                        Gene_Synonym_One = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneSynonymHeaderName + " ", "");
-                        //remove the double quotes
-                        Gene_Synonym_One = Gene_Synonym_One.Replace("\"", "");
-                        //remove the semi colon
-                        Gene_Synonym_One = Gene_Synonym_One.Replace(";", "");
-                        //trim the gene synonym one
-                        Gene_Synonym_One = Gene_Synonym_One.Trim();
-                    }
-                    else
-                    {
-                        //set the gene synonym two
-                        Gene_Synonym_Two = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneSynonymHeaderName + " ", "");
-                        //remove the double quotes
-                        Gene_Synonym_Two = Gene_Synonym_Two.Replace("\"", "");
-                        //remove the semi colon
-                        Gene_Synonym_Two = Gene_Synonym_Two.Replace(";", "");
-                        //trim the gene synonym two
-                        Gene_Synonym_Two = Gene_Synonym_Two.Trim();
-                    }
-
-                }
-
                 //check if the current item is the pseudo
                 if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName))
                 {
@@ -293,6 +323,25 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     Gene_Biotype = Gene_Biotype.Replace(";", "");
                     //trim the gene biotype
                     Gene_Biotype = Gene_Biotype.Trim();
+
+                }
+
+                //process the gene synonym
+                if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneSynonymHeaderName))
+                {
+
+                    //set the gene synonym one
+                    var Synonym = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneSynonymHeaderName + " ", "");
+                    //remove the double quotes
+                    Synonym = Synonym.Replace("\"", "");
+                    //remove the semi colon
+                    Synonym = Synonym.Replace(";", "");
+                    //trim the gene synonym one
+                    Synonym = Synonym.Trim();
+
+                    //add the gene synonym to the list
+                    Gene_Synonyms.Add(Synonym);
+
                 }
 
             }
@@ -302,61 +351,6 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
     
         }
 
-
-        /// <summary>
-        /// constructor taking all variable values
-        /// </summary>
-        /// <param name="geneId"></param>
-        /// <param name="geneName"></param>
-        /// <param name="geneDescription"></param>
-        /// <param name="strand"></param>
-        /// <param name="startLocation"></param>
-        /// <param name="db_Xref_One"></param>
-        /// <param name="db_Xref_Two"></param>
-        /// <param name="gb_Key"></param>
-        /// <param name="gene_Biotype"></param>
-        /// <param name="gene_Synonym"></param>
-        public DataModelGeneId(string geneId, string geneName, string geneDescription, string strand, int startLocation, int endLocation, string db_Xref_One, string db_Xref_Two, string gb_Key, string gene_Biotype, string gene_Synonym_One, string gene_Synonym_Two)
-        {
-            //set the gene id
-            GeneId = geneId;
-
-            //set the gene name
-            GeneName = geneName;
-
-            //set the gene description
-            Description = geneDescription;
-
-            //set the strand
-            Strand = strand;
-
-            //set the start location
-            Start = startLocation;
-
-            //set the end location
-            End = endLocation;
-
-            //set the db xref one
-            Db_Xref_One = db_Xref_One;
-
-            //set the db xref two
-            Db_Xref_Two = db_Xref_Two;
-
-            //set the gb key
-            Gb_Key = gb_Key;
-
-            //set the gene biotype
-            Gene_Biotype = gene_Biotype;
-
-            //set the gene synonym
-            Gene_Synonym_One = gene_Synonym_One;
-
-            //set the gene synonym
-            Gene_Synonym_Two = gene_Synonym_Two;
-
-            //set the list of gene elements
-            ListGeneTranscripts = new List<DataModelGeneTranscript>();
-        }
 
         /// <summary>
         /// searches the list of gene transcripts for a given gene transcript id and returns the gene transcript

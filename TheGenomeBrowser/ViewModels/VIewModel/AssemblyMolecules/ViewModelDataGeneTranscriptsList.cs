@@ -120,15 +120,7 @@ public class ViewModelDataGeneTranscriptsList
                             viewModelDataGeneTranscriptItem.NumberOfTranscripts = 1;
 
                             //set the NumberOfExons -- > inner list
-                            viewModelDataGeneTranscriptItem.NumberOfExons = transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon.Count();
-
-                            //set the TotalNumberOfEntriesForTranscript (if the count of the number of exons, and the number in the CDS and the number in the UTR are the same then we have a complete transcript)
-                            viewModelDataGeneTranscriptItem.TotalNumberOfEntriesForTranscript = transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon.Count() + transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS.Count;
-
-
-                            //set the TotalNumberOfEntriesFor
-
-                            //set the TotalNumberOfEntriesForExon
+                            viewModelDataGeneTranscriptItem.NumberOfExons = transcript.GeneTranscriptObject.NumberOfExons; 
 
                             //add the new ViewModelDataGeneTranscriptItem to the dictionary
                             DictionaryViewModelDataGeneTranscripts.Add(key, viewModelDataGeneTranscriptItem);
@@ -247,11 +239,6 @@ public class ViewModelDataGeneTranscript
     /// variable that represent the number of exons
     /// </summary>
     public int NumberOfExons { get; set; }
-
-    /// <summary>
-    /// variable that represent the number of entrees total for a transcript
-    /// </summary>
-    public int TotalNumberOfEntriesForTranscript { get; set; }
 
     /// <summary>
     /// variable that represent the number of entrees total for a exon

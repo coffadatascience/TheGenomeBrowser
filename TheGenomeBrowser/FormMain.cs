@@ -4,6 +4,7 @@ using TheGenomeBrowser.DataModels.NCBIImportedData;
 using TheGenomeBrowser.Readers;
 using TheGenomeBrowser.ViewModels;
 using TheGenomeBrowser.ViewModels.Settings;
+using TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules;
 
 namespace TheGenomeBrowser
 {
@@ -82,7 +83,7 @@ namespace TheGenomeBrowser
             this.Text = "The Genome Browser";
 
             //set size of form
-            this.Size = new Size(1200, 1000);
+            this.Size = new Size(1200, 800);
 
             //new handler for imported GTF file data
             _handlerImportedGtfFileData = new HandlerImportedGtfFileData();
@@ -129,9 +130,9 @@ namespace TheGenomeBrowser
             //add a new button to the form that triggers and event to read the Assembly report file (this file can be used to lookup the chromosome to each accession number --> or that it is on a different molecule)
             Button buttonReadGff3File = new Button();
 
-            //setup progress bar
-            progressBar.Location = new Point(10, 98);
-            progressBar.Size = new Size(400, 13);
+            //setup progress bar (to the right side of the combo box)
+            progressBar.Location = new Point(225, 73);
+            progressBar.Size = new Size(545, 15);
             progressBar.Minimum = 0;
             progressBar.Maximum = 100;
             progressBar.Step = 1;
@@ -142,20 +143,18 @@ namespace TheGenomeBrowser
             //add the progress bar to the form
             splitContainerMain.Panel1.Controls.Add(progressBar);
 
-            //test button that retrieves the data from the database using the gene name and exon number
-            Button buttonTest = new Button();
-            //set name of button BUTTON_PROCESS_GTF
-            buttonTest.Name = BUTTON_PROCESS_GTF;
-            //set text of button
-            buttonTest.Text = "Process GTF file";
-            //set location of button
-            buttonTest.Location = new Point(290, 10);
-            //set size of button
-            buttonTest.Size = new Size(150, 50);
-            //add event handler
-            buttonTest.Click += new EventHandler(buttonProcessImportedGtfDataIntoDataModel_Click);
-            //add button to split container 1
-            splitContainerMain.Panel1.Controls.Add(buttonTest);
+            //add a label that is placed to the left side of the combo box (that states "views")
+            Label labelViews = new Label();
+            //set name of label
+            labelViews.Name = "labelViews";
+            //set text of label
+            labelViews.Text = "Views";
+            //set location of label
+            labelViews.Location = new Point(13, 75);
+            //set size of label
+            labelViews.Size = new Size(50, 50);
+            //add label to split container 1
+            splitContainerMain.Panel1.Controls.Add(labelViews);
 
             //add the combo box from the handler in the form just below the first button (import GTF file) and set the event handler for the combo box (this.comboBoxConditionalFormatExperimentView )
             splitContainerMain.Panel1.Controls.Add(_handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView);
@@ -167,7 +166,7 @@ namespace TheGenomeBrowser
             //set text of button
             buttonUntangleGtfData.Text = "Untangle GTF data";
             //set location of button
-            buttonUntangleGtfData.Location = new Point(450, 10);
+            buttonUntangleGtfData.Location = new Point(300, 10);
             //set size of button
             buttonUntangleGtfData.Size = new Size(150, 50);
             //add event handler
@@ -182,7 +181,7 @@ namespace TheGenomeBrowser
             //set text of button
             buttonCreateUniqueListTranscripts.Text = "Create unique list of transcripts";
             //set location of button
-            buttonCreateUniqueListTranscripts.Location = new Point(610, 10);
+            buttonCreateUniqueListTranscripts.Location = new Point(460, 10);
             //set size of button
             buttonCreateUniqueListTranscripts.Size = new Size(150, 50);
             //add event handler
@@ -197,7 +196,7 @@ namespace TheGenomeBrowser
             //set text of button
             buttonProcessTranscriptElements.Text = "Process Exon/CDS";
             //set location of button
-            buttonProcessTranscriptElements.Location = new Point(770, 10);
+            buttonProcessTranscriptElements.Location = new Point(620, 10);
             //set size of button
             buttonProcessTranscriptElements.Size = new Size(150, 50);
             //add event handler
@@ -316,6 +315,9 @@ namespace TheGenomeBrowser
             //trigger CreateUniqueListTranscripts in the handler
             await _handlerImportedGtfFileData.ProcessDataModelAssemblySourceListToViewModelDataGeneTranscriptsAsync(progress);
 
+            //set the data source for the grid
+            this._handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscripts.CreateDataGrid(this._handlerImportedGtfFileData.ViewModelDataGeneTranscriptsList);
+
             //make the progress bar invisible
             progressBar.Visible = false;
 
@@ -362,6 +364,9 @@ namespace TheGenomeBrowser
 
             //trigger ProcessNcbiDataToAssemblyBySource in the handler
             await _handlerImportedGtfFileData.ProcessNcbiDataToAssemblyBySourceAsync(_printDebug, progress);
+
+            //set the data source for the grid
+            this._handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId.DataSource = this._handlerImportedGtfFileData.ViewModelDataAssemblySources.ListViewModelDataAssemblySourceGenes;
 
             //make the progress bar invisible
             progressBar.Visible = false;
@@ -428,6 +433,9 @@ namespace TheGenomeBrowser
                         splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemblySourceGenesUniqueGeneId);
                         break;
                     case ViewModelParameters.EnumViewDataGridImportedDataGtfFile.DataModelTranscriptList:
+
+                        //NOTE JCO -- > if we want to have the overview for transcript then the transcript processing has to be redone after untangling the exons and CDS
+                        //              Or only the total need to be examined
                         //add the grid view to the split container 1
                         splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridDataModelAssemySourceGeneTranscripts);
                         break;
@@ -444,55 +452,6 @@ namespace TheGenomeBrowser
                 }
       
             }
-
-
-        }
-
-        /// <summary>
-        /// event handler for a button that triggers the processing of imported GTF data into a.o. gene lists (but may be all usefull data models)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        private async void buttonProcessImportedGtfDataIntoDataModel_Click(object? sender, EventArgs e)
-        {
-
-            //check if we have a data model in the GTF file handler, if not return appropiate message
-            if (_handlerImportedGtfFileData.DataModelGtfFile == null)
-            {
-                MessageBox.Show("No GTF file imported yet, please import a GTF file first");
-                return;
-            }
-
-            //make the progress bar visible
-            progressBar.Visible = true;
-
-            //setup a progress bar
-            var progress = new Progress<int>();
-
-            //set the progress bar to the text box
-            progress.ProgressChanged += (s, message) =>
-            {
-                //update the progress bar
-                progressBar.Value = message;
-            };
-
-
-            //process imported GTF data into data models using async ProcessGtfFileImportedDataSetViewAsync in the handler
-            await _handlerImportedGtfFileData.ProcessGtfFileImportedDataSetViewAsync(progress);
-
-            //make the progress bar invisible
-            progressBar.Visible = false;
-
-            //get the split container 1 and add the grid view to it (panel 2)
-            var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
-
-            //clear the split container 1
-            splitContainer1.Panel2.Controls.Clear();
-
-            //add the grid view to the split container 1
-            splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridGeneList);
-
 
 
         }
@@ -609,6 +568,8 @@ namespace TheGenomeBrowser
 
                 }
 
+                //report to the user a message that the GTF file is imported, and state the number of items
+                MessageBox.Show("GTF file imported, found " + GtfFile.FeaturesList.Count() + " items");
             }
 
 

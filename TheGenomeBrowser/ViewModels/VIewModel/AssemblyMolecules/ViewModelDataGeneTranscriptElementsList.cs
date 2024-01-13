@@ -51,8 +51,16 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
         /// <param name="includeExonList"></param>
         /// <param name="includeCDSlist"></param>
         /// <exception cref="Exception"></exception>
-        public void ProcessAssemblySources(List<DataModelAssemblySource> assemblySources, bool includeExonList, bool includeCDSlist)
+        public void ProcessAssemblySources(List<DataModelAssemblySource> assemblySources, bool includeExonList, bool includeCDSlist, IProgress<int> progress)
         {
+
+            //update counter
+            int counterUpdate = 0;
+            // counter genes
+            int counterGenes = 0;
+            //get number of genes in the genome of the assembly sources
+            int numberOfGenes = assemblySources.Sum(x => x.TheGenome.DictionaryOfMolecules.Sum(y => y.Value.GeneIds.Count));
+
 
             //clear the dictionary
             _dictionaryViewModelDataGeneTranscriptElements.Clear();
@@ -66,6 +74,16 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                 //loop all molecules
                 foreach (var DicItemMolecule in assemblySource.TheGenome.DictionaryOfMolecules)
                 {
+
+                    //var that set the molecule name in a 3 digit string in case it is a number (else it retains its original value)
+                    string moleculeNameString = DicItemMolecule.Value.moleculeChromosome;
+
+                    //check if the molecule name is a number
+                    if (int.TryParse(DicItemMolecule.Value.moleculeChromosome, out int moleculeNameInt))
+                    {
+                        //if so, then we need to add leading zeros
+                        moleculeNameString = moleculeNameInt.ToString("D3");
+                    }
 
                     //loop over all genes
                     foreach (var DicItemGenId in DicItemMolecule.Value.GeneIds)
@@ -87,11 +105,12 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                                 foreach (var GeneTranscriptElementExon in transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon)
                                 {
 
+
                                     //var that denotes EntreeNumberExon with 3 digits
                                     string EntreeNumberExonString = EntreeNumberExon.ToString("D3");
 
                                     //create the key
-                                    string key = DicItemMolecule.Value.moleculeChromosome + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId +  "_exon (n-" + EntreeNumberExonString + ")";
+                                    string key = moleculeNameString + "_" + DicItemGenId.Value.GeneId + "_" + transcript.TranscriptId +  "_exon (n-" + EntreeNumberExonString + ")";
 
                                     //check if the item is already in the dictionary
                                     if (_dictionaryViewModelDataGeneTranscriptElements.ContainsKey(key))
@@ -334,6 +353,35 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                             }
 
                         }
+
+                        //check if the progress is not null
+                        if (progress != null)
+                        {
+
+                            //check if we need to update the progress
+                            if (counterUpdate > 100)
+                            {
+                                //reset the number of features update
+                                counterUpdate = 0;
+
+                                //var for the progress percentage in double
+                                double progressPercentageDouble = ((double)counterGenes / (double)numberOfGenes) * 100;
+
+                                //calculate the progress
+                                int progressPercentage = (int)Math.Round(progressPercentageDouble);
+
+                                //report the progress
+                                progress.Report(progressPercentage);
+
+
+                            }
+                        }
+
+                        //update counter
+                        counterUpdate++;
+                        //count genes
+                        counterGenes++;
+
                     }
                 }
 

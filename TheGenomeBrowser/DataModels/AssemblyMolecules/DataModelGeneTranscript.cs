@@ -91,11 +91,23 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         public string Transcript_Biotype { get; set; }
 
+        /// <summary>
+        /// read only property returning the number of exons
+        /// </summary>
+        public int NumberOfExons
+        {
+            get
+            {
+                //return the number of exons
+                return GeneTranscriptObject.ListDataModelGeneTranscriptElementExon.Count;
+            }
+        }
 
         /// <summary>
         /// DataModelGeneTranscriptObject (contains start_codon, end_codon, list of exons, list of CDS)
         /// </summary>
         public DataModelGeneTranscriptObject GeneTranscriptObject{ get; set; }
+
 
         #endregion
 
@@ -278,6 +290,28 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
 
         #region properties
+
+        /// <summary>
+        /// read only property for the number of exons, return -1 if there are no exons
+        /// </summary>
+        public int NumberOfExons
+        {
+            get
+            {
+                //check if there are exons
+                if (ListDataModelGeneTranscriptElementExon != null)
+                {
+                    //return the number of exons
+                    return ListDataModelGeneTranscriptElementExon.Count;
+                }
+                else
+                {
+                    //return -1
+                    return -1;
+                }
+            }
+        }
+
 
         /// <summary>
         /// var with DataModelGeneTranscriptElementStartEndCodon information for this transcript

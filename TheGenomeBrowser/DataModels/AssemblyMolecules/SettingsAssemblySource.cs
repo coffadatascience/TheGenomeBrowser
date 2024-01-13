@@ -90,8 +90,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         /// <summary>
         /// constant for the header name of the gene name
+        /// NOTE --> the field gene has a space after gene in the line (maybe the only way to recognise it properly) (once set for the line it should be skipped in the rest of the attributes)
+        ///          note also that we are better of using the name as processed as GeneId, as it is the used key and thereofore clean from doubles)
         /// </summary>
-        public const string GeneNameHeaderName = "gene";
+        public const string GeneNameHeaderName = "gene ";
 
         /// <summary>
         /// constant for gene_synonym 

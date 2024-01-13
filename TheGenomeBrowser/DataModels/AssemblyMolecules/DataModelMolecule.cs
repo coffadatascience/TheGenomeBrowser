@@ -60,6 +60,16 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         #region methods
 
         /// <summary>
+        /// procedure that gets the number of genes on the molecule
+        /// </summary>
+        /// <returns></returns>
+        public int GetNumberOfGenes()
+        {
+            //return the number of genes
+            return GeneIds.Count;
+        }
+
+        /// <summary>
         /// procedure that returns the gene id for a given seqid
         /// </summary>
         /// <param name="seqid"></param>

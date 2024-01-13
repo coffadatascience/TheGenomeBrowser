@@ -73,6 +73,25 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
 
         #region methods
 
+        /// <summary>
+        /// procedure that returns the number of genes in the genome
+        /// </summary>
+        /// <returns></returns>
+        public int GetNumberOfGenes()
+        {
+            //init the number of genes
+            int numberOfGenes = 0;
+
+            //loop over the molecules
+            foreach (var molecule in DictionaryOfMolecules)
+            {
+                //add the number of genes
+                numberOfGenes += molecule.Value.GetNumberOfGenes();
+            }
+
+            //return the number of genes
+            return numberOfGenes;
+        }
 
 
         /// <summary>
