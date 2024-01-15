@@ -103,7 +103,7 @@ namespace TheGenomeBrowser.Readers
                 else if (line.StartsWith("# Taxid:"))
                 {
                     string fieldValue = line.Substring("# Taxid:".Length).Trim();
-                    dataModelDataModelAssemblyReport.Taxid = fieldValue;
+                    dataModelDataModelAssemblyReport.TaxId = fieldValue;
                 }
                 else if (line.StartsWith("# BioProject:"))
                 {

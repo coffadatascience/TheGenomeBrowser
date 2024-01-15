@@ -46,7 +46,7 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// var for taxid
         /// 
         /// </summary>
-        public string Taxid { get; internal set; }
+        public string TaxId { get; internal set; }
 
         /// <summary>
         /// var for bio project

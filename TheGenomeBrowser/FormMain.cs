@@ -71,7 +71,6 @@ namespace TheGenomeBrowser
 
         #region constructors
 
-
         /// <summary>
         /// constructor
         /// </summary>
@@ -211,6 +210,7 @@ namespace TheGenomeBrowser
         }
 
         #endregion
+
 
         #region events
 
@@ -476,7 +476,6 @@ namespace TheGenomeBrowser
                 //get the file path
                 string filePath = openFileDialog.FileName;
 
-
                 //new reader for the assembly report
                 var AssemblyReportReader = new NcbiGftAssemblyReportReader();
 
@@ -485,6 +484,11 @@ namespace TheGenomeBrowser
 
                 //process the assembly report
                 _handlerImportedGtfFileData.ProcessDataModelAssemblyReport(assemblyReport);
+
+                //extract file name from path
+                string fileName = Path.GetFileName(filePath);
+                //add the name of the file in the list source files of the handler
+                _handlerImportedGtfFileData.ListOfUsedSourceFiles.Add(fileName);
 
                 //get the split container 1 and add the grid view to it (panel 2)
                 var splitContainer1 = ReturnSplitContainerByName(SPLIT_CONTAINER_1);
@@ -546,6 +550,11 @@ namespace TheGenomeBrowser
 
                     //make the progress bar invisible
                     progressBar.Visible = false;
+
+                    //extract file name from path
+                    string fileName = Path.GetFileName(filePath);
+                    //add the name of the file in the list source files of the handler
+                    _handlerImportedGtfFileData.ListOfUsedSourceFiles.Add(fileName);
 
                     //set the GTF file in the handler
                     _handlerImportedGtfFileData.DataModelGtfFile = GtfFile;

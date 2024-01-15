@@ -398,8 +398,6 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
         }
 
 
-
-
         #endregion
 
 

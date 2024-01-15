@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace TheGenomeBrowser.DataModels.Genes
 {
     /// <summary>
+    /// NOTE JCO -- > these classes are under construction, they are not yet used in the application (could be for future use of quick look up of genes)
     /// class for the data model look up gene list but now for a single gene
     /// </summary>
     public class DataModelLookupGene()

@@ -96,7 +96,7 @@ namespace TheGenomeBrowser.ViewModels.VIewModel
             //add the row data to the list of row data
             this.ListDataRowData.Add(rowData4);
             //create a data cell value
-            var dataCellValue4 = new DataCellItem(rowIndex, dataModelAssemblyReport.Taxid);
+            var dataCellValue4 = new DataCellItem(rowIndex, dataModelAssemblyReport.TaxId);
             //add the data cell value to the row data
             columnData.ListDataCellItem.Add(dataCellValue4);
             //count the row index

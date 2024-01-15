@@ -23,6 +23,11 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         public string moleculeChromosome;
 
         /// <summary>
+        /// ref seqa accession number as found in the gtf file (we use this to link the gtf file to the assembly report, e.g. get the chromosome name)
+        /// </summary>
+        public string refSeqAccenGtf;
+
+        /// <summary>
         /// dictionary with all the Gene id (genes) that are located on the molecule (here the key is the GeneId field)
         /// </summary>
         public Dictionary<string, DataModelGeneId> GeneIds { get; set; }
@@ -42,10 +47,12 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// constructor
         /// </summary>
         /// <param name="moleculeChromosome"></param>
-        public DataModelMolecule(string moleculeChromosome)
+        public DataModelMolecule(string moleculeChromosome, string refSeqAccenGtf)
         {
             //set the molecule chromosome
             this.moleculeChromosome = moleculeChromosome;
+            //set the ref seq accession number
+            this.refSeqAccenGtf = refSeqAccenGtf;
 
             //init the dictionary with the seqids
             GeneIds = new Dictionary<string, DataModelGeneId>();

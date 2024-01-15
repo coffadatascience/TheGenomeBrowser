@@ -46,6 +46,11 @@ namespace TheGenomeBrowser.ViewModels
         /// </summary>
         public ComboBox comboBoxConditionalFormatExperimentView { get; set; }
 
+        /// <summary>
+        /// list of files used for the import (we just add all files here for reference later)
+        /// </summary>
+        public List<string> ListOfUsedSourceFiles { get; set; }
+
         #endregion
 
         #region settings
@@ -189,6 +194,9 @@ namespace TheGenomeBrowser.ViewModels
             // new DataModelAssemblySourceList
             DataModelAssemblySourceList = new DataModels.AssemblyMolecules.DataModelAssemblySourceList();
 
+            //create list of files
+            ListOfUsedSourceFiles = new List<string>();
+
             //create view model
             ViewModelGtfFile = new ViewModelGtfFile();
             //create view model for the assembly report comments
@@ -285,6 +293,20 @@ namespace TheGenomeBrowser.ViewModels
 
             //return the chromosome
             return chromosome;
+        }
+
+        /// <summary>
+        /// procedure that accepts a string (source file name) and adds it to the list of source file (if it is not yet in the list)
+        /// </summary>
+        /// <param name="sourceFileName"></param>
+        public void AddSourceFileToList(string sourceFileName)
+        {
+            //check if the source file name is not yet in the list
+            if (!ListOfUsedSourceFiles.Contains(sourceFileName))
+            {
+                //add the source file name to the list
+                ListOfUsedSourceFiles.Add(sourceFileName);
+            }
         }
 
         #endregion
@@ -661,13 +683,14 @@ namespace TheGenomeBrowser.ViewModels
                     if (!continueImportWithoutAssemblyReport) return;
                 }
 
-
+                //get ref seq accn from gtf file (its called seq name in the GTF file)
+                string refSeqAccn = feature.Seqname;
 
                 //check if the molecule is in the dictionary, if not add it by creating a new DataModelMolecule
                 if (!dataModelAssemblySource.TheGenome.DictionaryOfMolecules.ContainsKey(MoleculeChromosome))
                 {
                     //create a new DataModelMolecule
-                    dataModelMolecule = new DataModels.AssemblyMolecules.DataModelMolecule(MoleculeChromosome);
+                    dataModelMolecule = new DataModels.AssemblyMolecules.DataModelMolecule(MoleculeChromosome, refSeqAccn);
                     //add the data model molecule to the dictionary
                     dataModelAssemblySource.TheGenome.DictionaryOfMolecules.Add(MoleculeChromosome, dataModelMolecule);
                 }

@@ -34,7 +34,9 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
             }
         }
 
-        // var that returns the source type of the first item in the list
+        /// <summary>
+        /// var that returns the source type of the first item in the list
+        /// </summary>
         public string SourceType
         {
             get
@@ -43,7 +45,9 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
             }
         }
 
-        // var that returns the gene name of the first item in the list
+        /// <summary>
+        /// var that returns the gene name of the first item in the list
+        /// </summary>
         public string GeneName
         {
             get
@@ -51,7 +55,10 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
                 return ListOfDataModelGeneId[0].GeneName;
             }
         }
-        // var that returns the description of the first item in the list
+
+        /// <summary>
+        /// var that returns the description of the first item in the list
+        /// </summary>
         public string Description
         {
             get
@@ -60,7 +67,9 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
             }
         }
 
-        //var that returns the DbRefXrefOne of the first item in the list
+        /// <summary>
+        /// var that returns the DbRefXrefOne of the first item in the list
+        /// </summary>
         public string DbRefXrefOne
         {
             get
@@ -69,7 +78,9 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
             }
         }
 
-        //var that returns the DbRefXrefTwo of the first item in the list
+        /// <summary>
+        /// var that returns the DbRefXrefTwo of the first item in the list
+        /// </summary>
         public string DbRefXrefTwo
         {
             get
@@ -78,7 +89,9 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
             }
         }
 
-        //var that returns the GeneBiotype of the first item in the list
+        /// <summary>
+        /// var that returns the GeneBiotype of the first item in the list
+        /// </summary>
         public string GeneBiotype
         {
             get
@@ -87,7 +100,9 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
             }
         }
 
-        //var that returns if the gene is a pseudo for the first item in the list
+        /// <summary>
+        /// var that returns if the gene is a pseudo for the first item in the list
+        /// </summary>
         public bool IsPseudo
         {
             get
@@ -96,16 +111,16 @@ namespace TheGenomeBrowser.ViewModels.VIewModel.AssemblyMolecules
             }
         }
 
-        //var that returns the synonyms of the first item in the list
+        /// <summary>
+        /// var that returns the synonyms of the first item in the list
+        /// </summary>
         public string Synonyms
         {
             get
             {
                 return ListOfDataModelGeneId[0].Synonyms;
             }
-        }
-
-        
+        }   
 
         /// <summary>
         /// var that source type of the second item in the list (if it exists, else return na)
