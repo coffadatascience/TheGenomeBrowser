@@ -321,6 +321,18 @@ namespace TheGenomeBrowser
                 //gzip the file
                 ComProcedures.ZipFile(filePath);
 
+                //make the progress bar invisible
+                progressBar.Visible = false;
+
+                //return a message to the user that the genome has been serialized and zipped and what the location of the file is. Ask the user if they want to open the folder where the file is located.
+                DialogResult dialogResult = MessageBox.Show("SophiasGenome has been serialized and zipped to " + this._filePathSaveXml + ". Do you want to open the folder where the file is located?", "SophiasGenome has been serialized and zipped", MessageBoxButtons.YesNo);
+
+                //check if the user wants to open the folder
+                if (dialogResult == DialogResult.Yes)
+                {
+                    //open the folder
+                    System.Diagnostics.Process.Start("explorer.exe", "/select, " + this._filePathSaveXml);
+                }
 
             }
 
