@@ -77,6 +77,31 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         //constant for the name of the RefSeq
         public const string REFSEQ = "RefSeq";
 
+        //constants we use for GeneBiotype -	GeneBioType (filter): (enum 1. Protein_coding 2. Transcribed_pseudogene 3. Pseudogene 4. lncRNA (long non coding RNAs) 5. Other  should be none as noted in current annotation file)
+        //constant for the name of the Protein_coding
+        public const string Protein_coding = "protein_coding";
+        //constant for the name of the Transcribed_pseudogene
+        public const string Transcribed_pseudogene = "transcribed_pseudogene";
+        //constant for the name of the Pseudogene
+        public const string Pseudogene = "pseudogene";
+        //constant for the name of the lncRNA
+        public const string lncRNA = "lncRNA";
+        //constant for the name of the Other
+        public const string Other = "other";
+
+        //constants we use for TranscriptBiotype - TranscriptBiotype (filter): (enum 1. transcript 2. mRNA 3. miRNA 4. Primary_transcript 5. lncRNA 6. Other)
+        //constant for the name of the transcript
+        public const string TranscriptBiotype_Transcript = "transcript";
+        //constant for the name of the mRNA
+        public const string TranscriptBiotype_mRNA = "mRNA";
+        //constant for the name of the miRNA
+        public const string TranscriptBiotype_miRNA = "miRNA";
+        //constant for the name of the Primary_transcript
+        public const string TranscriptBiotype_Primary_transcript = "Primary_transcript";
+        //constant for the name of the lncRNA
+        public const string TranscriptBiotype_lncRNA = "lncRNA";
+
+
         #endregion
 
 
@@ -147,7 +172,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         public enum GeneBiotype
         {
             Protein_coding = 1,
-            Transcribed_pseudogene = 2,
+            Transcribed_pseudogene = 2, //"transcribed_pseudogene
             Pseudogene = 3,
             lncRNA = 4,
             Other = 5
@@ -173,7 +198,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         {
             plus = 1,
             minus = 2,
-            other = 3
+            unknown = 3
         }
 
         /// <summary>
@@ -188,7 +213,20 @@ namespace TheGenomeBrowser.COM.ExportVersion01
             Unknown = 5
         }
         
-        //enum for sequence rol (enum: 1. 
+        //enum for Gene biotype (enum 1. Protein_coding 2. Transcribed_pseudogene 3. Pseudogene 4. lncRNA (long non coding RNAs) 5. Other  should be none as noted in current annotation file)
+        //enum for Transcript biotype (enum 1. transcript 2. mRNA 3. miRNA 4. Primary_transcript 5. lncRNA 6. Other)
+        public enum GeneTranscriptBiotype
+        {
+            Protein_coding = 1,
+            Transcribed_pseudogene = 2,
+            Pseudogene = 3,
+            lncRNA = 4,
+            Other = 5,
+            transcript = 6,
+            mRNA = 7,
+            miRNA = 8,
+            Primary_transcript = 9,
+        }
 
 
         #endregion
@@ -335,6 +373,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// <returns>The corresponding source type enum</returns>
         public static SophiasGenomeExportVersion01.SourceType ConvertStringToSourceType(string source)
         {
+            //match the string to the constants and return an enum
             switch (source)
             {
                 case SophiasGenomeExportVersion01.BESTREFSEQ:
@@ -353,6 +392,81 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                     return SophiasGenomeExportVersion01.SourceType.Other;
             }
         }
+
+        /// <summary>
+        /// procedure that converts a string to a GeneBiotype using the constants as denoted in this class
+        /// </summary>
+        /// <param name="geneBiotypeString"></param>
+        /// <returns></returns>
+        public static SophiasGenomeExportVersion01.GeneBiotype ConvertStringToGeneBiotype(string geneBiotypeString)
+        {
+            //match the string to the constants and return an enum
+            switch (geneBiotypeString)
+            {
+                case SophiasGenomeExportVersion01.Protein_coding:
+                    return SophiasGenomeExportVersion01.GeneBiotype.Protein_coding;
+                case SophiasGenomeExportVersion01.Transcribed_pseudogene:
+                    return SophiasGenomeExportVersion01.GeneBiotype.Transcribed_pseudogene;
+                case SophiasGenomeExportVersion01.Pseudogene:
+                    return SophiasGenomeExportVersion01.GeneBiotype.Pseudogene;
+                case SophiasGenomeExportVersion01.lncRNA:
+                    return SophiasGenomeExportVersion01.GeneBiotype.lncRNA;
+                case SophiasGenomeExportVersion01.Other:
+                    return SophiasGenomeExportVersion01.GeneBiotype.Other;
+                default:
+                    return SophiasGenomeExportVersion01.GeneBiotype.Other;
+            }
+        }
+
+        /// <summary>
+        /// convert a string to a TranscriptBiotype using the constants as denoted in this class
+        /// </summary>
+        /// <param name="strandString"></param>
+        /// <returns></returns>
+        public static SophiasGenomeExportVersion01.Strand ConvertStringToStrand(string strandString)
+        {
+            //match the string to the constants and return an enum
+            switch (strandString)
+            {
+                case "+":
+                    return SophiasGenomeExportVersion01.Strand.plus;
+                case "-":
+                    return SophiasGenomeExportVersion01.Strand.minus;
+                default:
+                    return SophiasGenomeExportVersion01.Strand.unknown;
+            }
+        }
+
+        /// <summary>
+        /// procedure that converts a string to a GeneTranscriptBiotype using the constants as denoted in this class
+        /// </summary>
+        /// <param name="transcriptBiotypeString"></param>
+        /// <returns></returns>
+        public static SophiasGenomeExportVersion01.TranscriptBiotype ConvertStringToTranscriptBiotype(string transcriptBiotypeString)
+        {
+            //match the string to the constants and return an enum
+            switch (transcriptBiotypeString)
+            {
+                case SophiasGenomeExportVersion01.TranscriptBiotype_Transcript:
+                    return SophiasGenomeExportVersion01.TranscriptBiotype.transcript;
+                case SophiasGenomeExportVersion01.TranscriptBiotype_mRNA:
+                    return SophiasGenomeExportVersion01.TranscriptBiotype.mRNA;
+                case SophiasGenomeExportVersion01.TranscriptBiotype_miRNA:
+                    return SophiasGenomeExportVersion01.TranscriptBiotype.miRNA;
+                case SophiasGenomeExportVersion01.TranscriptBiotype_Primary_transcript:
+                    return SophiasGenomeExportVersion01.TranscriptBiotype.Primary_transcript;
+                case SophiasGenomeExportVersion01.TranscriptBiotype_lncRNA:
+                    return SophiasGenomeExportVersion01.TranscriptBiotype.lncRNA;
+                default:
+                    return SophiasGenomeExportVersion01.TranscriptBiotype.Other;
+            }
+        }
+
+        // convert a string to a TranscriptBiotype using the constants as denoted in this class
+
+
+        
+
 
         #endregion
 
@@ -596,6 +710,16 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         public int End { get; set; }
 
         /// <summary>
+        /// var for description
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// enum for strand
+        /// </summary>
+        public SophiasGenomeExportVersion01.Strand Strand { get; set; }
+
+        /// <summary>
         /// sourcetype
         /// </summary>
         public SophiasGenomeExportVersion01.SourceType SourceType { get; set; }
@@ -608,7 +732,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// <summary>
         /// list of synonyms known
         /// </summary>
-        public List<string> ListOfSynonyms { get; set; }
+        public List<string> Gene_Synonyms { get; set; }
 
         /// <summary>
         /// list of transcripts for this gene
@@ -676,11 +800,6 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         public SophiasGenomeExportVersion01.Strand Strand { get; set; }
      
         /// <summary>
-        /// source name
-        /// </summary>
-        public SophiasGenomeExportVersion01.SourceName SourceName { get; set; }
-
-        /// <summary>
         /// var for transcript biotype
         /// </summary>
         public SophiasGenomeExportVersion01.TranscriptBiotype TranscriptBiotype { get; set; }
@@ -695,13 +814,23 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// var for start codon (note that is the strand is plus, then the end of the start codon is plus 3, if its minus it is minus 3)
         /// this number typically matches with a position in the first exon where the CDS start --> the part that gets translated into amino acids
         /// </summary>
-        public int StartCodon { get; set; }
+        public int StartCodonStart { get; set; }
+
+        /// <summary>
+        /// var for end of the start codon (typically + 3)
+        /// </summary>
+        public int StartCodonEnd{ get; set; }
 
         /// <summary>
         /// var for end codon (note that is the strand is plus, then the end of the end codon is plus 3, if its minus it is minus 3)
         /// This number typically matches with a position in the last exon where the CDS ends --> the part that gets translated into amino acids
         /// </summary>
-        public int EndCodon { get; set; }
+        public int StopCodonStart { get; set; }
+
+        /// <summary>
+        /// end of stop codon (typically + 3)
+        /// </summary>
+        public int StopCodonEnd { get; set; }
 
         /// <summary>
         /// CDS object
@@ -804,6 +933,13 @@ namespace TheGenomeBrowser.COM.ExportVersion01
 
 
         #region constructors
+
+        /// <summary>
+        /// var parameterless constructor
+        /// </summary>
+        public ExonItemSophiaDataModelCOM()
+        {
+        }
 
         /// <summary>
         /// contructor with all fields
@@ -931,6 +1067,13 @@ namespace TheGenomeBrowser.COM.ExportVersion01
 
 
         #region constructors
+
+        /// <summary>
+        /// parameterless constructor
+        /// </summary>
+        public CDSItemSophiaDataModelCOM()
+        {
+        }
 
         /// <summary>
         /// constructor with all fields

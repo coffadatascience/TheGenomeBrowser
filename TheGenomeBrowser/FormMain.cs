@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows.Forms;
+using TheGenomeBrowser.COM.ExportVersion01;
 using TheGenomeBrowser.DataModels.NCBIImportedData;
 using TheGenomeBrowser.Readers;
 using TheGenomeBrowser.ViewModels;
@@ -26,6 +27,11 @@ namespace TheGenomeBrowser
         /// but we also want an easy trigger to get the output in the debug window
         /// </summary>
         private bool _printDebug = false;
+
+        /// <summary>
+        /// var string for file path of save XML
+        /// </summary>
+        private string _filePathSaveXml = "";
 
         #endregion
 
@@ -203,16 +209,124 @@ namespace TheGenomeBrowser
             //add button to split container 1
             splitContainerMain.Panel1.Controls.Add(buttonProcessTranscriptElements);
 
+            //button that save the imported data model to ParseDataModelAssemblySourceToCOM
+            Button buttonSaveDataModelAssemblySourceToCOM = new Button();
+            //set name of button BUTTON_PROCESS_GTF
+            buttonSaveDataModelAssemblySourceToCOM.Name = "buttonSaveDataModelAssemblySourceToCOM";
+            //set text of button
+            buttonSaveDataModelAssemblySourceToCOM.Text = "Save data model to COM";
+            //set location of button
+            buttonSaveDataModelAssemblySourceToCOM.Location = new Point(780, 10);
+            //set size of button
+            buttonSaveDataModelAssemblySourceToCOM.Size = new Size(150, 50);
+            //add event handler
+            buttonSaveDataModelAssemblySourceToCOM.Click += ButtonSaveDataModelAssemblySourceToCOM_Click;
+            //add button to split container 1
+            splitContainerMain.Panel1.Controls.Add(buttonSaveDataModelAssemblySourceToCOM);
 
             //add the text box to the form just below the combo box
             _handlerImportedGtfFileData.comboBoxConditionalFormatExperimentView.SelectedIndexChanged += new EventHandler(ComboBoxViewDataGridImportedDataGtfFile_SelectedIndexChanged);
 
+
+            //add on close event
+            this.FormClosing += new FormClosingEventHandler(FormMain_FormClosing);
         }
+
+
+
+
+
 
         #endregion
 
 
         #region events
+
+
+        /// <summary>
+        /// on close event that asks the user to delete the unzipped XML file that was created (note that a zipped version is present). Add a title and icon.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void FormMain_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+
+            //check if the file exists
+            if (File.Exists(_filePathSaveXml))
+            {
+                //ask the user if he wants to delete the file
+                DialogResult dialogResult = MessageBox.Show("Do you want to delete the unzipped XML file that was created?", "Delete unzipped XML file", MessageBoxButtons.YesNo);
+                //check if the user wants to delete the file
+                if (dialogResult == DialogResult.Yes)
+                {
+                    //delete the file
+                    File.Delete(_filePathSaveXml);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// events that triggers the parse the imported data model to a COM object (using ParseDataModelAssemblySourceToCOM)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ButtonSaveDataModelAssemblySourceToCOM_Click(object? sender, EventArgs e)
+        {
+
+            //check if we have a data model in the GTF file handler, if not return appropiate message
+            if (_handlerImportedGtfFileData.DataModelGtfFile == null)
+            {
+                MessageBox.Show("No GTF file imported yet, please import a GTF file first");
+                return;
+            }
+
+            //create a save file dialog that will determine the location where the COM data model will be serialized
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            //COM file will be an XML file
+            saveFileDialog.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
+            saveFileDialog.RestoreDirectory = true;
+            saveFileDialog.Title =
+                "Save COM data model file";
+            //check if the user selected a file
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+
+                //make the progress bar visible
+                progressBar.Visible = true;
+
+                //setup a progress bar
+                var progress = new Progress<int>();
+
+                //set the progress bar to the text box
+                progress.ProgressChanged += (s, message) =>
+                {
+                    //update the progress bar
+                    progressBar.Value = message;
+                };
+
+                //get the file path
+                string filePath = saveFileDialog.FileName;
+
+                //get the first source from ListOfAssemblySources
+                var DataModelAssemblySource = _handlerImportedGtfFileData.DataModelAssemblySourceList.ListOfAssemblySources[0];
+
+                //use ComProcedures to parse the data model to a COM object
+                var SophiasGenome = await ComProcedures.ParseDataModelAssemblySourceToCOMAsync(DataModelAssemblySource, _handlerImportedGtfFileData.DataModelGtfAssemblyReport, _handlerImportedGtfFileData.ListOfUsedSourceFiles, progress);
+
+                //serialize SophiasGenome
+                this._filePathSaveXml = await ComProcedures.SerializeSophiasGenomeAsync(SophiasGenome, filePath);
+
+                //gzip the file
+                ComProcedures.ZipFile(filePath);
+
+
+            }
+
+
+        }
+
 
         /// <summary>
         /// triggers event that places all entree in the GftFeature list that are stop_codon, end_codon, exon, and CDS is the right object (button name BUTTON_PROCESS_TRANSCRIPT_ELEMENTS)

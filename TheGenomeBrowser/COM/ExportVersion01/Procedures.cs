@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,8 +18,29 @@ namespace TheGenomeBrowser.COM.ExportVersion01
     /// ---> these thus also may be managed under different versions, this allows different version of different solutions to actually have some overlap in the COM objects preventing the need to update all solutions at the same time
     /// (which may save time if some parts are not updated or some part are already ready in earlier stages and the component itself is already validated/verified and a key path yet needs to be updated) --> note that with some planning such instnaces may be easily avoided)
     /// </summary>
-    public class Procedures
+    public static class ComProcedures
     {
+
+        #region methods - conversion
+
+        /// <summary>
+        /// async method to parse the data model assembly source to COM
+        /// </summary>
+        /// <param name="dataModelAssemblySource"></param>
+        /// <param name="dataModelGtfAssemblyReport"></param>
+        /// <param name="listOfUsedSourceFiles"></param>
+        /// <returns></returns>
+        public static async Task<SophiasGenomeExportVersion01> ParseDataModelAssemblySourceToCOMAsync(
+            DataModels.AssemblyMolecules.DataModelAssemblySource dataModelAssemblySource,
+            DataModelAssemblyReport dataModelGtfAssemblyReport,
+            List<string> listOfUsedSourceFiles,
+            IProgress<int> progress)
+        {
+            return await Task.Run(() =>
+            {
+                return ParseDataModelAssemblySourceToCOM(dataModelAssemblySource, dataModelGtfAssemblyReport, listOfUsedSourceFiles, progress);
+            });
+        }
 
 
         /// <summary>
@@ -30,7 +53,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         public static TheGenomeBrowser.COM.ExportVersion01.SophiasGenomeExportVersion01 ParseDataModelAssemblySourceToCOM(
             DataModels.AssemblyMolecules.DataModelAssemblySource dataModelAssemblySource,
             DataModelAssemblyReport dataModelGtfAssemblyReport,
-            List<string> listOfUsedSourceFiles)
+            List<string> listOfUsedSourceFiles, IProgress<int> progress)
         {
 
             //create the COM object
@@ -69,14 +92,18 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                 // though we must note that molecule information in the assembly is then missing in the COM object (though not essential to many works), so we may not be able to create a complete list of genes and transcripts etc)
                 sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM.ListOfChromosomesUsedForAssembly = CreateMoleculesList(dataModelAssemblySource.TheGenome);
             }
+            
 
             // Now we have a list of molecules we may create the list of genes and transcripts etc
-            // Note that 
+            // use LoopDictionaryOfMolecules to process the data model the genome and provide the list of chromosomes used for assembly
+            LoopDictionaryOfMolecules(dataModelAssemblySource.TheGenome, sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM.ListOfChromosomesUsedForAssembly, progress);
 
 
 
             //return the COM object
             return sophiasGenomeExportVersion01;
+
+
         }
 
 
@@ -85,8 +112,14 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// </summary>
         /// <param name="dataModelTheGenome"></param>
         /// <param name="listOfChromosomesUsedForAssembly"></param>
-        public void LoopDictionaryOfMolecules(DataModelTheGenome dataModelTheGenome, List<MoleculeSophiaDataModelCOM> listOfChromosomesUsedForAssembly)
+        public static void LoopDictionaryOfMolecules(DataModelTheGenome dataModelTheGenome, List<MoleculeSophiaDataModelCOM> listOfChromosomesUsedForAssembly, IProgress<int> progress)
         {
+
+            //var int counter for progress
+            int counter = 0;
+
+            //get total counter for all molecules
+            int totalNumberOfMolecules = dataModelTheGenome.DictionaryOfMolecules.Count;
 
             //loop the dictionary of molecules
             foreach (var molecule in dataModelTheGenome.DictionaryOfMolecules.Values)
@@ -98,6 +131,13 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                 //check if the molecule is found
                 if (retrievedMolecule != null)
                 {
+
+                    //var for new list of genes
+                    List<GeneSophiaDataModelCOM> listOfGenes = new List<GeneSophiaDataModelCOM>();
+
+                    //set to this molecule
+                    retrievedMolecule.ListOfGenes = listOfGenes;
+
                     // Process genes here from molecule to retrievedMolecule
                     //loop the genes in the current molecule
                     foreach (var geneId in molecule.GeneIds.Values)
@@ -107,26 +147,207 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                         GeneSophiaDataModelCOM geneSophiaDataModelCOM = new GeneSophiaDataModelCOM();
 
                         //set the properties of the COM object
-                        //1. set the gene id
+                        //1. set the gene id (KEY)
                         geneSophiaDataModelCOM.GeneId = geneId.GeneId;
-                        //2. set DbXrefOne
+                        //2. set DbXrefOne (KEY)
                         geneSophiaDataModelCOM.DbRefXrefOne = geneId.Db_Xref_One;
-                        //3. set DbXrefTwo
+                        //3. set DbXrefTwo (KEY)
                         geneSophiaDataModelCOM.DbRefXrefTwo = geneId.Db_Xref_Two;
                         //4. set source type using ConvertStringToSourceType
                         geneSophiaDataModelCOM.SourceType = ConvertStringToSourceType(geneId.Source);
+                        //5. set gene biotype using ConvertStringToGeneBiotype
+                        geneSophiaDataModelCOM.GeneBiotype = ConvertStringToGeneBiotype(geneId.Gene_Biotype);
+                        //6. set start
+                        geneSophiaDataModelCOM.Start = geneId.Start;
+                        //7. set end
+                        geneSophiaDataModelCOM.End = geneId.End;
+                        //8. set strand
+                        geneSophiaDataModelCOM.Strand = ConvertStringToStrand(geneId.Strand);
+                        //9. set description
+                        geneSophiaDataModelCOM.Description = geneId.Description;
+                        //10. set synonyms
+                        geneSophiaDataModelCOM.Gene_Synonyms = geneId.Gene_Synonyms;
+
+                        //add the gene COM object to the list of genes
+                        listOfGenes.Add(geneSophiaDataModelCOM);
 
 
+                        //var for new list of transcripts
+                        List<TranscriptSophiaDataModelCOM> listOfTranscripts = new List<TranscriptSophiaDataModelCOM>();
+
+                        //loop the transcripts in the current gene (CreateTranscriptsList for this GeneId)
+                        //create the list of transcripts COM objects
+                        List<TranscriptSophiaDataModelCOM> transcriptsList = CreateTranscriptsList(geneId.ListGeneTranscripts);
+
+                        //set to this geneId
+                        geneSophiaDataModelCOM.ListOfTranscripts = transcriptsList;
+
+                        //add the gene COM object to the list of genes
+                        listOfGenes.Add(geneSophiaDataModelCOM);
 
                     }
 
 
+                }
+
+
+                //check if the progress is not null
+                if (progress != null)
+                {
+
+                    //var for the progress percentage in double
+                    double progressPercentageDouble = ((double)counter / (double)totalNumberOfMolecules) * 100;
+
+                    //calculate the progress
+                    int progressPercentage = (int)Math.Round(progressPercentageDouble);
+
+                    //report the progress
+                    progress.Report(progressPercentage);
 
                 }
+
+                //increase the counter
+                counter++;
             }
+
         }
 
 
+        /// <summary>
+        /// create a list of all transcripts COM objects from the data model
+        /// </summary>
+        /// <param name="geneIds"></param>
+        /// <returns></returns>
+        public static List<TranscriptSophiaDataModelCOM> CreateTranscriptsList(List<DataModelGeneTranscript> listGeneTranscripts)
+        {
+
+            //new list of transcripts COM objects
+            List<TranscriptSophiaDataModelCOM> transcriptsList = new List<TranscriptSophiaDataModelCOM>();
+
+            //loop the transcripts in the current gene id
+            foreach (var transcript in listGeneTranscripts)
+            {
+                //create the COM object
+                TranscriptSophiaDataModelCOM transcriptSophiaDataModelCOM = new TranscriptSophiaDataModelCOM();
+
+                // Set the properties of the COM object
+                transcriptSophiaDataModelCOM.TranscriptId = transcript.TranscriptId;
+                transcriptSophiaDataModelCOM.DbRefXref = transcript.Db_Xref;
+                transcriptSophiaDataModelCOM.TranscriptBiotype = ConvertStringToTranscriptBiotype(transcript.Transcript_Biotype);
+                transcriptSophiaDataModelCOM.Start = transcript.Start;
+                transcriptSophiaDataModelCOM.End = transcript.End;
+                transcriptSophiaDataModelCOM.Strand = ConvertStringToStrand(transcript.Strand);
+
+                //add the COM object to the list
+                transcriptsList.Add(transcriptSophiaDataModelCOM);
+
+                //create the list of exons COM objects
+                transcriptSophiaDataModelCOM.ListOfExons = ConvertExons(transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon);
+                
+                //create the list of cds COM objects
+                transcriptSophiaDataModelCOM.CDSSophiaDataModelCOM.ListOfCDS = ConvertCds(transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS);
+
+                //set protein id (using GetCheckProteinIds)
+                transcriptSophiaDataModelCOM.CDSSophiaDataModelCOM.ProteinId = GetCheckProteinIds(transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS);
+                //set product (using GetCheckProduct)
+                transcriptSophiaDataModelCOM.CDSSophiaDataModelCOM.Product = GetCheckProduct(transcript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS);
+                
+                //check if the transcript has a start codon and end codon
+                if (transcript.GeneTranscriptObject.DataModelGeneTranscriptElementStartCodon != null)
+                {
+                    //set start codon
+                    transcriptSophiaDataModelCOM.StartCodonStart = transcript.GeneTranscriptObject.DataModelGeneTranscriptElementStartCodon.Start;
+                    transcriptSophiaDataModelCOM.StartCodonEnd = transcript.GeneTranscriptObject.DataModelGeneTranscriptElementStartCodon.End;
+                }
+                else
+                {
+                    //set start codon
+                    transcriptSophiaDataModelCOM.StartCodonStart = -1;
+                    transcriptSophiaDataModelCOM.StartCodonEnd = -1;
+                }
+
+                //check if the transcript has a stop codon
+                if (transcript.GeneTranscriptObject.DataModelGeneTranscriptElementStopCodon != null)
+                {
+                    //set stop codon
+                    transcriptSophiaDataModelCOM.StopCodonStart = transcript.GeneTranscriptObject.DataModelGeneTranscriptElementStopCodon.Start;
+                    transcriptSophiaDataModelCOM.StopCodonEnd = transcript.GeneTranscriptObject.DataModelGeneTranscriptElementStopCodon.End;
+                }
+                else
+                {
+                    //set stop codon
+                    transcriptSophiaDataModelCOM.StopCodonStart = -1;
+                    transcriptSophiaDataModelCOM.StopCodonEnd = -1;
+                }
+                
+            }
+
+
+            return transcriptsList;
+        }
+
+
+
+        /// <summary>
+        /// convert a list of cds COM objects from the data model
+        /// </summary>
+        /// <param name="cds"></param>
+        /// <returns></returns>
+        public static List<CDSItemSophiaDataModelCOM> ConvertCds(List<DataModelGeneTranscriptElementCDS> cds)
+        {
+            //new cds
+            var cdsSophiaDataModelComList = new List<CDSItemSophiaDataModelCOM>();
+
+            //loop elements
+            foreach (var cd in cds)
+            {
+                //new cds
+                var cdsSophiaDataModelCom = new CDSItemSophiaDataModelCOM();
+
+                //set properties
+                cdsSophiaDataModelCom.Start = cd.Start;
+                cdsSophiaDataModelCom.End = cd.End;
+                //exon
+                cdsSophiaDataModelCom.ExonNumber = cd.ExonNumber;
+
+                cdsSophiaDataModelComList.Add(cdsSophiaDataModelCom);
+            }
+
+            return cdsSophiaDataModelComList;
+        }
+
+
+        /// <summary>
+        /// procedure that converts a list of exons to a list of COM objects
+        /// </summary>
+        /// <param name="exons"></param>
+        /// <returns></returns>
+        private static List<ExonItemSophiaDataModelCOM> ConvertExons(List<DataModelGeneTranscriptElementExon> exons)
+        {
+
+            //new list
+            var exonSophiaDataModelComList = new List<ExonItemSophiaDataModelCOM>();
+
+            //loop the exons
+            foreach (var exon in exons)
+            {
+                //create the COM object
+                var exonSophiaDataModelCom = new ExonItemSophiaDataModelCOM();
+
+                //set the properties of the COM object
+                exonSophiaDataModelCom.Start = exon.Start;
+                exonSophiaDataModelCom.End = exon.End;
+                //set exon
+                exonSophiaDataModelCom.ExonNumber = exon.ExonNumber;
+
+                //add the COM object to the list
+                exonSophiaDataModelComList.Add(exonSophiaDataModelCom);
+            }
+
+            //return the list
+            return exonSophiaDataModelComList;
+
+        }
 
 
         /// <summary>
@@ -201,7 +422,8 @@ namespace TheGenomeBrowser.COM.ExportVersion01
 
                 //check if the sequence role is provided value (eq assembled-molecules) and if the include is true all with that value are added (else all without that value are added)
                 //this allows to use this procedure to create a list of all molecules except assembled molecules (and once again for all assembled molecules)
-                if ((SequenceRoleCurrentMolecule == sequenceRole) & (include == true))
+                if ((SequenceRoleCurrentMolecule == sequenceRole) & (include == true) |
+                    (SequenceRoleCurrentMolecule != sequenceRole) & (include == false))
                 {
                     //create the COM object
                     MoleculeSophiaDataModelCOM moleculeSophiaDataModelCOM = new MoleculeSophiaDataModelCOM();
@@ -234,6 +456,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
             return listOfMoleculesCOM;
 
         }
+
 
         /// <summary>
         /// procedure that processes the dataModelGtfAssemblyReport to a TheHumanGenomeSophiaDataModelCOM COM object, in case the dataModelGtfAssemblyReport is NULL, then we add logical values denoting na
@@ -312,7 +535,12 @@ namespace TheGenomeBrowser.COM.ExportVersion01
             //return the COM object
             return theHumanGenomeSophiaDataModelCOM;
         }
-        
+
+        #endregion
+
+
+        #region Functions
+
         /// <summary>
         /// Extract chromosome from refseq
         /// </summary>
@@ -341,7 +569,133 @@ namespace TheGenomeBrowser.COM.ExportVersion01
 
         }
 
-     
+        /// <summary>
+        /// check and get CDS protein id
+        /// </summary>
+        /// <param name="cdsList"></param>
+        /// <returns></returns>
+        public static string GetCheckProteinIds(List<DataModelGeneTranscriptElementCDS> cdsList)
+        {
+            //check if the list is empty
+            if (cdsList.Count == 0)
+            {
+                return SophiasGenomeExportVersion01.ConstantForNa;
+            }
+
+            //get the protein id
+            string proteinId = cdsList[0].ProteinId;
+            bool sameProteinId = true;
+
+            //check if all protein ids are the same
+            foreach (var cds in cdsList)
+            {
+                if (cds.ProteinId != proteinId)
+                {
+                    sameProteinId = false;
+                    break;
+                }
+            }
+
+            //if not all protein ids are the same, return na
+            if (!sameProteinId)
+            {
+                System.Diagnostics.Debug.WriteLine("Protein IDs are not the same.");
+            }
+
+            //return the protein id
+            return proteinId;
+        }
+
+        /// <summary>
+        /// procedure that checks if all products are the same and returns the product
+        /// </summary>
+        /// <param name="cdsList"></param>
+        /// <returns></returns>
+        public static string GetCheckProduct(List<DataModelGeneTranscriptElementCDS> cdsList)
+        {
+            //check if the list is empty
+            if (cdsList.Count == 0)
+            {
+                return SophiasGenomeExportVersion01.ConstantForNa;
+            }
+
+            //get the product
+            string product = cdsList[0].Product;
+            bool sameProduct = true;
+
+            //check if all products are the same
+            foreach (var cds in cdsList)
+            {
+                if (cds.Product != product)
+                {
+                    sameProduct = false;
+                    break;
+                }
+            }
+
+            //if not all products are the same, return na
+            if (!sameProduct)
+            {
+                System.Diagnostics.Debug.WriteLine("Products are not the same.");
+            }
+
+            //return the product
+            return product;
+        }
+
+
+        /// <summary>
+        /// async method to serialize Sophia the genome
+        /// </summary>
+        /// <param name="sophiasGenome"></param>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static async Task<string> SerializeSophiasGenomeAsync(SophiasGenomeExportVersion01 sophiasGenome, string filePath)
+        {
+            //create the serializer
+            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(SophiasGenomeExportVersion01));
+
+            //create the stream writer
+            using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(filePath))
+            {
+                //serialize the object
+                serializer.Serialize(streamWriter, sophiasGenome);
+            }
+
+            //return file path of the stored XML file
+            return filePath;
+        }
+
+
+        /// <summary>
+        /// procedure that takes a filePath and zips the file using zip
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        public static void ZipFile(string filePath)
+        {
+
+            //create the zip file path
+            string zipFilePath = Path.ChangeExtension(filePath, ".zip");
+            //create the zip file
+            using (FileStream fileStream = new FileStream(zipFilePath, FileMode.Create))
+            {
+                //create the zip archive
+                using (ZipArchive archive = new ZipArchive(fileStream, ZipArchiveMode.Create))
+                {
+                    archive.CreateEntryFromFile(filePath, Path.GetFileName(filePath));
+                }
+
+            }
+        }
+
+
+
+        #endregion
+
+
+
+
 
     }
 
