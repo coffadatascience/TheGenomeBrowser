@@ -667,6 +667,8 @@ namespace TheGenomeBrowser
                 //read the GTF file with the async gtf reader
                 DataModelGtfFile GtfFile = await GTFReader.ReadGFF3Async(filePath, progress);
 
+                //clear the GTFReader
+                GTFReader = null;
 
                 // check if the GTF file is not null, then load the GTF data model in the handler dataview
                 if (GtfFile != null)
@@ -697,7 +699,6 @@ namespace TheGenomeBrowser
 
                     //add the grid view to the split container 1
                     splitContainer1.Panel2.Controls.Add(_handlerImportedGtfFileData.ViewDataGridImportedDataGtfFile);
-
 
                 }
 

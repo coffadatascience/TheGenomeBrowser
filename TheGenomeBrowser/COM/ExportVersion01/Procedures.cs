@@ -162,7 +162,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                         //7. set end
                         geneSophiaDataModelCOM.End = geneId.End;
                         //8. set strand
-                        geneSophiaDataModelCOM.Strand = ConvertStringToStrand(geneId.Strand);
+                        geneSophiaDataModelCOM.Strand = ConvertIntStrandToEnumStrand(geneId.Strand);
                         //9. set description
                         geneSophiaDataModelCOM.Description = geneId.Description;
                         //10. set synonyms
@@ -231,7 +231,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                 transcriptSophiaDataModelCOM.TranscriptBiotype = ConvertStringToTranscriptBiotype(transcript.Transcript_Biotype);
                 transcriptSophiaDataModelCOM.Start = transcript.Start;
                 transcriptSophiaDataModelCOM.End = transcript.End;
-                transcriptSophiaDataModelCOM.Strand = ConvertStringToStrand(transcript.Strand);
+                transcriptSophiaDataModelCOM.Strand = ConvertIntStrandToEnumStrand(transcript.Strand);
                 //model evidence
                 transcriptSophiaDataModelCOM.ModelEvidence = transcript.ModelEvidence;
 

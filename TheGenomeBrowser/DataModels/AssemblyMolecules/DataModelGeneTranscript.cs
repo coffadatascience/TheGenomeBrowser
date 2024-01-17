@@ -50,7 +50,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// var for strand
         /// </summary>
-        public string Strand { get; set; }
+        public int Strand { get; set; }
 
         /// <summary>
         /// var for frame
@@ -140,7 +140,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="attributeLine"></param>
-        public DataModelGeneTranscript(string transcripIdUsedKey, string seqName, int start, int end, string strand, int frame, string lineFeedAttributes) : this()
+        public DataModelGeneTranscript(string transcripIdUsedKey, string seqName, int start, int end, int strand, int frame, string lineFeedAttributes) : this()
         {
 
             //new GeneTranscriptObject
@@ -384,10 +384,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="end"></param>
         /// <param name="exonNumber"></param>
         /// <param name="strand"></param>
-        public void AddDataModelGeneTranscriptElementExon(int start, int end, string exonNumber, string strand, string product)
+        public void AddDataModelGeneTranscriptElementExon(int start, int end, string exonNumber, int strand, string product)
         {
             //create a new DataModelGeneTranscriptElementExon
-            var dataModelGeneTranscriptElementExon = new DataModelGeneTranscriptElementExon(start, end, exonNumber, strand, product);
+            var dataModelGeneTranscriptElementExon = new DataModelGeneTranscriptElementExon(start, end, strand, exonNumber, product);
 
             //add the DataModelGeneTranscriptElementExon to the list
             ListDataModelGeneTranscriptElementExon.Add(dataModelGeneTranscriptElementExon);
@@ -403,7 +403,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="proteinId"></param>
-        public void AddDataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, int frame, string proteinId, string product, string note)
+        public void AddDataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, int strand, int frame, string proteinId, string product, string note)
         {
             //create a new DataModelGeneTranscriptElementCDS
             var dataModelGeneTranscriptElementCDS = new DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product, note);

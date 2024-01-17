@@ -420,20 +420,22 @@ namespace TheGenomeBrowser.COM.ExportVersion01
 
         /// <summary>
         /// convert a string to a TranscriptBiotype using the constants as denoted in this class
+        /// During import we set Plus to +1, Minus to -1 and Unknown to 0
         /// </summary>
         /// <param name="strandString"></param>
         /// <returns></returns>
-        public static SophiasGenomeExportVersion01.Strand ConvertStringToStrand(string strandString)
+        public static SophiasGenomeExportVersion01.Strand ConvertIntStrandToEnumStrand(int strandString)
         {
             //match the string to the constants and return an enum
             switch (strandString)
             {
-                case "+":
+                case 1:
                     return SophiasGenomeExportVersion01.Strand.plus;
-                case "-":
+                case -1:
                     return SophiasGenomeExportVersion01.Strand.minus;
                 default:
                     return SophiasGenomeExportVersion01.Strand.unknown;
+
             }
         }
 

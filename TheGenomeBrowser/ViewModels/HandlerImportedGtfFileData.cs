@@ -375,7 +375,7 @@ namespace TheGenomeBrowser.ViewModels
                 // var for end
                 int end = feature.End;
                 // var for strand
-                string strand = feature.Strand;
+                int strand = feature.Strand;
                 // var for frame
                 int frame = feature.Frame;
                 string proteinId = feature.ProteinId;

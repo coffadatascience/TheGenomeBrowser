@@ -95,7 +95,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// var for strand
         /// </summary>
-        public string Strand { get; set; }
+        public int Strand { get; set; }
 
         /// <summary>
         /// var for frame 
@@ -131,7 +131,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="proteinId"></param>
-        public DataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, int frame, string proteinId, string product, string note)
+        public DataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, int strand, int frame, string proteinId, string product, string note)
         {
             //set the fields
             Start = start;
@@ -179,7 +179,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// var for strand
         /// </summary>
-        public string Strand { get; set; }
+        public int Strand { get; set; }
 
         /// <summary>
         /// produce as found (this is the product of the gene typically a transcript)
@@ -199,7 +199,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="end"></param>
         /// <param name="exonNumber"></param>
         /// <param name="strand"></param>
-        public DataModelGeneTranscriptElementExon(int start, int end, string strand, string exonNumber, string product)
+        public DataModelGeneTranscriptElementExon(int start, int end, int strand, string exonNumber, string product)
         {
             //set the fields
             Start = start;

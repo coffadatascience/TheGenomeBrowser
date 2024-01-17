@@ -115,6 +115,24 @@ namespace TheGenomeBrowser.Readers
                     frameInt = -1;
                 }
 
+                //var for strand as an int
+                int strandInt = 0;
+
+                //Convert strand to enum
+                if (strand == "+")
+                {
+                    strandInt = 1;
+                }
+                else if (strand == "-")
+                {
+                    strandInt = -1;
+                }
+                else
+                {
+                    //otherwise we set it to 0
+                    strandInt = 0;
+                }
+
                 //create a new GFF3Feature
                 GTFFeature feature = new DataModels.NCBIImportedData.GTFFeature
                 {
@@ -125,7 +143,7 @@ namespace TheGenomeBrowser.Readers
                     End = end,
                     // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
                     //Score = score,
-                    Strand = strand,
+                    Strand = strandInt,
                     Frame = frameInt,
                 };
 
@@ -199,24 +217,27 @@ namespace TheGenomeBrowser.Readers
                         //add the attribute to the feature
                         feature.DbXref = DbXref;
                     }
-                    // position 04: process the gbkeyHeaderName
-                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.gbkeyHeaderName))
-                    {
-                        //var for gbkeyHeaderName
-                        string gbkey = "";
 
-                        //remove the constant string
-                        gbkey = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.gbkeyHeaderName, "");
+                    // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
 
-                        //remove the double quotes
-                        gbkey = gbkey.Replace("\"", "");
+                    //// position 04: process the gbkeyHeaderName
+                    //else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.gbkeyHeaderName))
+                    //{
+                    //    //var for gbkeyHeaderName
+                    //    string gbkey = "";
 
-                        //trim the string
-                        gbkey = gbkey.Trim();
+                    //    //remove the constant string
+                    //    gbkey = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.gbkeyHeaderName, "");
 
-                        //add the attribute to the feature
-                        feature.GbKey = gbkey;
-                    }
+                    //    //remove the double quotes
+                    //    gbkey = gbkey.Replace("\"", "");
+
+                    //    //trim the string
+                    //    gbkey = gbkey.Trim();
+
+                    //    //add the attribute to the feature
+                    //    feature.GbKey = gbkey;
+                    //}
 
                     // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
                     // --> note that this tag is almost impossible to properly process (positions are not constant, header title is not unique, possibly we only need the gene Id
@@ -317,24 +338,25 @@ namespace TheGenomeBrowser.Readers
                         feature.ProteinId = ProteinId;
                     }
 
+                    // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
                     // position 07: process the pseudo
-                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName))
-                    {
-                        //var for pseudo
-                        string Pseudo = "";
+                    //else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName))
+                    //{
+                    //    //var for pseudo
+                    //    string Pseudo = "";
 
-                        //remove the constant string
-                        Pseudo = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName, "");
+                    //    //remove the constant string
+                    //    Pseudo = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.PseudoHeaderName, "");
 
-                        //remove the double quotes
-                        Pseudo = Pseudo.Replace("\"", "");
+                    //    //remove the double quotes
+                    //    Pseudo = Pseudo.Replace("\"", "");
 
-                        //trim the string
-                        Pseudo = Pseudo.Trim();
+                    //    //trim the string
+                    //    Pseudo = Pseudo.Trim();
 
-                        //add the attribute to the feature
-                        feature.Pseudo = Pseudo;
-                    }
+                    //    //add the attribute to the feature
+                    //    feature.Pseudo = Pseudo;
+                    //}
 
                     // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
                     // position 08: process the transcript_biotype
@@ -404,9 +426,6 @@ namespace TheGenomeBrowser.Readers
                 //increase the progress counter
                 ProgressCounter++;
             }
-
-            //clear memory of reader
-
 
             //return the list of features
             return DataModelGtfFile;

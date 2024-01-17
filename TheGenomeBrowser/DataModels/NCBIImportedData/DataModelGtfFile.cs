@@ -84,7 +84,7 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// <summary>
         /// var for strand
         /// </summary>
-        public string Strand { get; set; }
+        public int Strand { get; set; }
 
         /// <summary>
         /// var for frame (note this is only available for CDS and start_codon and stop_codon - if it is not available it is a dot and we set it to -1)
@@ -111,10 +111,11 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// </summary>
         public string DbXref { get; set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>
         /// var for gb key
         /// </summary>
-        public string GbKey { get; internal set; }
+        //public string GbKey { get; internal set; }
 
         // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
 
@@ -138,15 +139,17 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// </summary>
         public string ModelEvidence { get; internal set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>
         /// var for proteint id
         /// </summary>
         public string ProteinId { get; internal set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>
         /// var for gene biotype
         /// </summary>
-        public string Pseudo { get; internal set; }
+        //public string Pseudo { get; internal set; }
 
         // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>

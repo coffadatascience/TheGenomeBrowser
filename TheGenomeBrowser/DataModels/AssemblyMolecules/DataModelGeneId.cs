@@ -59,7 +59,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// var for strand
         /// </summary>
-        public string Strand { get; set; }
+        public int Strand { get; set; }
 
         /// <summary>
         /// var for frame
@@ -195,7 +195,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         /// <param name="geneId"></param>
         /// <param name="lineFeed"></param>
-        public DataModelGeneId(string seqname, string source, string feature, int start, int end, string strand, int frame, string geneId, string lineFeedAttributes)
+        public DataModelGeneId(string seqname, string source, string feature, int start, int end, int strand, int frame, string geneId, string lineFeedAttributes)
         {
 
             //set fields
