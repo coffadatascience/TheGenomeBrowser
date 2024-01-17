@@ -168,17 +168,12 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                         //10. set synonyms
                         geneSophiaDataModelCOM.Gene_Synonyms = geneId.Gene_Synonyms;
 
-                        //add the gene COM object to the list of genes
-                        listOfGenes.Add(geneSophiaDataModelCOM);
-
 
                         //var for new list of transcripts
                         List<TranscriptSophiaDataModelCOM> listOfTranscripts = new List<TranscriptSophiaDataModelCOM>();
-
                         //loop the transcripts in the current gene (CreateTranscriptsList for this GeneId)
                         //create the list of transcripts COM objects
                         List<TranscriptSophiaDataModelCOM> transcriptsList = CreateTranscriptsList(geneId.ListGeneTranscripts);
-
                         //set to this geneId
                         geneSophiaDataModelCOM.ListOfTranscripts = transcriptsList;
 

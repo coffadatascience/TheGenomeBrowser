@@ -232,11 +232,6 @@ namespace TheGenomeBrowser
             this.FormClosing += new FormClosingEventHandler(FormMain_FormClosing);
         }
 
-
-
-
-
-
         #endregion
 
 
@@ -727,7 +722,7 @@ namespace TheGenomeBrowser
             var splitContainer1 = this.Controls.Find(SPLIT_CONTAINER_1, true).FirstOrDefault() as SplitContainer;
 
             //return the request split contaier
-            if (nameSplitContainer == nameSplitContainer) return splitContainer1;
+            if (nameSplitContainer == splitContainer1.Name) return splitContainer1;
 
             //return null if we didnt find the requested splitcontainerq
             return null;
