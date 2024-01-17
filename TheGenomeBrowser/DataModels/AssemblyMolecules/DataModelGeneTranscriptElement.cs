@@ -100,7 +100,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// var for frame 
         /// </summary>
-        public string Frame { get; set; }
+        public int Frame { get; set; }
 
         /// <summary>
         /// var for protein id
@@ -131,7 +131,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="proteinId"></param>
-        public DataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product, string note)
+        public DataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, int frame, string proteinId, string product, string note)
         {
             //set the fields
             Start = start;

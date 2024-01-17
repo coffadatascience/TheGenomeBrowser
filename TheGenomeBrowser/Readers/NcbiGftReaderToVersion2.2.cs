@@ -104,8 +104,16 @@ namespace TheGenomeBrowser.Readers
                 int end = int.Parse(fields[4]);
                 string score = fields[5];
                 string strand = fields[6];
-                string frame = fields[7];
                 string[] attributePairs = fields[8].Split(';');
+
+                //get frame
+                string frame = fields[7];
+
+                //try parse to integer, if it fails we set it to -1
+                if (!int.TryParse(frame, out int frameInt))
+                {
+                    frameInt = -1;
+                }
 
                 //create a new GFF3Feature
                 GTFFeature feature = new DataModels.NCBIImportedData.GTFFeature
@@ -115,9 +123,10 @@ namespace TheGenomeBrowser.Readers
                     FeatureType = featureType,
                     Start = start,
                     End = end,
-                    Score = score,
+                    // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
+                    //Score = score,
                     Strand = strand,
-                    Frame = frame,
+                    Frame = frameInt,
                 };
 
                 //var string builder for the attributes
@@ -209,27 +218,28 @@ namespace TheGenomeBrowser.Readers
                         feature.GbKey = gbkey;
                     }
 
+                    // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
                     // --> note that this tag is almost impossible to properly process (positions are not constant, header title is not unique, possibly we only need the gene Id
                     // position 05: process the gene name
                     // !!!!! note that the tag Gene is often used for the gene name, but not always. Sometimes the tag gene is used for the gene id. So we need to check if the tag gene is used for the gene name or for the gene id
                     // we may thus also need to use the position of the tag to determine if the tag is used for the gene name or for the gene id
-                    else if ((CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName)) & (CurrentPair.Contains(feature.GeneId)))
-                    {
-                        //var for gene name
-                        string GeneName = "";
+                    //else if ((CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName)) & (CurrentPair.Contains(feature.GeneId)))
+                    //{
+                    //    //var for gene name
+                    //    string GeneName = "";
 
-                        //remove the constant string
-                        GeneName = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName, "");
+                    //    //remove the constant string
+                    //    GeneName = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneNameHeaderName, "");
 
-                        //remove the double quotes
-                        GeneName = GeneName.Replace("\"", "");
+                    //    //remove the double quotes
+                    //    GeneName = GeneName.Replace("\"", "");
 
-                        //trim the string
-                        GeneName = GeneName.Trim();
+                    //    //trim the string
+                    //    GeneName = GeneName.Trim();
 
-                        //add the attribute to the feature
-                        feature.Gene = GeneName;
-                    }
+                    //    //add the attribute to the feature
+                    //    feature.Gene = GeneName;
+                    //}
 
                     // position 06: process the note
                     else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.NoteHeaderName))
@@ -325,24 +335,26 @@ namespace TheGenomeBrowser.Readers
                         //add the attribute to the feature
                         feature.Pseudo = Pseudo;
                     }
+
+                    // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
                     // position 08: process the transcript_biotype
-                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.TranscriptBiotypeHeaderName))
-                    {
-                        //var for transcript_biotype
-                        string TranscriptBiotype = "";
+                    //else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.TranscriptBiotypeHeaderName))
+                    //{
+                    //    //var for transcript_biotype
+                    //    string TranscriptBiotype = "";
 
-                        //remove the constant string
-                        TranscriptBiotype = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.TranscriptBiotypeHeaderName, "");
+                    //    //remove the constant string
+                    //    TranscriptBiotype = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.TranscriptBiotypeHeaderName, "");
 
-                        //remove the double quotes
-                        TranscriptBiotype = TranscriptBiotype.Replace("\"", "");
+                    //    //remove the double quotes
+                    //    TranscriptBiotype = TranscriptBiotype.Replace("\"", "");
 
-                        //trim the string
-                        TranscriptBiotype = TranscriptBiotype.Trim();
+                    //    //trim the string
+                    //    TranscriptBiotype = TranscriptBiotype.Trim();
 
-                        //add the attribute to the feature
-                        feature.TranscriptBiotype = TranscriptBiotype;
-                    }
+                    //    //add the attribute to the feature
+                    //    feature.TranscriptBiotype = TranscriptBiotype;
+                    //}
 
                     // Position 09: process the exon number
                     else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ExonNumberHeaderName))

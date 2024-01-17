@@ -50,10 +50,11 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         public int End { get; set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>
         /// var to score
         /// </summary>
-        public string Score { get; set; }
+        //public string Score { get; set; }
 
         /// <summary>
         /// var for strand
@@ -63,7 +64,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// var for frame
         /// </summary>
-        public string Frame { get; set; }
+        public int Frame { get; set; }
 
 
         // ------------------------------------------------------------------------
@@ -194,7 +195,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         /// <param name="geneId"></param>
         /// <param name="lineFeed"></param>
-        public DataModelGeneId(string seqname, string source, string feature, int start, int end, string score, string strand, string frame, string geneId, string lineFeedAttributes)
+        public DataModelGeneId(string seqname, string source, string feature, int start, int end, string strand, int frame, string geneId, string lineFeedAttributes)
         {
 
             //set fields
@@ -203,7 +204,8 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             Feature = feature;
             Start = start;
             End = end;
-            Score = score;
+            // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
+            //Score = score;
             Strand = strand;
             Frame = frame;
 

@@ -377,7 +377,7 @@ namespace TheGenomeBrowser.ViewModels
                 // var for strand
                 string strand = feature.Strand;
                 // var for frame
-                string frame = feature.Frame;
+                int frame = feature.Frame;
                 string proteinId = feature.ProteinId;
                 // var for product
                 string product = feature.Product;
@@ -727,7 +727,7 @@ namespace TheGenomeBrowser.ViewModels
                     string geneId = feature.GeneId;
 
                     //create a new DataModelGeneId passing the first 8 feature items and the attribute line feed
-                    DataModelGeneId = new DataModels.AssemblyMolecules.DataModelGeneId(feature.Seqname, feature.Source, feature.FeatureType, feature.Start, feature.End, feature.Score, feature.Strand, feature.Frame, geneId, feature.AttributesString);
+                    DataModelGeneId = new DataModels.AssemblyMolecules.DataModelGeneId(feature.Seqname, feature.Source, feature.FeatureType, feature.Start, feature.End, feature.Strand, feature.Frame, geneId, feature.AttributesString);
 
                     //check if the gene id is not null or empty
                     if (!string.IsNullOrEmpty(geneId))
@@ -889,7 +889,7 @@ namespace TheGenomeBrowser.ViewModels
 
                     // process the transcript (make a new DataModelTranscript passing the first 8 feature items and the attribute line feed)
                     var DataModelTranscript = new DataModels.AssemblyMolecules.DataModelGeneTranscript(
-                                               TranscriptId, GtfFeature.Seqname, GtfFeature.Start, GtfFeature.End, GtfFeature.Score, GtfFeature.Strand, GtfFeature.Frame, GtfFeature.AttributesString);
+                                               TranscriptId, GtfFeature.Seqname, GtfFeature.Start, GtfFeature.End, GtfFeature.Strand, GtfFeature.Frame, GtfFeature.AttributesString);
 
                     //add to DataModelGeneId
                     DataModelGeneId.ListGeneTranscripts.Add(DataModelTranscript);
@@ -906,7 +906,7 @@ namespace TheGenomeBrowser.ViewModels
                     {
                         // process the transcript (make a new DataModelTranscript passing the first 8 feature items and the attribute line feed)
                         var DataModelGeneId = new DataModels.AssemblyMolecules.DataModelGeneTranscript(
-                                                                              TranscriptId, GtfFeature.Seqname, GtfFeature.Start, GtfFeature.End, GtfFeature.Score, GtfFeature.Strand, GtfFeature.Frame, GtfFeature.AttributesString);
+                                                                              TranscriptId, GtfFeature.Seqname, GtfFeature.Start, GtfFeature.End, GtfFeature.Strand, GtfFeature.Frame, GtfFeature.AttributesString);
 
                         //var for source DataModelGeneId.source --> if we find it here, then we have found the gene id in another source name than the line feed suggests
                         var sourceDataModelGeneId = DataModelGeneIdOtherSourceThatGtfFeatureLineFeed.Source;

@@ -74,10 +74,12 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// </summary>
         public int End { get; set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
+
         /// <summary>
         /// var for score
         /// </summary>
-        public string Score { get; set; }
+        //public string Score { get; set; }
 
         /// <summary>
         /// var for strand
@@ -85,9 +87,9 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         public string Strand { get; set; }
 
         /// <summary>
-        /// var for frame
+        /// var for frame (note this is only available for CDS and start_codon and stop_codon - if it is not available it is a dot and we set it to -1)
         /// </summary>
-        public string Frame { get; set; }
+        public int Frame { get; set; }
 
         /// <summary>
         /// var for gene id
@@ -114,10 +116,12 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// </summary>
         public string GbKey { get; internal set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
+
         /// <summary>
         /// var for gene name
         /// </summary>
-        public string Gene { get; set; }
+        //public string Gene { get; set; }
 
         /// <summary>
         /// var for note
@@ -144,10 +148,11 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// </summary>
         public string Pseudo { get; internal set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>
         /// var for transcript biotype
         /// </summary>
-        public string TranscriptBiotype { get; internal set; }
+        //public string TranscriptBiotype { get; internal set; }
 
 
         /// <summary>

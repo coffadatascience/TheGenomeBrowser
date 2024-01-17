@@ -41,10 +41,11 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         public int End { get; set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>
         /// var to score
         /// </summary>
-        public string Score { get; set; }
+        //public string Score { get; set; }
 
         /// <summary>
         /// var for strand
@@ -54,7 +55,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <summary>
         /// var for frame
         /// </summary>
-        public string Frame { get; set; }
+        public int Frame { get; set; }
 
         /// <summary>
         /// var for gene id (field of GeneId) (note that although this should be the same as the higher level gene id, we will store it here as well -- > since its placed in the file and we still investigate the links)
@@ -139,7 +140,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="attributeLine"></param>
-        public DataModelGeneTranscript(string transcripIdUsedKey, string seqName, int start, int end, string score, string strand, string frame, string lineFeedAttributes) : this()
+        public DataModelGeneTranscript(string transcripIdUsedKey, string seqName, int start, int end, string strand, int frame, string lineFeedAttributes) : this()
         {
 
             //new GeneTranscriptObject
@@ -149,7 +150,9 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             this.SeqName = seqName;
             this.Start = start;
             this.End = end;
-            this.Score = score;
+
+            // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
+            //this.Score = score;
             this.Strand = strand;
             this.Frame = frame;
             //set Key transcripId
@@ -400,7 +403,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="proteinId"></param>
-        public void AddDataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product, string note)
+        public void AddDataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, int frame, string proteinId, string product, string note)
         {
             //create a new DataModelGeneTranscriptElementCDS
             var dataModelGeneTranscriptElementCDS = new DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product, note);
