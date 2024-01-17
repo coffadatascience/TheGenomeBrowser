@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
-using static TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource;
 
 namespace TheGenomeBrowser.COM.ExportVersion01
 {
@@ -755,6 +754,112 @@ namespace TheGenomeBrowser.COM.ExportVersion01
             //init the list of transcripts
             ListOfTranscripts = new List<TranscriptSophiaDataModelCOM>();
 
+        }
+
+        #endregion
+
+        #region methods
+
+
+        /// <summary>
+        /// count the number of unique exons for this gene (these are all the exon entrees in all transcripts that are unique)
+        /// </summary>
+        /// <returns></returns>
+        public int CountUniqueExons()
+        {
+            //init the hashset
+            HashSet<int> uniqueExons = new HashSet<int>();
+
+            //loop through the transcripts and add the exon numbers to the hashset
+            foreach (TranscriptSophiaDataModelCOM transcript in ListOfTranscripts)
+            {
+                //loop through the exons
+                foreach (ExonItemSophiaDataModelCOM exon in transcript.ListOfExons)
+                {
+
+                    //add the exon number to the hashset
+                    uniqueExons.Add(exon.ExonNumber);
+
+                }
+
+            }
+
+            //return the count of the hashset
+            return uniqueExons.Count;
+
+        }
+
+        /// <summary>
+        /// procedure that counts the number of unique exons using linq (we may check what is faster, and if we can use linq in the COM)
+        /// </summary>
+        /// <returns></returns>
+        public int CountUniqueExonsLinq()
+        {
+            //use the linq to get the count of the unique exons
+            var NumberOfExons = this.ListOfTranscripts.SelectMany(x => x.ListOfExons).Distinct().Count();
+
+            //return the number of exons
+            return NumberOfExons;
+
+        }
+
+        /// <summary>
+        /// procedure that counts the number of unique transcripts for this gene
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public int CountUniqueTranscripts()
+        {
+            //init the hashset
+            HashSet<string> uniqueTranscripts = new HashSet<string>();
+
+            //loop through the transcripts and add the exon numbers to the hashset
+            foreach (TranscriptSophiaDataModelCOM transcript in ListOfTranscripts)
+            {
+                //add the transcript id to the hashset
+                uniqueTranscripts.Add(transcript.TranscriptId);
+            }
+
+            //return the count of the hashset
+            return uniqueTranscripts.Count;
+
+        }
+
+        /// <summary>
+        /// procedure that make one string of all synonyms divided by a comma and a space
+        /// </summary>
+        /// <returns></returns>
+        public string MakeSynonymsString()
+        {
+            //init the string
+            string synonymsString = "";
+
+            //loop through the synonyms and add them to the string
+            foreach (string synonym in Gene_Synonyms)
+            {
+                //add the synonym to the string
+                synonymsString += synonym + ", ";
+            }
+
+            //return the string
+            return synonymsString;
+        }
+
+        /// <summary>
+        /// procedure that return the name of the product of the first transcript
+        /// </summary>
+        /// <returns></returns>
+        public string GetProductNameFirstTranscript()
+        {
+            //check if there are transcripts
+            if (ListOfTranscripts.Count > 0)
+            {
+                //return the product name of the first transcript
+                return ListOfTranscripts[0].CDSSophiaDataModelCOM.Product;
+            }
+
+            //return empty string
+            return "";
         }
 
         #endregion
