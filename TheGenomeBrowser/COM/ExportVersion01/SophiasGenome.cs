@@ -804,6 +804,11 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// </summary>
         public SophiasGenomeExportVersion01.TranscriptBiotype TranscriptBiotype { get; set; }
 
+        //Note -- > a transcript has a list of exon that produce a product (usually a transcript BioType is mRNA. Its the CDS that is translated into a protein and thus here we have two products, one related to what is transcribed by the exons and possibly a second which is the product of that transcript (usually after modification) but a transcript may also be a functional molecule on its own.
+        /// <summary>
+        /// var for product of exons (note that we obtain this from the first exon item in the list of exons --> we assume that all exon items in the list are the same)
+        /// </summary>
+        public string ProductOfExons { get; set; }
 
         /// <summary>
         /// list of exons
@@ -831,6 +836,22 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// end of stop codon (typically + 3)
         /// </summary>
         public int StopCodonEnd { get; set; }
+
+        /// <summary>
+        /// string var to product of CDS (note that we obtain this from the first CDS item in the list of CDS --> we assume that all CDS items in the list are the same)
+        /// </summary>
+        public string ProductOfCDS { get; set; }
+        
+        /// <summary>
+        /// var for note on cDS (extracted from a CDS line, tell something about the product)
+        /// </summary>
+        public string NoteOnCDS { get; set; }
+
+
+        /// <summary>
+        /// var for model evidence (typically present on the transcript)
+        /// </summary>
+        public string ModelEvidence { get; set; }
 
         /// <summary>
         /// CDS object

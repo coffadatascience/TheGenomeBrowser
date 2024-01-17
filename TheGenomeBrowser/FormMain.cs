@@ -270,6 +270,9 @@ namespace TheGenomeBrowser
         private async void ButtonSaveDataModelAssemblySourceToCOM_Click(object? sender, EventArgs e)
         {
 
+            //var to produce debug report (bool)
+            bool printDebug = false; //--> for troubleshooting or watching the progress in the debug window with interesting information
+
             //check if we have a data model in the GTF file handler, if not return appropiate message
             if (_handlerImportedGtfFileData.DataModelGtfFile == null)
             {
@@ -308,7 +311,7 @@ namespace TheGenomeBrowser
                 var DataModelAssemblySource = _handlerImportedGtfFileData.DataModelAssemblySourceList.ListOfAssemblySources[0];
 
                 //use ComProcedures to parse the data model to a COM object
-                var SophiasGenome = await ComProcedures.ParseDataModelAssemblySourceToCOMAsync(DataModelAssemblySource, _handlerImportedGtfFileData.DataModelGtfAssemblyReport, _handlerImportedGtfFileData.ListOfUsedSourceFiles, progress);
+                var SophiasGenome = await ComProcedures.ParseDataModelAssemblySourceToCOMAsync(DataModelAssemblySource, _handlerImportedGtfFileData.DataModelGtfAssemblyReport, _handlerImportedGtfFileData.ListOfUsedSourceFiles, progress, printDebug);
 
                 //serialize SophiasGenome
                 this._filePathSaveXml = await ComProcedures.SerializeSophiasGenomeAsync(SophiasGenome, filePath);

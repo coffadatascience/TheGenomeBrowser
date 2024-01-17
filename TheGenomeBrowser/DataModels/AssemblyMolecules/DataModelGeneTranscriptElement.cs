@@ -112,6 +112,11 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// </summary>
         public string Product { get; set; }
 
+        /// <summary>
+        /// note on CDS
+        /// </summary>
+        public string Note { get; set; }
+
         #endregion
 
 
@@ -126,7 +131,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="proteinId"></param>
-        public DataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product)
+        public DataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product, string note)
         {
             //set the fields
             Start = start;
@@ -136,6 +141,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             Frame = frame;
             ProteinId = proteinId;
             Product = product;
+            Note = note;
         }
 
                                                                                                                
@@ -174,7 +180,11 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// var for strand
         /// </summary>
         public string Strand { get; set; }
-    
+
+        /// <summary>
+        /// produce as found (this is the product of the gene typically a transcript)
+        /// </summary>
+        public string Product { get; set; }
 
         #endregion
 
@@ -189,7 +199,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="end"></param>
         /// <param name="exonNumber"></param>
         /// <param name="strand"></param>
-        public DataModelGeneTranscriptElementExon(int start, int end, string strand, string exonNumber)
+        public DataModelGeneTranscriptElementExon(int start, int end, string strand, string exonNumber, string product)
         {
             //set the fields
             Start = start;
@@ -197,6 +207,7 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
             //set the exon number
             ExonNumber = Convert.ToInt32(exonNumber);
             Strand = strand;
+            Product = product;
         }
 
 

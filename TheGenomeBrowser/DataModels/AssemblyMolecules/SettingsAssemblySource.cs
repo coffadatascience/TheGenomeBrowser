@@ -130,6 +130,16 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         public const string ProductHeaderName = "product";
 
         /// <summary>
+        /// constant for note
+        /// </summary>
+        public const string NoteHeaderName = "note";
+
+        /// <summary>
+        /// constant for model evidence (model_evidence)
+        /// </summary>
+        public const string ModelEvidenceHeaderName = "model_evidence";
+
+        /// <summary>
         /// constant for protein_id
         /// </summary>
         public const string ProteinIdHeaderName = "protein_id";

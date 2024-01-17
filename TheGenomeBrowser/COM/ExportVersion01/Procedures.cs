@@ -34,11 +34,11 @@ namespace TheGenomeBrowser.COM.ExportVersion01
             DataModels.AssemblyMolecules.DataModelAssemblySource dataModelAssemblySource,
             DataModelAssemblyReport dataModelGtfAssemblyReport,
             List<string> listOfUsedSourceFiles,
-            IProgress<int> progress)
+            IProgress<int> progress, bool produceDebugReport)
         {
             return await Task.Run(() =>
             {
-                return ParseDataModelAssemblySourceToCOM(dataModelAssemblySource, dataModelGtfAssemblyReport, listOfUsedSourceFiles, progress);
+                return ParseDataModelAssemblySourceToCOM(dataModelAssemblySource, dataModelGtfAssemblyReport, listOfUsedSourceFiles, progress, produceDebugReport);
             });
         }
 
@@ -53,7 +53,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         public static TheGenomeBrowser.COM.ExportVersion01.SophiasGenomeExportVersion01 ParseDataModelAssemblySourceToCOM(
             DataModels.AssemblyMolecules.DataModelAssemblySource dataModelAssemblySource,
             DataModelAssemblyReport dataModelGtfAssemblyReport,
-            List<string> listOfUsedSourceFiles, IProgress<int> progress)
+            List<string> listOfUsedSourceFiles, IProgress<int> progress, bool produceDebugReport)
         {
 
             //create the COM object
@@ -96,7 +96,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
 
             // Now we have a list of molecules we may create the list of genes and transcripts etc
             // use LoopDictionaryOfMolecules to process the data model the genome and provide the list of chromosomes used for assembly
-            LoopDictionaryOfMolecules(dataModelAssemblySource.TheGenome, sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM.ListOfChromosomesUsedForAssembly, progress);
+            LoopDictionaryOfMolecules(dataModelAssemblySource.TheGenome, sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM.ListOfChromosomesUsedForAssembly, progress, produceDebugReport);
 
 
 
@@ -112,7 +112,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// </summary>
         /// <param name="dataModelTheGenome"></param>
         /// <param name="listOfChromosomesUsedForAssembly"></param>
-        public static void LoopDictionaryOfMolecules(DataModelTheGenome dataModelTheGenome, List<MoleculeSophiaDataModelCOM> listOfChromosomesUsedForAssembly, IProgress<int> progress)
+        public static void LoopDictionaryOfMolecules(DataModelTheGenome dataModelTheGenome, List<MoleculeSophiaDataModelCOM> listOfChromosomesUsedForAssembly, IProgress<int> progress, bool produceDebugReport)
         {
 
             //var int counter for progress
@@ -173,7 +173,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                         List<TranscriptSophiaDataModelCOM> listOfTranscripts = new List<TranscriptSophiaDataModelCOM>();
                         //loop the transcripts in the current gene (CreateTranscriptsList for this GeneId)
                         //create the list of transcripts COM objects
-                        List<TranscriptSophiaDataModelCOM> transcriptsList = CreateTranscriptsList(geneId.ListGeneTranscripts);
+                        List<TranscriptSophiaDataModelCOM> transcriptsList = CreateTranscriptsList(geneId.ListGeneTranscripts, produceDebugReport);
                         //set to this geneId
                         geneSophiaDataModelCOM.ListOfTranscripts = transcriptsList;
 
@@ -213,7 +213,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// </summary>
         /// <param name="geneIds"></param>
         /// <returns></returns>
-        public static List<TranscriptSophiaDataModelCOM> CreateTranscriptsList(List<DataModelGeneTranscript> listGeneTranscripts)
+        public static List<TranscriptSophiaDataModelCOM> CreateTranscriptsList(List<DataModelGeneTranscript> listGeneTranscripts, bool produceDebugReport)
         {
 
             //new list of transcripts COM objects
@@ -232,6 +232,27 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                 transcriptSophiaDataModelCOM.Start = transcript.Start;
                 transcriptSophiaDataModelCOM.End = transcript.End;
                 transcriptSophiaDataModelCOM.Strand = ConvertStringToStrand(transcript.Strand);
+                //model evidence
+                transcriptSophiaDataModelCOM.ModelEvidence = transcript.ModelEvidence;
+
+                //Now product of the exons should be one and can be derived from any of the exons (we use the first, and if there are more add an error value but continue adding the first two with the warning unexpected)
+                transcriptSophiaDataModelCOM.ProductOfExons = transcript.GeneTranscriptObject.ReturnProductNameForExons();
+                //set product of cds
+                transcriptSophiaDataModelCOM.ProductOfCDS = transcript.GeneTranscriptObject.ReturnProductNameForCDS();
+                //Note on CDS (CDS and start stop lines sometimes have notes that tell something about precursor that are transcribed by a different variant name -- these linkage may be interesting and so we may add it as the CDS note. Though they are not concrete blocks of information)
+                transcriptSophiaDataModelCOM.NoteOnCDS = transcript.GeneTranscriptObject.ReturnNoteOnCDS();
+
+                //when in debug mode print the Gene ID, ProductOfExons and ProductOfCDS into the debug window if ProductOfExons is not empty or ProductOfCDS is not empty
+                //if we want to produce some details during export we can set the bool to true (else it is slower)
+                if (produceDebugReport == true)
+                {
+#if DEBUG
+                    if (transcriptSophiaDataModelCOM.ProductOfExons != "" || transcriptSophiaDataModelCOM.ProductOfCDS != "")
+                    {
+                        System.Diagnostics.Debug.WriteLine("Transcript ID: " + transcriptSophiaDataModelCOM.TranscriptId + " ProductOfExons: " + transcriptSophiaDataModelCOM.ProductOfExons + " ProductOfCDS: " + transcriptSophiaDataModelCOM.ProductOfCDS);
+                    }
+#endif
+                }
 
                 //add the COM object to the list
                 transcriptsList.Add(transcriptSophiaDataModelCOM);

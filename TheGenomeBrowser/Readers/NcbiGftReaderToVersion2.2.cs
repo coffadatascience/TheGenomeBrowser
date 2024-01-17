@@ -136,7 +136,7 @@ namespace TheGenomeBrowser.Readers
                     string CurrentPair = pair.Trim();
 
                     // Position 01: process the gene id
-                    if (CurrentPair.Contains( TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneIdHeaderName))
+                    if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.GeneIdHeaderName))
                     {
                         //var for GeneId
                         string GeneId = "";
@@ -231,6 +231,44 @@ namespace TheGenomeBrowser.Readers
                         feature.Gene = GeneName;
                     }
 
+                    // position 06: process the note
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.NoteHeaderName))
+                    {
+                        //var for note
+                        string Note = "";
+
+                        //remove the constant string
+                        Note = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.NoteHeaderName, "");
+
+                        //remove the double quotes
+                        Note = Note.Replace("\"", "");
+
+                        //trim the string
+                        Note = Note.Trim();
+
+                        //add the attribute to the feature
+                        feature.Note = Note;
+                    }
+
+                    // position 06X (optional model_evidence) : process the model evidence (this may have a denotion to the number of mRNA that were matched
+                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ModelEvidenceHeaderName))
+                    {
+                        //var for model evidence
+                        string ModelEvidence = "";
+
+                        //remove the constant string
+                        ModelEvidence = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ModelEvidenceHeaderName, "");
+
+                        //remove the double quotes
+                        ModelEvidence = ModelEvidence.Replace("\"", "");
+
+                        //trim the string
+                        ModelEvidence = ModelEvidence.Trim();
+
+                        //add the attribute to the feature
+                        feature.ModelEvidence = ModelEvidence;
+                    }
+
                     // position 06a: process the product
                     else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ProductHeaderName))
                     {
@@ -249,6 +287,7 @@ namespace TheGenomeBrowser.Readers
                         //add the attribute to the feature
                         feature.Product = Product;
                     }
+
                     // position 6b: process protein id (note this is only present for CDS)
                     else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ProteinIdHeaderName))
                     {

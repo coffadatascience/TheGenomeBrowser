@@ -120,9 +120,19 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         public string Gene { get; set; }
 
         /// <summary>
+        /// var for note
+        /// </summary>
+        public string Note { get; internal set; }
+
+        /// <summary>
         /// var for product
         /// </summary>
         public string Product { get; internal set; }
+
+        /// <summary>
+        /// string for model evidence
+        /// </summary>
+        public string ModelEvidence { get; internal set; }
 
         /// <summary>
         /// var for proteint id

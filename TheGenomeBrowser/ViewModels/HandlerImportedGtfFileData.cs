@@ -381,6 +381,8 @@ namespace TheGenomeBrowser.ViewModels
                 string proteinId = feature.ProteinId;
                 // var for product
                 string product = feature.Product;
+                // var for note
+                string note = feature.Note;
 
                 //try part exon number to int (fill -1  if it fails)
                 int exonNumber = -1;
@@ -417,7 +419,7 @@ namespace TheGenomeBrowser.ViewModels
                         //-------------------------------------
 
                         //new DataModelGeneTranscriptElementCDS
-                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product);
+                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product, note);
 
                         //add to DataModelGeneTranscript
                         DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS.Add(DataModelGeneTranscriptElementCDS);
@@ -441,7 +443,7 @@ namespace TheGenomeBrowser.ViewModels
 
                         //process the information of the DicItem GtfFeature to create a new element that is placed in the exon list
                         //create a new DataModelGeneTranscriptElementExon
-                        var DataModelGeneTranscriptElementExon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementExon(start, end, strand, feature.ExonNumber);
+                        var DataModelGeneTranscriptElementExon = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementExon(start, end, strand, feature.ExonNumber, product);
 
                         //add to DataModelGeneTranscript
                         DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementExon.Add(DataModelGeneTranscriptElementExon);
@@ -454,7 +456,7 @@ namespace TheGenomeBrowser.ViewModels
                     {
 
                         //new DataModelGeneTranscriptElementCDS
-                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product);
+                        var DataModelGeneTranscriptElementCDS = new DataModels.AssemblyMolecules.DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product, note);
 
                         //add to DataModelGeneTranscript
                         DataModelGeneTranscript.GeneTranscriptObject.ListDataModelGeneTranscriptElementCDS.Add(DataModelGeneTranscriptElementCDS);

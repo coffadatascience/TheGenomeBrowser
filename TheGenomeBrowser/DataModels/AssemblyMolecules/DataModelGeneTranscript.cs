@@ -92,6 +92,11 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         public string Transcript_Biotype { get; set; }
 
         /// <summary>
+        /// var for model evidence (note that gene does not have this feature in this model but that such data was also note found 20240116)
+        /// </summary>
+        public string ModelEvidence { get; set; }
+
+        /// <summary>
         /// read only property returning the number of exons
         /// </summary>
         public int NumberOfExons
@@ -260,6 +265,19 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
                     Transcript_Biotype = Transcript_Biotype.Trim();
                 }
 
+                //check if the current item is the model evidence
+                if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ModelEvidenceHeaderName))
+                {
+                    //set the model evidence
+                    ModelEvidence = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ModelEvidenceHeaderName + " ", "");
+                    //remove the double quotes
+                    ModelEvidence = ModelEvidence.Replace("\"", "");
+                    //remove the semi colon
+                    ModelEvidence = ModelEvidence.Replace(";", "");
+                    //trim
+                    ModelEvidence = ModelEvidence.Trim();
+                }
+
             }
 
         }
@@ -363,10 +381,10 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="end"></param>
         /// <param name="exonNumber"></param>
         /// <param name="strand"></param>
-        public void AddDataModelGeneTranscriptElementExon(int start, int end, string exonNumber, string strand)
+        public void AddDataModelGeneTranscriptElementExon(int start, int end, string exonNumber, string strand, string product)
         {
             //create a new DataModelGeneTranscriptElementExon
-            var dataModelGeneTranscriptElementExon = new DataModelGeneTranscriptElementExon(start, end, exonNumber, strand);
+            var dataModelGeneTranscriptElementExon = new DataModelGeneTranscriptElementExon(start, end, exonNumber, strand, product);
 
             //add the DataModelGeneTranscriptElementExon to the list
             ListDataModelGeneTranscriptElementExon.Add(dataModelGeneTranscriptElementExon);
@@ -382,16 +400,120 @@ namespace TheGenomeBrowser.DataModels.AssemblyMolecules
         /// <param name="strand"></param>
         /// <param name="frame"></param>
         /// <param name="proteinId"></param>
-        public void AddDataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product)
+        public void AddDataModelGeneTranscriptElementCDS(int start, int end, int exonNumber, string strand, string frame, string proteinId, string product, string note)
         {
             //create a new DataModelGeneTranscriptElementCDS
-            var dataModelGeneTranscriptElementCDS = new DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product);
+            var dataModelGeneTranscriptElementCDS = new DataModelGeneTranscriptElementCDS(start, end, exonNumber, strand, frame, proteinId, product, note);
 
             //add the DataModelGeneTranscriptElementCDS to the list
             ListDataModelGeneTranscriptElementCDS.Add(dataModelGeneTranscriptElementCDS);
         }
 
+        /// <summary>
+        /// procedure that returns checks if all product are the same for all exons and then returns the product a string that states "Multiple products + the concatenated string of all products" if there are multiple products
+        /// </summary>
+        /// <returns></returns>
+        public string ReturnProductNameForExons()
+        {
+            //var for the product
+            string product = "";
 
+            //loop the exons
+            foreach (var exon in ListDataModelGeneTranscriptElementExon)
+            {
+                //check if the product is empty
+                if (product == "")
+                {
+                    //set the product
+                    product = exon.Product;
+                }
+                else
+                {
+                    //check if the product is not the same
+                    if (product != exon.Product)
+                    {
+                        //return the product
+                        return "Unexpected event found: multiple products in one exon list: " + product + " + " + exon.Product;
+                    }
+                }
+            }
+
+            //return the product
+            return product;
+        }
+
+
+        /// <summary>
+        /// similar procedure like ReturnProductNameForExons but for CDS
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public string ReturnProductNameForCDS()
+        {
+
+            //var for the product
+            string product = "";
+
+            //loop the CDS
+            foreach (var cds in ListDataModelGeneTranscriptElementCDS)
+            {
+                //check if the product is empty
+                if (product == "")
+                {
+                    //set the product
+                    product = cds.Product;
+                }
+                else
+                {
+                    //check if the product is not the same
+                    if (product != cds.Product)
+                    {
+                        //return the product
+                        return "Unexpected event found: multiple products in one CDS list: " + product + " + " + cds.Product;
+                    }
+                }
+            }
+
+            //return the product
+            return product;
+
+        }
+
+        /// <summary>
+        /// procedure like ReturnProductNameForCDS but for notes in the CDS
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public string ReturnNoteOnCDS()
+        {
+
+            //var for the note
+            string note = "";
+
+            //loop the CDS
+            foreach (var cds in ListDataModelGeneTranscriptElementCDS)
+            {
+                //check if the note is empty
+                if (note == "")
+                {
+                    //set the note
+                    note = cds.Note;
+                }
+                else
+                {
+                    //check if the note is not the same
+                    if (note != cds.Note)
+                    {
+                        //return the note
+                        return "Unexpected event found: multiple notes in one CDS list: " + note + " + " + cds.Note;
+                    }
+                }
+            }
+
+            //return the note
+            return note;
+
+        }
         #endregion
 
 
