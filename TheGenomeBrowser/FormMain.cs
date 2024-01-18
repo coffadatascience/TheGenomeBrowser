@@ -307,11 +307,8 @@ namespace TheGenomeBrowser
                 //get the file path
                 string filePath = saveFileDialog.FileName;
 
-                //get the first source from ListOfAssemblySources
-                var DataModelAssemblySource = _handlerImportedGtfFileData.DataModelAssemblySourceList.ListOfAssemblySources[0];
-
                 //use ComProcedures to parse the data model to a COM object
-                var SophiasGenome = await ComProcedures.ParseDataModelAssemblySourceToCOMAsync(DataModelAssemblySource, _handlerImportedGtfFileData.DataModelGtfAssemblyReport, _handlerImportedGtfFileData.ListOfUsedSourceFiles, progress, printDebug);
+                var SophiasGenome = await ComProcedures.ParseDataModelAssemblySourceToCOMAsync(_handlerImportedGtfFileData.DataModelAssemblySourceList.ListOfAssemblySources, _handlerImportedGtfFileData.DataModelGtfAssemblyReport, _handlerImportedGtfFileData.ListOfUsedSourceFiles, progress, printDebug);
 
                 //serialize SophiasGenome
                 this._filePathSaveXml = await ComProcedures.SerializeSophiasGenomeAsync(SophiasGenome, filePath);

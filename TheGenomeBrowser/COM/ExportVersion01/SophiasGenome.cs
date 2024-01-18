@@ -954,7 +954,6 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// </summary>
         public string NoteOnCDS { get; set; }
 
-
         /// <summary>
         /// var for model evidence (typically present on the transcript)
         /// </summary>

@@ -134,10 +134,11 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
         /// </summary>
         public string Product { get; internal set; }
 
+        // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>
         /// string for model evidence
         /// </summary>
-        public string ModelEvidence { get; internal set; }
+        //public string ModelEvidence { get; internal set; }
 
         // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>

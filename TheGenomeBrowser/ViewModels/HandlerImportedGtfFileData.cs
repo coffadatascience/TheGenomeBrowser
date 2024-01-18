@@ -881,6 +881,16 @@ namespace TheGenomeBrowser.ViewModels
                 // 2. get the correct molecule from the genome in the source
                 var DataModelMolecule = DataModelAssemblySource.TheGenome.DictionaryOfMolecules[Molecule];
 
+                // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
+
+                //// var for model evidence
+                //string modelEvidence = "";
+                ////set the model evidence if it is not null or empty
+                //if (!string.IsNullOrEmpty(GtfFeature.ModelEvidence))
+                //{
+                //    modelEvidence = GtfFeature.ModelEvidence;
+                //}
+
                 // check if we can find DataModelGeneId using the gene id as in the GTF file. If we can not find a gene id then we place the transcript GtfFeature in the list of transcripts for the Genome <unprocessed> or unplaced
                 if (DataModelMolecule.GeneIds.ContainsKey(GtfFeature.GeneId))
                 {

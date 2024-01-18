@@ -110,6 +110,9 @@ public class ViewModelDataGeneTranscriptsList
                             //set the MoleculeName
                             viewModelDataGeneTranscriptItem.MoleculeName = DicItemMolecule.Value.moleculeChromosome;
 
+                            //set the ModelEvidence
+                            viewModelDataGeneTranscriptItem.ModelEvidence = transcript.ModelEvidence;
+
                             //set the DbRefXref
                             viewModelDataGeneTranscriptItem.DbRefXref = transcript.Db_Xref;
 
@@ -215,6 +218,10 @@ public class ViewModelDataGeneTranscript
     /// </summary>
     public string MoleculeName { get; set; }
 
+    /// <summary>
+    /// var for model evidence
+    /// </summary>
+    public string ModelEvidence { get; set; }
 
     /// <summary>
     /// field that represent the gene name

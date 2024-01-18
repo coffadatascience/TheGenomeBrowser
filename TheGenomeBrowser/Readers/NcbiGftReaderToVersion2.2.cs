@@ -281,24 +281,24 @@ namespace TheGenomeBrowser.Readers
                         feature.Note = Note;
                     }
 
-                    // position 06X (optional model_evidence) : process the model evidence (this may have a denotion to the number of mRNA that were matched
-                    else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ModelEvidenceHeaderName))
-                    {
-                        //var for model evidence
-                        string ModelEvidence = "";
+                    //// position 06X (optional model_evidence) : process the model evidence (this may have a denotion to the number of mRNA that were matched
+                    //else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ModelEvidenceHeaderName))
+                    //{
+                    //    //var for model evidence
+                    //    string ModelEvidence = "";
 
-                        //remove the constant string
-                        ModelEvidence = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ModelEvidenceHeaderName, "");
+                    //    //remove the constant string
+                    //    ModelEvidence = CurrentPair.Replace(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ModelEvidenceHeaderName, "");
 
-                        //remove the double quotes
-                        ModelEvidence = ModelEvidence.Replace("\"", "");
+                    //    //remove the double quotes
+                    //    ModelEvidence = ModelEvidence.Replace("\"", "");
 
-                        //trim the string
-                        ModelEvidence = ModelEvidence.Trim();
+                    //    //trim the string
+                    //    ModelEvidence = ModelEvidence.Trim();
 
-                        //add the attribute to the feature
-                        feature.ModelEvidence = ModelEvidence;
-                    }
+                    //    //add the attribute to the feature
+                    //    feature.ModelEvidence = ModelEvidence;
+                    //}
 
                     // position 06a: process the product
                     else if (CurrentPair.Contains(TheGenomeBrowser.DataModels.AssemblyMolecules.SettingsAssemblySource.ProductHeaderName))

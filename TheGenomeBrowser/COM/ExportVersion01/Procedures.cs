@@ -31,14 +31,14 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// <param name="listOfUsedSourceFiles"></param>
         /// <returns></returns>
         public static async Task<SophiasGenomeExportVersion01> ParseDataModelAssemblySourceToCOMAsync(
-            DataModels.AssemblyMolecules.DataModelAssemblySource dataModelAssemblySource,
+            List<DataModelAssemblySource> listOfAssemblySources,
             DataModelAssemblyReport dataModelGtfAssemblyReport,
             List<string> listOfUsedSourceFiles,
             IProgress<int> progress, bool produceDebugReport)
         {
             return await Task.Run(() =>
             {
-                return ParseDataModelAssemblySourceToCOM(dataModelAssemblySource, dataModelGtfAssemblyReport, listOfUsedSourceFiles, progress, produceDebugReport);
+                return ParseDataModelAssemblySourceToCOM(listOfAssemblySources, dataModelGtfAssemblyReport, listOfUsedSourceFiles, progress, produceDebugReport);
             });
         }
 
@@ -51,7 +51,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
         /// <param name="dataModelAssemblySource"></param>
         /// <returns></returns>
         public static TheGenomeBrowser.COM.ExportVersion01.SophiasGenomeExportVersion01 ParseDataModelAssemblySourceToCOM(
-            DataModels.AssemblyMolecules.DataModelAssemblySource dataModelAssemblySource,
+            List<DataModelAssemblySource> listOfAssemblySources,
             DataModelAssemblyReport dataModelGtfAssemblyReport,
             List<string> listOfUsedSourceFiles, IProgress<int> progress, bool produceDebugReport)
         {
@@ -70,7 +70,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
             //4 set the file names used
             sophiasGenomeExportVersion01.ListOfUsedSourceFiles = listOfUsedSourceFiles;
 
-            //Now we process the properties for the TheHumanGenomeSophiaDataModelCOM
+            //Now we process the properties for the TheHumanGenomeSophiaDataModelCOM --> note this procedure can handle dataModelGtfAssemblyReport being Null (it will fill in a comment so we can continue working the GTF file data)
             sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM = ProcessDataModelGtfAssemblyReportToTheHumanGenomeSophiaDataModelCOM(dataModelGtfAssemblyReport);
 
             // Now if we have a AssemblyReportItemsList in the dataModelGtfAssemblyReport then we process the data to the COM object that formulates the list of molecules for the genoem
@@ -87,18 +87,28 @@ namespace TheGenomeBrowser.COM.ExportVersion01
             else
             {
 
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // Check edit
+                // NOTE JCO --? we may have multiple sources (typically we may find all chromosomes in all sources, so for now we use to make the list on item [0]
+                // to be complete we would prefer to check all sources and make a list of all chromosomes that are found in all sources (this is not done yet)
+                // 20240116 --> make extract chromosome list via all sources proces
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                 //Note that we will use a different procedure that build the assembled list of molecules
                 // --> this is purposely done so that the assembly report is optional (though relevant and useful, we may have sources in the future that do not have this information
                 // though we must note that molecule information in the assembly is then missing in the COM object (though not essential to many works), so we may not be able to create a complete list of genes and transcripts etc)
-                sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM.ListOfChromosomesUsedForAssembly = CreateMoleculesList(dataModelAssemblySource.TheGenome);
+                sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM.ListOfChromosomesUsedForAssembly = CreateMoleculesList(listOfAssemblySources[0].TheGenome);
             }
             
 
-            // Now we have a list of molecules we may create the list of genes and transcripts etc
-            // use LoopDictionaryOfMolecules to process the data model the genome and provide the list of chromosomes used for assembly
-            LoopDictionaryOfMolecules(dataModelAssemblySource.TheGenome, sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM.ListOfChromosomesUsedForAssembly, progress, produceDebugReport);
+            //loop the list of assembly sources and create the list of molecules COM objects
+            foreach (var assemblySource in listOfAssemblySources)
+            {
+                // Now we have a list of molecules we may create the list of genes and transcripts etc
+                // use LoopDictionaryOfMolecules to process the data model the genome and provide the list of chromosomes used for assembly
+                LoopDictionaryOfMolecules(assemblySource.TheGenome, sophiasGenomeExportVersion01.TheHumanGenomeSophiaDataModelCOM.ListOfChromosomesUsedForAssembly, progress, produceDebugReport);
 
-
+            }
 
             //return the COM object
             return sophiasGenomeExportVersion01;
@@ -132,12 +142,15 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                 if (retrievedMolecule != null)
                 {
 
-                    //var for new list of genes
-                    List<GeneSophiaDataModelCOM> listOfGenes = new List<GeneSophiaDataModelCOM>();
+                    //check if the list of genes is not null
+                    if (retrievedMolecule.ListOfGenes == null)
+                    {
+                        //create the list of genes
+                        retrievedMolecule.ListOfGenes = new List<GeneSophiaDataModelCOM>();
 
-                    //set to this molecule
-                    retrievedMolecule.ListOfGenes = listOfGenes;
+                    }
 
+ 
                     // Process genes here from molecule to retrievedMolecule
                     //loop the genes in the current molecule
                     foreach (var geneId in molecule.GeneIds.Values)
@@ -145,6 +158,16 @@ namespace TheGenomeBrowser.COM.ExportVersion01
 
                         //create the COM object
                         GeneSophiaDataModelCOM geneSophiaDataModelCOM = new GeneSophiaDataModelCOM();
+
+                        //get the GeneId in the current retrievedMolecule (if it exists)
+                        GeneSophiaDataModelCOM retrievedGene = retrievedMolecule.ListOfGenes.FirstOrDefault(g => g.GeneId == geneId.GeneId);
+
+                        //if retrieved gene is not null then throw and error
+                        if (retrievedGene != null)
+                        {
+                            //throw an error
+                            throw new Exception("GeneId already exists in the retrieved molecule");
+                        }
 
                         //set the properties of the COM object
                         //1. set the gene id (KEY)
@@ -178,7 +201,7 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                         geneSophiaDataModelCOM.ListOfTranscripts = transcriptsList;
 
                         //add the gene COM object to the list of genes
-                        listOfGenes.Add(geneSophiaDataModelCOM);
+                        retrievedMolecule.ListOfGenes.Add(geneSophiaDataModelCOM);
 
                     }
 
@@ -251,6 +274,15 @@ namespace TheGenomeBrowser.COM.ExportVersion01
                     {
                         System.Diagnostics.Debug.WriteLine("Transcript ID: " + transcriptSophiaDataModelCOM.TranscriptId + " ProductOfExons: " + transcriptSophiaDataModelCOM.ProductOfExons + " ProductOfCDS: " + transcriptSophiaDataModelCOM.ProductOfCDS);
                     }
+
+                    //print model evidence if it is not empty to a debug window
+                    if (transcriptSophiaDataModelCOM.ModelEvidence != "")
+                    {
+                        //print model evidence
+                        System.Diagnostics.Debug.WriteLine("Transcript ID: " + transcriptSophiaDataModelCOM.TranscriptId + " ModelEvidence: " + transcriptSophiaDataModelCOM.ModelEvidence);
+
+                    }
+
 #endif
                 }
 
