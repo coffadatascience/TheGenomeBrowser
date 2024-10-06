@@ -142,7 +142,7 @@ namespace TheGenomeBrowser.DataModels.NCBIImportedData
 
         // tag = 2024117TestMemoryUpdateGTFFile  ==> we will test to remove some of the attributes to see if the memory usage is reduced (we consider that we may remove these as they are later imported to the specific type and then taken from the line feed)
         /// <summary>
-        /// var for proteint id
+        /// var for protein id
         /// </summary>
         public string ProteinId { get; internal set; }
 
