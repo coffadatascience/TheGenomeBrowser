@@ -1,5 +1,6 @@
+------------------------------------------------------------------
 TheGenomeBrowser
-
+------------------------------------------------------------------
 Content
 Table of Contents
 TheGenomeBrowser	1
@@ -31,8 +32,9 @@ Genomic Data Organization and Management	12
 Notes on GTF File Import and Data Model Optimization	13
 Alternative Sources in Gene Model	13
 
-
+-----------------------------------------------
 Introduction
+-----------------------------------------------
 
 # Genomic Data Organizer
 
@@ -53,7 +55,9 @@ This project aims to streamline the process of organizing and utilizing genomic 
 - Enables flexible and autonomous data handling
 - Supports long-term result comparison and product development
 
+-----------------------------------------------
 Genome Assembly: Reconstruction of Genetic Sequences
+-----------------------------------------------
 Genome assembly is the process of reconstructing a complete genome sequence from shorter sequence reads. There are two main types:
 
 1. Reference-based Assembly: Compares sample sequences to existing database sequences.
@@ -67,7 +71,9 @@ Key Points:
   - Simple for small genomes (e.g., bacteria, fungi)
   - Complex and time-consuming for eukaryotic genomes, especially without reference genomes
 
+-----------------------------------------------
 NCBI Datasets 
+-----------------------------------------------
 Although NCBI provides a lot of online tools to search the genome they also provide complete genomic datasets that may be downloaded for usage.
 
 https://www.ncbi.nlm.nih.gov/datasets/genome/
@@ -82,7 +88,9 @@ Having such a complete data set available at a local computer may provide some a
 -	Rather than the need to maintain reference information to each used piece of information (such as a gene name or used accession number) in relation to the assembly version we only have a reference to a single reference assembly. This would then allow use only to maintain the positionality to the human genome to access all information about that position. 
 -	When an update of the used reference genome assembly is available all used information can be updated in a batch action allowing one to evaluate updates to all location and information that was used during research and data gathering. This would then also allow to curate an overview of all changes in the available assembly data that are relevant to our research.
 
+-----------------------------------------------
 The Genome Browser
+-----------------------------------------------
 This project is created for research purposes. We want to examine how to import entire genome assemblies from online sources and filter and structure useful information into a multidimensional data model that mimics the genomic structure of the human genome. 
 
 We then aim to normalize in the context of data modeling and:
@@ -107,15 +115,19 @@ In the context of converting a flat file into a structured data model, as descri
 
 To be able to also access online information we will also use index keys following the structure as the NBCI uses to connect different levels of hierarchical data. This will then allow groupings on these keys to be used to retrieve batches of information, rather than accessing each piece of information manually in browsers. These batches may be formed based on collections that are grouped on a functional level in the context of our investigation. 
 
-
+-----------------------------------------------
 Types of Data Models
+-----------------------------------------------
 In this project we will ue at least 3 different data models, these being:
 
 -	The file import data model: this model is used to import the assembly data and may different between different versions that we may want to use. Typically this model includes all fields of the file. 
 -	The internal data model: this model receives the normalized extract of the import data model removing all redundant information. This data model includes the identified dimensions and facts as is understood about the structure of the human genome.
 -	The export (interface) data model: this model allows the data to be transported to a data model that can be used as an interface between different components. This then allows a single import / export procedure and data model to be maintained between different component which may be separately maintained. This separation thus allows different related large components to be synchronized in a separate life cycle update by only updated these parts. The main development of each separate component may therefore be under constant development without the need to constantly synchronize or wait on the development of another component. The advantage of this is that focus can be maintained to what is currently at hand, while influences that are of a higher hierarchical level may be evaluated on a more comprehensive functional level. 
 -	Quality control models: view models that are used to organize that in such a way that the data is organized for easy visualization. This allows quality control steps to be executed while import the data in a comprehensive manner.
+
+-----------------------------------------------
 Project status
+-----------------------------------------------
 As this project is currently used on a developer level, the state of readiness may be defined as a proof of concept. What is included?
 -	Import procedures for GTF file
 -	Import procedures for assembly report data
@@ -128,13 +140,18 @@ Possible updates
 -	Make a BLAZOR front end
 -	Include downloading of the annotation data files from the application
 -	Make the entire workflow command line approachable
+
+-----------------------------------------------
 Useability
+-----------------------------------------------
 This project can be used to download/install via the setup project that can be found in the Github repository and attempt evaluate its usage its value in its current state; that would be by using it to create a normalized database model based on NCBI annotation data. This project may also be used open code to use import procedure or data models and to reuse code in research project that have a focus on the (human) genome.
 Tested files % versions
 Genome annotation is the process of finding and designating locations of individual genes and other features on raw DNA sequences, called assemblies. Annotation gives meaning to a given sequence and makes it much easier for researchers to view and analyze its contents.
 In a de novo genome assembly and annotation project, the nucleotide sequence of a genome is first assembled, as completely as possible, and then annotated. The annotation process infers the structure and function of the assembled sequences.
 
+---------------------------------------
 Tested file / data:
+---------------------------------------
 This project was launched to investigate the possibilities of using organised datamodels downstream a pipelines development, therefore development was based  on the availability of a single input file version of NCBI (GCF_000001405.39_GRCh38.p13). We may however note that version (GCF_000001405.40_GRCh38.p14) also works. New releases of complete annotation sets seems to be limited, next to that due to the data model setup (being true to known features in phsyical reality) we may only need to add new import proecedures, rather than requiring much adjustment in internal models.
 
 Availability of file (Google drive download adress):
@@ -147,21 +164,34 @@ o	https://drive.google.com/file/d/1m3LuL6JX3syxWOAiQiWmLksY9NpJlKAD/view?usp=sha
 o	https://drive.google.com/file/d/1afxu4hhOypCvESS6IomQOtC45ZKUv1_U/view?usp=sharing
 
 Other known formats:  as appears on the NCBI website https://www.ncbi.nlm.nih.gov/datasets/taxonomy/9606/ 
+
+---------------------------------------
 Annotation file formats
+---------------------------------------
 Formats of annotation files available in NCBI Datasets Data Packages
 https://www.ncbi.nlm.nih.gov/datasets/docs/v2/reference-docs/file-formats/annotation-files/
+
+---------------------------------------
 Setup project / Manual
+---------------------------------------
+
 In the Github repository a setup file may be found (“SetupTheGenomeBrowser.zip”) that may be used to install the application on a Windows computer. The repository also include a manual that describes the installation procedure as well as how one may use the program to convert an annotation file.
+
+-----------------------------------------------
 Feedback / collaboration
+-----------------------------------------------
 This project is open-source and available for free use. We encourage feedback and welcome collaboration from anyone interested in contributing. Your insights can help improve the functionality and usability of the project. If you have suggestions, questions, or would like to collaborate, please feel free to reach out via the email address provided on my GitHub profile. Together, we can enhance this tool and make genomic data management more efficient for everyone.
 
 Share
 
 Rewrite
 
-
+-----------------------------------------------
 Technical information
+-----------------------------------------------
+---------------------------------------
 Reading an Annotation File
+---------------------------------------
 
 File Formats
 
@@ -209,7 +239,9 @@ Alternative Source
 
 For additional information, refer to the Gene Ontology Annotation File Format (GAF) version 2.2 documentation.
 
+---------------------------------------
 Reading and Processing Assembly Report File
+---------------------------------------
 The assembly_report.txt file is a crucial resource for NCBI RefSeq genome assemblies. It can be obtained from:
 
 1. The NCBI Assembly portal by searching for the desired genome and selecting "Assembly structure report" from the downloads menu.
@@ -247,11 +279,17 @@ To efficiently process and organize the genomic data:
 3. Generate a genes list as a secondary lookup table.
 
 This approach allows for more stable and efficient data retrieval compared to downloading individual gene positions via Entrez.
+
+-----------------------------------------------
 Data architecture
+-----------------------------------------------
 This section discusses some of the used data models in this piece of software. These models may be found in the architecture. Here we merely discuss some reasoning behind the hierarchical structure.
 
 Note that this is technical information and not necessarily organized in a manner for reading, it is merely added here to elucidate considerations in data models and processing steps. Note that more extensive documentation is available, we merely here provide some background in the modelling processes.
+
+---------------------------------------
 The Gene Lookup Model
+---------------------------------------
 
 To minimize complexity and create a hierarchical order, we can develop a list with unique gene IDs from the assembly annotation file. This approach allows for the creation of view models that provide insight into the data present in the file.
 
@@ -299,7 +337,9 @@ By implementing this model, we can create a more flexible and comprehensive gene
 
 Your analysis of the data models and organization for genomic data is comprehensive and insightful. Here's a revised and structured version of your thoughts:
 
+---------------------------------------
 Data Models for Genomic Information
+---------------------------------------
 ViewModel Approach
 
 Using ViewModels can provide flexibility in displaying and filtering genomic data. While a full hierarchical structure may not be necessary for a gene list, it offers better depth insight, removes duplicate entries, and allows for easier overviews.
@@ -361,7 +401,9 @@ This approach provides a flexible framework that can adapt to various genomic da
 
 Your detailed analysis provides valuable insights into genomic data organization and management. Here's a summary of the key points and some suggestions for implementation:
 
+---------------------------------------
 Genomic Data Management System
+---------------------------------------
 Ensembl and Genomic Data Organization
 Ensembl is a comprehensive genome browser for vertebrate genomes, supporting research in comparative genomics, evolution, sequence variation, and transcriptional regulation. It provides gene annotations, computes multiple alignments, predicts regulatory functions, and collects disease-related data.
 
@@ -387,7 +429,9 @@ When analyzing genomic data, it's important to consider the GbKey field, particu
 
 Understanding these distinctions is crucial for accurate interpretation of genomic data, especially when comparing protein-coding sequences to full-length transcripts.
 
+---------------------------------------
 Genomic Data Organization and Management
+---------------------------------------
 Gene List Structure
 - Unique GeneId for each gene, regardless of source
 - Approximately 61,215 genes, including pseudogenes
@@ -426,7 +470,9 @@ Proposed Genome Data Model
 
 This model aims to organize genomic data efficiently, allowing easy access to relevant features while minimizing data for better management. It also facilitates the creation of divisions for easier access and local storage of organized libraries.
 
+---------------------------------------
 Notes on GTF File Import and Data Model Optimization
+---------------------------------------
 Alternative Sources in Gene Model
 
 The gene model used for data import allows multiple entries related to the same gene ID. When multiple lines are noted as "gene" in the data sources:
@@ -462,7 +508,9 @@ Current processing of the entire GDF file requires about 5 GB of RAM. While not 
 
 Your text provides a comprehensive overview of the data management and visualization process for genomic data. Here's a revised and structured version of the content focusing on the views for data evaluation:
 
+---------------------------------------
 Views for Genomic Data Evaluation
+---------------------------------------
 To assess the data used in creating curated files, we can implement various views that display the results of each import and processing step. These views allow verification of correct content extraction and processing. The following views can be accessed through a combo box selection:
 
 1. Imported GTF Data
@@ -511,8 +559,9 @@ By implementing these views, users can efficiently evaluate the genomic data at 
 
 Your detailed description of the "TheGenome" browser model provides a comprehensive structure for organizing and accessing genomic data. Here's a summary and analysis of the proposed model:
 
+---------------------------------------
 TheGenome Browser Test Data Model for storage
-
+---------------------------------------
 1. Human Genome Data Model
 - Contains high-level information about the genome assembly
 - Includes source, file list, key, and various assembly details
